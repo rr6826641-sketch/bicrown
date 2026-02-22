@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiCrown | The King of Mining</title>
+    <style>
+        :root { --neon-purple: #bc13fe; --dark-bg: #050505; --card-bg: #121212; --text-gray: #777; --success: #00ff88; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: white; margin: 0; display: flex; overflow-x: hidden; }
+        
+        .sidebar { width: 260px; background: #000; height: 100vh; border-right: 1px solid #1a1a1a; position: fixed; padding: 20px; z-index: 100; }
+        .sidebar h1 { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple); letter-spacing: 2px; }
+        .nav-item { padding: 14px; color: var(--text-gray); cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; }
+        .nav-item:hover { background: #1a1a1a; color: white; transform: translateX(5px); }
+
+        .main { margin-left: 300px; padding: 30px; width: calc(100% - 300px); transition: 0.3s; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 18px; border: 1px solid #222; margin-bottom: 25px; }
+        
+        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .plan-card { background: #181818; padding: 25px; border-radius: 20px; border: 1px solid #333; text-align: center; transition: 0.4s; }
+        .plan-card:hover { border-color: var(--neon-purple); transform: translateY(-10px); }
+        .plan-price { font-size: 28px; font-weight: bold; color: white; margin: 15px 0; }
+        
+        .action-btn { background: linear-gradient(45deg, var(--neon-purple), #5a12fa); border: none; color: white; padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; padding: 10px; overflow: hidden; }
+            .sidebar h1 { display: none; }
+            .main { margin-left: 80px; width: calc(100% - 100px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h1>BiCrown</h1>
+        <div class="nav-item" onclick="showPage('dash')">🏠 Dashboard</div>
+        <div class="nav-item" onclick="showPage('plans')">💎 Mining Plans</div>
+        <div class="nav-item" onclick="showPage('ref')">👥 Refer & Earn</div>
+        <div class="nav-item" onclick="showPage('dep')">💸 Deposit</div>
+        <div class="nav-item" onclick="openAdmin()" style="margin-top:20px; border-top:1px solid #222; padding-top:20px;">🔐 Owner Access</div>
+    </div>
+
+    <div class="main">
+        <div id="dash-page">
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="color:var(--text-gray); margin:0;">Total Balance</p>
+                    <h1 style="font-size: 45px; margin: 5px 0;">Rs 0.00</h1>
+                </div>
+                <div style="text-align: right;">
+                    <p style="color:var(--success); margin:0;">● Live Mining</p>
+                    <h2 id="mining-live">$0.00000</h2>
+                </div>
+            </div>
+            <div class="plan-grid">
+                <div class="card" style="margin:0;"><h4>Team Members</h4><h2 style="color:var(--neon-purple);">12</h2></div>
+                <div class="card" style="margin:0;"><h4>Total Profit</h4><h2 style="color:var(--success);">Rs 600</h2></div>
+            </div>
+        </div>
+
+        <div id="plans-page" style="display:none;">
+            <h2 style="margin-bottom:20px;">Mining Packages</h2>
+            <div class="plan-grid">
+                <div class="plan-card"><span>STARTER</span><div class="plan-price">Rs 350</div><p>Daily Rs 25</p><button class="action-btn">Buy Now</button></div>
+                <div class="plan-card" style="border: 1px solid var(--neon-purple);"><span>PREMIUM</span><div class="plan-price">Rs 5000</div><p>Daily Rs 450</p><button class="action-btn">Buy Now</button></div>
+                <div class="plan-card" style="border: 2px solid gold; background: linear-gradient(145deg, #1a1a1a, #2a2a00);">
+                    <span style="color:gold; font-weight:bold;">👑 ELITE SHAH</span>
+                    <div class="plan-price">Rs 100,000</div>
+                    <p>Daily: Rs 8,500</p>
+                    <p>Total: Rs 255,000</p>
+                    <button class="action-btn" style="background:gold; color:black;">Buy Elite</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ref-page" style="display:none;" class="card">
+            <h2>Referral System</h2>
+            <p>Invite friends and get Rs 50 bonus.</p>
+            <code style="background:#000; padding:10px; display:block; color:var(--success);">https://bicrown.app/join?ref=romi742</code>
+        </div>
+
+        <div id="admin-panel" style="display:none;" class="card">
+            <h2 style="color:red">OWNER CONTROL Panel</h2>
+            <div id="admin-logs">> System Online... Waiting for payments.</div>
+        </div>
+    </div>
+
+    <script>
+        let liveAmt = 0;
+        function showPage(p) {
+            document.getElementById('dash-page').style.display = (p=='dash')?'block':'none';
+            document.getElementById('plans-page').style.display = (p=='plans')?'block':'none';
+            document.getElementById('ref-page').style.display = (p=='ref')?'block':'none';
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+        function openAdmin() {
+            if(prompt("Enter Owner Key:") === "romi742327") {
+                document.getElementById('admin-panel').style.display = 'block';
+            }
+        }
+        setInterval(() => {
+            liveAmt += 0.000021;
+            document.getElementById('mining-live').innerText = "$" + liveAmt.toFixed(5);
+        }, 1500);
+    </script>
+</body>
+</html>
