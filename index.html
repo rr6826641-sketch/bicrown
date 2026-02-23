@@ -2,125 +2,204 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiCrown | Official Mining</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BiCrown | Official Investment</title>
     <style>
-        :root { --gold: #ffd700; --neon: #bc13fe; --dark: #050505; --card: #121212; --success: #00ff88; }
-        body { font-family: 'Inter', sans-serif; background: var(--dark); color: white; margin: 0; display: flex; overflow-x: hidden; }
-        .sidebar { width: 260px; background: #000; height: 100vh; border-right: 1px solid #222; position: fixed; padding: 20px; display: flex; flex-direction: column; z-index: 100; }
-        .profile { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #222; }
-        .profile img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold); }
-        .nav-item { padding: 15px; color: #888; cursor: pointer; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover, .nav-item.active { background: #1a1a1a; color: white; border-left: 4px solid var(--gold); }
-        .main { margin-left: 280px; padding: 30px; width: 100%; }
-        .hero-card { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); padding: 35px; border-radius: 25px; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; }
-        .balance-val { font-size: 50px; color: var(--gold); font-weight: bold; font-family: 'Courier New', monospace; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #222; transition: 0.3s; }
-        .ad-banner { background: #1a1a1a; border: 1px solid #444; padding: 15px; border-radius: 12px; margin-bottom: 25px; text-align: center; color: #888; font-size: 14px; }
-        .ad-banner span { color: var(--success); font-weight: bold; animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-gold { background: var(--gold); color: black; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
-        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
+        :root { --gold: #ffd700; --purple: #bc13fe; --dark: #000; --card: #111; --success: #00ff88; }
+        body { font-family: 'Inter', sans-serif; background: var(--dark); color: white; margin: 0; padding-bottom: 90px; }
+        
+        /* Navigation */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #080808; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { color: #555; text-align: center; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--gold); }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+        /* Pages */
+        .page { display: none; padding: 15px; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* UI Elements */
+        .card { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #222; margin-bottom: 15px; position: relative; }
+        .balance-val { font-size: 38px; font-weight: bold; color: var(--gold); margin: 10px 0; }
+        
+        input, select { width: 100%; padding: 15px; background: #080808; border: 1px solid #333; border-radius: 12px; color: white; margin: 10px 0; outline: none; }
+        .btn-gold { width: 100%; padding: 16px; background: linear-gradient(45deg, var(--gold), #b8860b); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: black; }
+        
+        .rank-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; background: rgba(255, 215, 0, 0.1); color: var(--gold); font-size: 12px; border: 1px solid var(--gold); }
+        .level-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="profile">
-            <img src="https://img.icons8.com/color/144/crown.png" alt="BiCrown">
-            <h3 style="margin: 10px 0 5px; color: var(--gold);">BiCrown</h3>
-            <span style="font-size: 12px; color: var(--success);">✓ Verified Owner</span>
+    <header style="padding: 15px; display: flex; align-items: center; justify-content: space-between; background: #080808;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div style="position:relative;">
+                <img id="u-img" src="https://i.pravatar.cc/100" style="width:50px; height:50px; border-radius:50%; border:2px solid var(--gold);">
+                <input type="file" id="up-img" style="display:none;" onchange="updateImg(event)">
+                <label for="up-img" style="position:absolute; bottom:0; right:0; background:var(--gold); border-radius:50%; width:18px; height:18px; text-align:center; font-size:12px; color:black; cursor:pointer;">✎</label>
+            </div>
+            <div>
+                <div style="font-weight:bold; font-size: 16px;">BiCrown User</div>
+                <div class="rank-badge">Rank: Bronze Miner</div>
+            </div>
         </div>
-        <div class="nav-item active" onclick="showPage('dash')">📊 Dashboard</div>
-        <div class="nav-item" onclick="showPage('plans')">💎 Mining Plans</div>
-        <div class="nav-item" onclick="showPage('wallet')">💰 Wallet (Deposit)</div>
-        <div class="nav-item" onclick="showPage('ref')">👥 Referrals</div>
-        <div class="nav-item" style="margin-top: auto; color: red;" onclick="location.reload()">🚪 Logout</div>
+        <div style="font-size:12px; text-align:right; color: #888;">UID: BC-99201<br><span style="color:var(--success)">● Active</span></div>
+    </header>
+
+    <div id="p-home" class="page active">
+        <div class="card" style="background: linear-gradient(135deg, #1a1a1a, #000); border-color: var(--gold);">
+            <p style="color:#888; margin:0;">BiCrown Available Balance</p>
+            <div class="balance-val">Rs <span id="main-bal">0.00</span></div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                <span>Deposited: Rs 0.00</span>
+                <span>Withdrawn: Rs 0.00</span>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 25px;">Start Investment</h3>
+        <div class="card">
+            <label style="font-size: 12px; color: #888;">Investment Amount (PKR):</label>
+            <input type="number" id="lock-amt" placeholder="Minimum Rs 350">
+            <label style="font-size: 12px; color: #888;">Select Lock Period:</label>
+            <select id="lock-time">
+                <option value="3">3 Days (Profit 3%)</option>
+                <option value="7">1 Week (Profit 8%)</option>
+                <option value="14">2 Weeks (Profit 18%)</option>
+                <option value="30">1 Month (Profit 45%)</option>
+                <option value="60">2 Months (Profit 100%)</option>
+                <option value="90">3 Months (Profit 160%)</option>
+            </select>
+            <button class="btn-gold" onclick="investNow()">Activate Lock & Earn</button>
+        </div>
     </div>
 
-    <div class="main">
-        <div class="ad-banner">
-            📢 AD: <span>Cloud Mining Hashrate +15%</span> | Secure your profits with BiCrown!
-        </div>
-
-        <div id="dash-page">
-            <div class="hero-card">
-                <p style="color: #888; margin: 0;">Main Mining Balance</p>
-                <div class="balance-val">Rs <span id="growing-bal">350.00</span></div>
-                <p style="color: var(--success); margin: 5px 0;">● Cloud Miner Active</p>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn btn-gold" onclick="showPage('wallet')">Deposit</button>
-                    <button class="btn" style="background:#222; color:white;" onclick="showPage('ref')">Refer Friends</button>
-                </div>
+    <div id="p-dep" class="page">
+        <h2>Recharge BiCrown</h2>
+        <div id="dep-step-1">
+            <p style="color: #888;">Select your payment method:</p>
+            <div class="card" onclick="setMet('Easypaisa')" style="cursor:pointer; display: flex; align-items: center; gap: 10px;">
+                <img src="https://img.icons8.com/color/48/wallet.png" width="30"> Easypaisa
             </div>
-            <div class="grid">
-                <div class="card"><h4>Earnings</h4><h2 style="color: var(--success);">+ Rs 85.20</h2></div>
-                <div class="card"><h4>Hashrate</h4><h2 style="color: var(--gold);">18.2 TH/s</h2></div>
+            <div class="card" onclick="setMet('JazzCash')" style="cursor:pointer; display: flex; align-items: center; gap: 10px;">
+                <img src="https://img.icons8.com/color/48/bank-card-back-side.png" width="30"> JazzCash
             </div>
         </div>
-
-        <div id="wallet-page" style="display:none;">
-            <div class="card">
-                <h2 style="color: var(--gold);">Deposit Funds</h2>
-                <div style="background: #000; padding: 20px; border-radius: 15px; border: 1px dashed var(--gold); margin-bottom: 20px;">
-                    <p style="font-size: 18px; margin: 5px 0;"><strong>Easypaisa:</strong> 03431793371</p>
-                    <p style="font-size: 18px; margin: 5px 0;"><strong>Account Name:</strong> Bus Pari</p>
-                </div>
-                <input type="number" id="d-amt" placeholder="Amount (Rs)">
-                <input type="text" id="d-trx" placeholder="TRX ID">
-                <button class="btn btn-gold" onclick="sendAdmin()">Submit Deposit</button>
+        <div id="dep-step-2" style="display:none;">
+            <div class="card" style="border: 1px dashed var(--gold); background: #080808;">
+                <p>Send Payment To:</p>
+                <h2 id="acc-name" style="color: var(--gold); margin: 5px 0;">---</h2>
+                <h3 id="acc-num" style="margin: 0;">---</h3>
             </div>
-        </div>
-
-        <div id="plans-page" style="display:none;">
-            <h2>Mining Plans</h2>
-            <div class="grid" id="plan-list"></div>
-        </div>
-
-        <div id="ref-page" style="display:none;">
-            <div class="card"><h2>Referral Link</h2><p>Invite and earn 10% bonus!</p><div style="background:#000; padding:10px; border-radius:5px; border:1px solid #333; color:var(--success);">https://bicrown-mining.netlify.app/join?id=user742</div></div>
+            <input type="number" id="d-amt" placeholder="Enter Sent Amount">
+            <input type="text" id="d-trx" placeholder="Transaction ID (TRX)">
+            <p style="font-size:12px; color: #888;">Upload Screenshot Proof:</p>
+            <input type="file" style="border: none; padding: 0;">
+            <button class="btn-gold" onclick="submitDeposit()">Submit Proof</button>
         </div>
     </div>
+
+    <div id="p-team" class="page">
+        <h2>Referral Network (18 Levels)</h2>
+        <div class="card">
+            <p style="font-size: 12px; color: #888;">Your Invite Link:</p>
+            <div style="background:#000; padding:12px; border-radius:8px; border:1px solid #333; font-size:11px; color: var(--success);" id="ref-link">
+                https://bicrown-mining.netlify.app/join?ref=BC78402
+            </div>
+            <button class="btn-gold" style="margin-top: 10px; padding: 10px; font-size: 12px;" onclick="alert('Copied!')">Copy Link</button>
+        </div>
+        <div id="levels-list">
+            </div>
+    </div>
+
+    <div id="p-with" class="page">
+        <h2>Withdraw Funds</h2>
+        <div class="card">
+            <select id="w-m">
+                <option>Easypaisa</option>
+                <option>JazzCash</option>
+            </select>
+            <input type="number" placeholder="Withdraw Amount">
+            <input type="text" placeholder="Account Number">
+            <input type="text" placeholder="Account Holder Name">
+            <p style="font-size:11px; color:var(--gold);">*Withdrawals are processed within 24 hours.</p>
+            <button class="btn-gold" onclick="alert('Withdrawal request submitted successfully!')">Confirm Withdraw</button>
+        </div>
+    </div>
+
+    <div id="p-acc" class="page">
+        <h2>User Settings</h2>
+        <div class="card">
+            <div class="level-row"><span>Total Profit Earned</span><span style="color:var(--success)">Rs 0.00</span></div>
+            <div class="level-row"><span>Current Rank</span><span style="color:var(--gold)">Bronze Miner</span></div>
+            <div class="level-row"><span>Personal Info</span><span>Edit ❯</span></div>
+            <div class="level-row"><span>Security & Password</span><span>Change ❯</span></div>
+        </div>
+        <button class="btn-gold" style="background: #222; color: red; border: 1px solid red;" onclick="location.reload()">Logout Account</button>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="nav('home', this)"><span class="nav-icon">🏠</span>Home</div>
+        <div class="nav-item" onclick="nav('dep', this)"><span class="nav-icon">💳</span>Deposit</div>
+        <div class="nav-item" onclick="nav('team', this)"><span class="nav-icon">👥</span>Team</div>
+        <div class="nav-item" onclick="nav('with', this)"><span class="nav-icon">💰</span>Withdraw</div>
+        <div class="nav-item" onclick="nav('acc', this)"><span class="nav-icon">⚙️</span>Settings</div>
+    </nav>
 
     <script>
-        // Balance Growing Logic
-        let bal = 350.00;
-        setInterval(() => { bal += 0.08; document.getElementById('growing-bal').innerText = bal.toFixed(2); }, 2500);
-
-        function showPage(p) {
-            ['dash-page', 'wallet-page', 'ref-page', 'plans-page'].forEach(id => document.getElementById(id).style.display = 'none');
-            document.getElementById(p + '-page').style.display = 'block';
+        function nav(p, el) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById('p-' + p).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+            window.scrollTo(0,0);
         }
 
-        // --- UPDATED PLANS: 350, 700, 1000 and more ---
-        const planList = document.getElementById('plan-list');
-        const startPlans = [
-            { name: "Starter", price: 350, daily: 30 },
-            { name: "Basic", price: 700, daily: 65 },
-            { name: "Standard", price: 1000, daily: 100 }
-        ];
-
-        startPlans.forEach(p => {
-            planList.innerHTML += `<div class="card" style="text-align:center; border-color:var(--gold);"><h3>${p.name}</h3><h2 style="color:var(--gold)">Rs ${p.price}</h2><p style="color:var(--success)">Daily: Rs ${p.daily}</p><button class="btn btn-gold" onclick="showPage('wallet')">Activate</button></div>`;
-        });
-
-        for(let i=1; i<=20; i++) {
-            let p = 1000 + (i*500);
-            planList.innerHTML += `<div class="card" style="text-align:center;"><h3>Pro v${i}</h3><h2>Rs ${p}</h2><p style="color:var(--success)">Daily: Rs ${Math.floor(p*0.09)}</p><button class="btn btn-gold" onclick="showPage('wallet')">Activate</button></div>`;
+        function updateImg(e) {
+            const r = new FileReader();
+            r.onload = () => document.getElementById('u-img').src = r.result;
+            r.readAsDataURL(e.target.files[0]);
         }
 
-        function sendAdmin() {
-            const token = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
-            const chat = "7005219148";
-            const amt = document.getElementById('d-amt').value;
-            const trx = document.getElementById('d-trx').value;
-            if(amt && trx) {
-                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=💰 *NEW DEPOSIT*%0AAccount: Bus Pari%0AAmount: Rs ${amt}%0ATRX: ${trx}&parse_mode=Markdown`)
-                .then(() => alert("Request Sent!"));
-            }
+        let currentMet = '';
+        function setMet(m) {
+            currentMet = m;
+            document.getElementById('dep-step-1').style.display = 'none';
+            document.getElementById('dep-step-2').style.display = 'block';
+            document.getElementById('acc-name').innerText = m === 'Easypaisa' ? 'Bus Pari' : 'Shahid Anwar';
+            document.getElementById('acc-num').innerText = m === 'Easypaisa' ? '03431793371' : '03020928966';
+        }
+
+        function submitDeposit() {
+            const a = document.getElementById('d-amt').value;
+            const t = document.getElementById('d-trx').value;
+            if(a && t) {
+                const token = "8494802061:AAHOhQJElPVkOqCuyZ0cP5PKL3k0_P50dDE";
+                const chat = "7005219148";
+                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=👑 *BiCrown Deposit Request*%0AMethod: ${currentMet}%0AAmount: Rs ${a}%0ATRX: ${t}&parse_mode=Markdown`)
+                .then(() => { alert("Submission Successful! We will verify within 30 minutes."); location.reload(); });
+            } else { alert("Please enter amount and TRX ID."); }
+        }
+
+        // 18 Levels Display
+        const teamDiv = document.getElementById('levels-list');
+        for(let i=1; i<=18; i++) {
+            teamDiv.innerHTML += `<div class="level-row"><span>Level ${i} Team Reward</span><span style="color:var(--purple)">${(12 - i*0.6).toFixed(1)}%</span></div>`;
+        }
+
+        // Balanced Profit Simulation
+        let bal = 0;
+        setInterval(() => {
+            bal += 0.01; // Bohat slow barhay ga taake real lage
+            document.getElementById('main-bal').innerText = bal.toFixed(2);
+        }, 5000);
+
+        function investNow() {
+            const amt = document.getElementById('lock-amt').value;
+            const days = document.getElementById('lock-time').value;
+            if(amt >= 350) {
+                alert(`Rs ${amt} has been locked for ${days} days in BiCrown System. Profit will credit upon maturity.`);
+            } else { alert("Minimum investment is Rs 350"); }
         }
     </script>
 </body>
