@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aviator Official Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0b0f1a; color: white; font-family: 'Inter', sans-serif; }
+        .radar-line { width: 2px; background: rgba(239, 68, 68, 0.5); position: absolute; }
+    </style>
+</head>
+<body class="p-10 flex flex-col items-center">
+    <div class="w-full max-w-4xl flex justify-between mb-10 bg-slate-900 p-5 rounded-2xl border border-slate-800">
+        <div><p class="text-slate-400 text-sm font-bold">WALLET</p><h2 id="bal" class="text-2xl text-emerald-400 font-black">$1,000.00</h2></div>
+        <div class="text-right"><p class="text-slate-400 text-sm font-bold">STATUS</p><h2 id="net" class="text-emerald-500 font-bold">SERVER LIVE</h2></div>
+    </div>
+
+    <div class="relative w-full max-w-4xl h-80 bg-slate-900 rounded-3xl border-2 border-slate-800 overflow-hidden flex items-center justify-center">
+        <div id="mult" class="text-8xl font-black italic tracking-tighter transition-all duration-75">1.00x</div>
+        <div id="plane-icon" class="absolute bottom-10 left-10 transition-all duration-100 hidden">✈️</div>
+    </div>
+
+    <div class="mt-8 w-full max-w-4xl grid grid-cols-2 gap-4">
+        <input type="number" id="amt" value="10" class="bg-slate-800 p-5 rounded-2xl text-xl outline-none border border-slate-700 focus:border-red-500 transition-all">
+        <button onclick="play()" id="pBtn" class="bg-red-600 hover:bg-red-700 rounded-2xl text-2xl font-black transition-all shadow-lg shadow-red-900/20">BET</button>
+    </div>
+
+    <script>
+        let balance = 1000, playing = false, mult = 1.0, crash = 0;
+
+        // --- BOT BRIDGE: Yeh data aapki APK uthaigi ---
+        window.GameData = {
+            getLiveCrash: () => crash, 
+            isGameActive: () => playing
+        };
+
+        function play() {
+            if(playing) { cashout(); return; }
+            let bet = parseFloat(document.getElementById('amt').value);
+            if(bet > balance) return alert("Low Balance!");
+
+            playing = true;
+            mult = 1.0;
+            crash = (Math.random() * 4 + 1.1).toFixed(2); // Prediction point
+            
+            document.getElementById('pBtn').innerText = "CASH OUT";
+            document.getElementById('pBtn').classList.replace('bg-red-600', 'bg-emerald-600');
+
+            let timer = setInterval(() => {
+                mult += 0.01;
+                document.getElementById('mult').innerText = mult.toFixed(2) + "x";
+                if(mult >= crash) { clearInterval(timer); end(false); }
+            }, 60);
+            window.activeGame = timer;
+        }
+
+        function cashout() {
+            if(!playing) return;
+            playing = false;
+            clearInterval(window.activeGame);
+            let bet = parseFloat(document.getElementById('amt').value);
+            balance += (bet * mult) - bet;
+            updateUI();
+            reset();
+        }
+
+        function end(win) {
+            playing = false;
+            let bet = parseFloat(document.getElementById('amt').value);
+            if(!win) {
+                balance -= bet;
+                document.getElementById('mult').innerText = "CRASHED @ " + crash + "x";
+                document.getElementById('mult').classList.add('text-red-600');
+            }
+            updateUI();
+            setTimeout(reset, 2000);
+        }
+
+        function updateUI() { document.getElementById('bal').innerText = "$" + balance.toFixed(2); }
+        function reset() {
+            document.getElementById('mult').classList.remove('text-red-600');
+            document.getElementById('mult').innerText = "1.00x";
+            document.getElementById('pBtn').innerText = "BET";
+            document.getElementById('pBtn').classList.replace('bg-emerald-600', 'bg-red-600');
+        }
+    </script>
+</body>
+</html>
