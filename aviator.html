@@ -2,87 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Aviator Official Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator VIP Official</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0b0f1a; color: white; font-family: 'Inter', sans-serif; }
-        .radar-line { width: 2px; background: rgba(239, 68, 68, 0.5); position: absolute; }
+        body { background: #0b0f1a; font-family: 'Inter', sans-serif; overflow: hidden; color: white; }
+        .game-area { background: #131722; position: relative; border-radius: 20px; border: 2px solid #2d3343; overflow: hidden; height: 380px; width: 100%; max-width: 800px; }
+        .grid-bg { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(#1e222d 1.5px, transparent 1.5px), linear-gradient(90deg, #1e222d 1.5px, transparent 1.5px); background-size: 50px 50px; transform: translate(-25%, -25%); z-index: 1; }
+        #plane { position: absolute; bottom: 30px; left: 30px; font-size: 45px; z-index: 10; transition: transform 0.1s linear; display: none; filter: drop-shadow(0 0 15px red); transform-origin: center; }
+        .multiplier { font-size: 80px; font-weight: 900; z-index: 20; text-shadow: 0 0 30px rgba(255,255,255,0.4); font-style: italic; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); }
+        .bet-btn-active { background: #facc15 !important; color: black !important; border-bottom: 5px solid #ca8a04 !important; }
+        .crashed-red { color: #ef4444; animation: shake 0.2s ease-in-out infinite; }
+        @keyframes shake { 0% { transform: translate(-50%, -50%) rotate(0deg); } 50% { transform: translate(-50%, -50%) rotate(1deg); } 100% { transform: translate(-50%, -50%) rotate(-1deg); } }
     </style>
 </head>
-<body class="p-10 flex flex-col items-center">
-    <div class="w-full max-w-4xl flex justify-between mb-10 bg-slate-900 p-5 rounded-2xl border border-slate-800">
-        <div><p class="text-slate-400 text-sm font-bold">WALLET</p><h2 id="bal" class="text-2xl text-emerald-400 font-black">$1,000.00</h2></div>
-        <div class="text-right"><p class="text-slate-400 text-sm font-bold">STATUS</p><h2 id="net" class="text-emerald-500 font-bold">SERVER LIVE</h2></div>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-[800px] flex justify-between p-4 bg-slate-900 rounded-xl mb-4 border border-slate-800 shadow-2xl">
+        <div><p class="text-[10px] text-slate-500 uppercase tracking-widest">Balance</p><h2 id="bal" class="text-xl text-emerald-400 font-black">$1,000.00</h2></div>
+        <div class="text-right"><p class="text-[10px] text-slate-500 uppercase tracking-widest">Status</p><h2 class="text-emerald-500 font-bold text-xs flex items-center gap-1"> <span class="animate-pulse">●</span> LIVE SERVER</h2></div>
     </div>
 
-    <div class="relative w-full max-w-4xl h-80 bg-slate-900 rounded-3xl border-2 border-slate-800 overflow-hidden flex items-center justify-center">
-        <div id="mult" class="text-8xl font-black italic tracking-tighter transition-all duration-75">1.00x</div>
-        <div id="plane-icon" class="absolute bottom-10 left-10 transition-all duration-100 hidden">✈️</div>
+    <div class="game-area shadow-inner">
+        <div class="grid-bg" id="grid"></div>
+        <div id="plane">✈️</div>
+        <div id="mult" class="multiplier">1.00x</div>
     </div>
 
-    <div class="mt-8 w-full max-w-4xl grid grid-cols-2 gap-4">
-        <input type="number" id="amt" value="10" class="bg-slate-800 p-5 rounded-2xl text-xl outline-none border border-slate-700 focus:border-red-500 transition-all">
-        <button onclick="play()" id="pBtn" class="bg-red-600 hover:bg-red-700 rounded-2xl text-2xl font-black transition-all shadow-lg shadow-red-900/20">BET</button>
+    <div class="w-full max-w-[800px] grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <div class="bg-slate-900 p-5 rounded-3xl flex flex-col gap-3 border border-slate-800 shadow-xl">
+            <div class="flex items-center justify-between bg-slate-950 p-1 rounded-full border border-slate-700">
+                <button onclick="changeAmt(-10)" class="w-10 h-10 rounded-full bg-slate-800 text-xl font-bold">-</button>
+                <input type="number" id="amt" value="10" class="bg-transparent text-center text-2xl font-black outline-none w-24">
+                <button onclick="changeAmt(10)" class="w-10 h-10 rounded-full bg-slate-800 text-xl font-bold">+</button>
+            </div>
+            <button onclick="handleAction()" id="pBtn" class="bg-red-600 hover:bg-red-700 p-5 rounded-2xl text-3xl font-black transition-all shadow-[0_6px_0_rgb(153,27,27)] active:shadow-none active:translate-y-1 uppercase tracking-tighter">BET</button>
+        </div>
+        
+        <div class="bg-slate-900 p-5 rounded-3xl border border-slate-800 hidden md:block">
+            <p class="text-[10px] text-slate-500 mb-3 font-bold italic tracking-widest">NETWORK LIVE BETS</p>
+            <div class="h-28 overflow-hidden flex flex-col gap-2" id="fakeBets"></div>
+        </div>
     </div>
 
     <script>
-        let balance = 1000, playing = false, mult = 1.0, crash = 0;
+        let balance = 1000, playing = false, mult = 1.0, crashPoint = 0, timer, betAmount = 0;
 
-        // --- BOT BRIDGE: Yeh data aapki APK uthaigi ---
-        window.GameData = {
-            getLiveCrash: () => crash, 
-            isGameActive: () => playing
-        };
+        window.GameData = { getLiveCrash: () => crashPoint, isGameActive: () => playing };
 
-        function play() {
-            if(playing) { cashout(); return; }
-            let bet = parseFloat(document.getElementById('amt').value);
-            if(bet > balance) return alert("Low Balance!");
+        function changeAmt(val) {
+            let input = document.getElementById('amt');
+            input.value = Math.max(10, parseInt(input.value) + val);
+        }
 
-            playing = true;
-            mult = 1.0;
-            crash = (Math.random() * 4 + 1.1).toFixed(2); // Prediction point
+        function handleAction() {
+            if (!playing) { startBet(); } else { cashout(); }
+        }
+
+        function startBet() {
+            betAmount = parseFloat(document.getElementById('amt').value);
+            if (betAmount > balance) return alert("Insufficient Balance!");
             
-            document.getElementById('pBtn').innerText = "CASH OUT";
-            document.getElementById('pBtn').classList.replace('bg-red-600', 'bg-emerald-600');
+            playing = true; mult = 1.0;
+            crashPoint = (Math.random() * 3.5 + 1.15).toFixed(2);
+            
+            const btn = document.getElementById('pBtn');
+            btn.classList.add('bet-btn-active');
+            btn.innerHTML = `CASHOUT<br><span id="profit" class="text-sm">PROFIT: $0.00</span>`;
+            
+            document.getElementById('plane').style.display = 'block';
+            document.getElementById('mult').classList.remove('crashed-red');
 
-            let timer = setInterval(() => {
+            timer = setInterval(() => {
                 mult += 0.01;
                 document.getElementById('mult').innerText = mult.toFixed(2) + "x";
-                if(mult >= crash) { clearInterval(timer); end(false); }
+                document.getElementById('profit').innerText = "PROFIT: $" + (betAmount * mult).toFixed(2);
+
+                let posX = (mult * 35); let posY = (mult * 22);
+                document.getElementById('plane').style.transform = `translate(${posX}px, -${posY}px) rotate(-15deg)`;
+                document.getElementById('grid').style.transform = `translate(-${25 + posX/8}%, -${25 - posY/8}%)`;
+
+                if (mult >= crashPoint) { stopGame(false); }
             }, 60);
-            window.activeGame = timer;
         }
 
         function cashout() {
-            if(!playing) return;
-            playing = false;
-            clearInterval(window.activeGame);
-            let bet = parseFloat(document.getElementById('amt').value);
-            balance += (bet * mult) - bet;
-            updateUI();
-            reset();
+            if (!playing) return;
+            balance += (betAmount * mult) - betAmount;
+            stopGame(true);
         }
 
-        function end(win) {
-            playing = false;
-            let bet = parseFloat(document.getElementById('amt').value);
-            if(!win) {
-                balance -= bet;
-                document.getElementById('mult').innerText = "CRASHED @ " + crash + "x";
-                document.getElementById('mult').classList.add('text-red-600');
+        function stopGame(isWin) {
+            clearInterval(timer); playing = false;
+            const btn = document.getElementById('pBtn');
+            btn.classList.remove('bet-btn-active');
+            btn.innerText = "BET";
+
+            if (!isWin) {
+                balance -= betAmount;
+                document.getElementById('mult').innerText = "FLEW AWAY!";
+                document.getElementById('mult').classList.add('crashed-red');
+                document.getElementById('plane').style.display = 'none';
+            } else {
+                // Plane keeps flying after cashout until crash
+                let finalTimer = setInterval(() => {
+                    mult += 0.01;
+                    let posX = (mult * 35); let posY = (mult * 22);
+                    document.getElementById('plane').style.transform = `translate(${posX}px, -${posY}px) rotate(-15deg)`;
+                    if(mult >= crashPoint) {
+                        clearInterval(finalTimer);
+                        document.getElementById('plane').style.display = 'none';
+                    }
+                }, 60);
             }
             updateUI();
-            setTimeout(reset, 2000);
         }
 
         function updateUI() { document.getElementById('bal').innerText = "$" + balance.toFixed(2); }
-        function reset() {
-            document.getElementById('mult').classList.remove('text-red-600');
-            document.getElementById('mult').innerText = "1.00x";
-            document.getElementById('pBtn').innerText = "BET";
-            document.getElementById('pBtn').classList.replace('bg-emerald-600', 'bg-red-600');
-        }
+
+        // Professional Fake Bets System
+        setInterval(() => {
+            const names = ["Jani_01", "Raja_G", "Khan_786", "VIP_Player", "Winner_99"];
+            const name = names[Math.floor(Math.random() * names.length)];
+            const winAmt = (Math.random() * 500 + 50).toFixed(2);
+            const div = document.createElement('div');
+            div.className = "flex justify-between text-[11px] animate-pulse bg-slate-950/50 p-2 rounded-lg";
+            div.innerHTML = `<span class="text-slate-400 font-mono">${name}</span> <span class="text-emerald-400 font-black">+$${winAmt}</span>`;
+            const list = document.getElementById('fakeBets');
+            list.prepend(div);
+            if(list.children.length > 4) list.lastChild.remove();
+        }, 2500);
     </script>
 </body>
 </html>
