@@ -3,160 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZS999 ULTRA - GLOBAL PLATFORM</title>
+    <title>ZS999 VIP - FINAL SYSTEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600;900&display=swap');
-        
-        body { background: #05080f; color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
-        .neon-text { text-shadow: 0 0 10px #facc15, 0 0 20px #facc15; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .glass-card:hover { border-color: #facc15; transform: translateY(-5px); }
-        
-        /* Sidebar/Menu Animation */
-        #sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(-100%); }
-        #sidebar.open { transform: translateX(0); }
-
-        /* Game Icons Glow */
-        .game-icon { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; }
-        .hot-label { position: absolute; top: 8px; left: 8px; background: linear-gradient(to right, #ef4444, #f59e0b); font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 900; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;700;900&display=swap');
+        body { background: #070a13; color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        .modal-screen { position: fixed; inset: 0; background: #070a13; z-index: 1000; display: none; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .pay-input { background: #131722; border: 1px solid #1e293b; padding: 12px; border-radius: 10px; width: 100%; color: white; outline: none; margin-top: 8px; }
+        .method-btn { border: 1px solid #1e293b; padding: 12px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
+        .method-btn.active { border-color: #facc15; background: rgba(250, 204, 21, 0.1); color: #facc15; }
     </style>
 </head>
 <body>
 
-    <nav class="sticky top-0 z-50 bg-[#0b0f1a] border-b border-slate-800 p-4 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <i onclick="toggleMenu()" class="fas fa-bars text-xl text-yellow-500 cursor-pointer"></i>
-            <h1 class="text-2xl font-black italic text-yellow-500 tracking-tighter neon-text" style="font-family: 'Orbitron';">ZS999</h1>
-        </div>
+    <nav class="p-4 flex justify-between items-center border-b border-slate-800 bg-[#0b0f1a]">
+        <h1 class="text-2xl font-black text-yellow-500 italic" style="font-family: 'Orbitron';">ZS999</h1>
         <div class="flex items-center gap-3">
-            <div class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-lg flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">$<span id="main-balance">520.00</span></span>
+            <div class="bg-slate-900 px-3 py-1 rounded-lg border border-slate-700 font-bold text-emerald-400">
+                $<span id="balance">520.00</span>
             </div>
-            <button onclick="showAction('Deposit')" class="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-4 py-1.5 rounded-md text-xs uppercase transition">Deposit</button>
+            <button onclick="openScreen('deposit-screen')" class="bg-emerald-500 text-black font-black px-4 py-1.5 rounded-md text-xs">DEPOSIT</button>
         </div>
     </nav>
 
-    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] z-[60] p-6 shadow-2xl border-r border-slate-800">
-        <div class="flex justify-between items-center mb-10">
-            <span class="font-black text-yellow-500">MENU</span>
-            <i onclick="toggleMenu()" class="fas fa-times text-xl cursor-pointer"></i>
+    <div class="p-4">
+        <div onclick="alert('Launching Game...')" class="bg-slate-900 p-4 rounded-3xl border border-slate-800 flex items-center justify-between mb-6">
+            <div>
+                <h3 class="font-black text-xl">AVIATOR VIP</h3>
+                <p class="text-xs text-gray-500">99.9% Winning Rate</p>
+            </div>
+            <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="w-20">
         </div>
-        <div class="space-y-6">
-            <div onclick="location.reload()" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-home"></i> Home</div>
-            <div onclick="showAction('Profile')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-user"></i> My Profile</div>
-            <div onclick="showAction('Wallet')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-wallet"></i> Wallet</div>
-            <div onclick="showAction('Withdraw')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-money-bill-wave"></i> Withdraw</div>
-            <div onclick="showAction('Support')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-headset"></i> 24/7 Support</div>
+
+        <button onclick="openScreen('withdraw-screen')" class="w-full bg-slate-800 py-4 rounded-2xl flex items-center justify-center gap-3 font-bold">
+            <i class="fas fa-wallet text-yellow-500"></i> Withdraw Funds
+        </button>
+    </div>
+
+    <div id="deposit-screen" class="modal-screen">
+        <div class="p-4 flex items-center gap-4 border-b border-slate-800">
+            <i onclick="closeScreen('deposit-screen')" class="fas fa-arrow-left"></i>
+            <span class="font-black uppercase">Send Payment</span>
+        </div>
+        <div class="p-6 space-y-6">
+            <div class="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-2xl">
+                <p class="text-[10px] text-yellow-500 font-black uppercase mb-2">Transfer to this account:</p>
+                <h2 class="text-xl font-black">03xx-xxxxxxx</h2> <p class="text-sm font-bold opacity-70">Account Name: YOUR NAME</p> </div>
+            <input type="number" id="dep-amt" class="pay-input" placeholder="Enter Amount Sent">
+            <input type="text" class="pay-input" placeholder="Transaction ID (TID)">
+            <button onclick="processDep()" class="w-full bg-yellow-500 text-black font-black py-4 rounded-xl mt-4">I HAVE SENT MONEY</button>
         </div>
     </div>
 
-    <main class="p-4 space-y-6">
-        
-        <div class="w-full h-40 rounded-3xl overflow-hidden relative">
-            <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="w-full h-full object-cover opacity-50">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#05080f] to-transparent"></div>
-            <div class="absolute bottom-4 left-6">
-                <h2 class="text-2xl font-black uppercase italic">Mega Bonus!</h2>
-                <p class="text-emerald-400 font-bold text-sm">Get 200% on your first deposit</p>
-            </div>
+    <div id="withdraw-screen" class="modal-screen">
+        <div class="p-4 flex items-center gap-4 border-b border-slate-800">
+            <i onclick="closeScreen('withdraw-screen')" class="fas fa-arrow-left"></i>
+            <span class="font-black">WITHDRAWAL REQUEST</span>
         </div>
-
-        <div>
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-black uppercase tracking-widest text-gray-400"><i class="fas fa-fire text-red-500 mr-2"></i> Hot Games</h3>
-                <span class="text-xs text-yellow-500 font-bold">See All</span>
+        <div class="p-6 space-y-4">
+            <p class="text-xs font-bold text-gray-500 uppercase">Select Payment Method</p>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="method-btn active" onclick="selectMethod(this)">EasyPaisa</div>
+                <div class="method-btn" onclick="selectMethod(this)">JazzCash</div>
             </div>
+            <input type="text" class="pay-input" placeholder="Your Account Number">
+            <input type="text" class="pay-input" placeholder="Account Holder Name">
+            <input type="number" id="wit-amt" class="pay-input" placeholder="Amount to Withdraw">
             
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div onclick="alert('Launching Aviator...')" class="glass-card p-2 rounded-2xl relative cursor-pointer">
-                    <span class="hot-label">HOT</span>
-                    <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="game-icon">
-                    <div class="p-2 text-center text-xs font-black">AVIATOR</div>
-                </div>
-
-                <div onclick="alert('Launching Mines...')" class="glass-card p-2 rounded-2xl relative cursor-pointer">
-                    <span class="hot-label">NEW</span>
-                    <img src="https://static.spribe.co/games/mines/mines-logo.png" class="game-icon">
-                    <div class="p-2 text-center text-xs font-black">MINES</div>
-                </div>
-
-                <div onclick="alert('Launching Plinko...')" class="glass-card p-2 rounded-2xl relative cursor-pointer">
-                    <span class="hot-label">HOT</span>
-                    <img src="https://static.spribe.co/games/plinko/plinko-logo.png" class="game-icon">
-                    <div class="p-2 text-center text-xs font-black">PLINKO</div>
-                </div>
-            </div>
+            <button onclick="processWithdraw()" class="w-full bg-red-600 font-black py-4 rounded-xl mt-6">SUBMIT WITHDRAWAL</button>
         </div>
+    </div>
 
-        <div class="glass-card rounded-2xl p-4">
-            <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase mb-3">
-                <span>Recent Winners</span>
-                <span class="text-emerald-500 animate-pulse">Live Tracking</span>
-            </div>
-            <div id="live-wins" class="space-y-3">
-                </div>
-        </div>
-    </main>
-
-    <div id="action-modal" class="fixed inset-0 bg-black/90 z-[100] hidden flex-col items-center justify-center p-6 text-center">
-        <div class="bg-slate-900 border border-slate-700 p-8 rounded-3xl w-full max-w-sm">
-            <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i id="modal-icon" class="fas fa-wallet text-3xl text-yellow-500"></i>
-            </div>
-            <h2 id="modal-title" class="text-2xl font-black mb-2 uppercase"></h2>
-            <p class="text-gray-400 text-sm mb-6">Service is currently under maintenance. Please try again in 30 minutes.</p>
-            <button onclick="closeAction()" class="w-full bg-white text-black font-black py-3 rounded-xl">GOT IT</button>
+    <div id="notify" class="fixed top-10 left-1/2 -translate-x-1/2 bg-white text-black p-4 rounded-2xl shadow-2xl z-[2000] hidden items-center gap-3 w-[90%]">
+        <i class="fas fa-clock text-orange-500 text-2xl"></i>
+        <div>
+            <h4 class="font-black text-sm">Withdrawal Pending!</h4>
+            <p class="text-[10px] opacity-70">Aapki request receive ho gayi hai. 24 ghante mein balance transfer ho jayega.</p>
         </div>
     </div>
 
     <script>
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
+        function openScreen(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeScreen(id) { document.getElementById(id).style.display = 'none'; }
+
+        function selectMethod(el) {
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
         }
 
-        function showAction(title) {
-            document.getElementById('modal-title').innerText = title;
-            const modal = document.getElementById('action-modal');
-            modal.style.display = 'flex';
+        function processDep() {
+            let a = document.getElementById('dep-amt').value;
+            if(!a) { alert("Please enter amount"); return; }
+            alert("Payment Proof Submitted! Checking your TID...");
+            closeScreen('deposit-screen');
+        }
+
+        function processWithdraw() {
+            let a = document.getElementById('wit-amt').value;
+            if(!a || a < 1) { alert("Please enter valid amount"); return; }
             
-            // Icon change based on action
-            const icon = document.getElementById('modal-icon');
-            if(title === 'Deposit') icon.className = "fas fa-plus-circle text-3xl text-emerald-500";
-            else if(title === 'Withdraw') icon.className = "fas fa-hand-holding-usd text-3xl text-red-500";
-            else icon.className = "fas fa-cog text-3xl text-yellow-500";
+            closeScreen('withdraw-screen');
+            const n = document.getElementById('notify');
+            n.style.display = 'flex';
+            setTimeout(() => { n.style.display = 'none'; }, 5000);
         }
-
-        function closeAction() {
-            document.getElementById('action-modal').style.display = 'none';
-        }
-
-        // Live Winner Logic
-        function addLiveWinner() {
-            const list = document.getElementById('live-wins');
-            const users = ["Raja_007", "Zubi_VIP", "Malik_King", "Sana_Pro", "Jani_786"];
-            const amounts = ["$45.20", "$120.00", "$12.50", "$300.99"];
-            
-            const row = document.createElement('div');
-            row.className = "flex justify-between items-center text-sm border-b border-slate-800 pb-2 animate-pulse";
-            row.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 bg-slate-800 rounded-full text-[10px] flex items-center justify-center">${users[Math.floor(Math.random()*users.length)][0]}</div>
-                    <span class="text-gray-300 font-medium">${users[Math.floor(Math.random()*users.length)]}</span>
-                </div>
-                <span class="text-emerald-400 font-black">+${amounts[Math.floor(Math.random()*amounts.length)]}</span>
-            `;
-            
-            list.prepend(row);
-            if(list.children.length > 5) list.removeChild(list.lastChild);
-        }
-
-        setInterval(addLiveWinner, 2000);
     </script>
 </body>
 </html>
