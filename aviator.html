@@ -3,111 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZS999 VIP - FINAL SYSTEM</title>
+    <title>ZS999 VIP Official</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;700;900&display=swap');
-        body { background: #070a13; color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
-        .modal-screen { position: fixed; inset: 0; background: #070a13; z-index: 1000; display: none; flex-direction: column; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .pay-input { background: #131722; border: 1px solid #1e293b; padding: 12px; border-radius: 10px; width: 100%; color: white; outline: none; margin-top: 8px; }
-        .method-btn { border: 1px solid #1e293b; padding: 12px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
-        .method-btn.active { border-color: #facc15; background: rgba(250, 204, 21, 0.1); color: #facc15; }
+        body { background: #0b0f1a; font-family: 'Inter', sans-serif; color: white; margin: 0; overflow-x: hidden; }
+        
+        /* 1. Home Game Cards with Real Images */
+        .game-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3343; overflow: hidden; position: relative; cursor: pointer; transition: 0.3s; }
+        .game-card:hover { border-color: #facc15; transform: translateY(-5px); }
+        .hot-label { position: absolute; top: 5px; left: 5px; background: #ef4444; color: white; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; z-index: 10; }
+        .game-img { width: 100%; height: 100px; object-fit: cover; }
+
+        /* 2. Spribe Loader (Black Theme) */
+        #spribe-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* 3. Aviator Modern Plane & Curve */
+        .game-viewport { background: #131722; border-radius: 20px; height: 260px; position: relative; overflow: hidden; border: 1px solid #1e293b; }
+        #plane-wrap { position: absolute; width: 70px; z-index: 50; display: none; filter: drop-shadow(0 0 10px #ff0000); }
+        .propeller { animation: spin 0.1s linear infinite; transform-origin: 85% 50%; }
+        @keyframes spin { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
+        
+        /* 4. Scrollable Bet List */
+        .bet-history { background: #0f172a; border-radius: 12px; height: 140px; overflow-y: auto; border: 1px solid #1e293b; }
+        .bet-item { display: flex; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid #1e293b; font-size: 10px; }
     </style>
 </head>
 <body>
 
-    <nav class="p-4 flex justify-between items-center border-b border-slate-800 bg-[#0b0f1a]">
-        <h1 class="text-2xl font-black text-yellow-500 italic" style="font-family: 'Orbitron';">ZS999</h1>
-        <div class="flex items-center gap-3">
-            <div class="bg-slate-900 px-3 py-1 rounded-lg border border-slate-700 font-bold text-emerald-400">
-                $<span id="balance">520.00</span>
+    <div id="home" class="p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-black italic text-yellow-500 tracking-tighter">ZS999</h1>
+            <div class="flex items-center gap-2 bg-slate-900 px-4 py-2 rounded-full border border-slate-700">
+                <span id="home-bal" class="text-emerald-400 font-bold">$8.94</span>
             </div>
-            <button onclick="openScreen('deposit-screen')" class="bg-emerald-500 text-black font-black px-4 py-1.5 rounded-md text-xs">DEPOSIT</button>
         </div>
-    </nav>
 
-    <div class="p-4">
-        <div onclick="alert('Launching Game...')" class="bg-slate-900 p-4 rounded-3xl border border-slate-800 flex items-center justify-between mb-6">
-            <div>
-                <h3 class="font-black text-xl">AVIATOR VIP</h3>
-                <p class="text-xs text-gray-500">99.9% Winning Rate</p>
+        <div class="grid grid-cols-3 gap-3">
+            <div onclick="openAviator()" class="game-card">
+                <span class="hot-label">HOT</span>
+                <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="game-img" alt="Aviator">
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400">AVIATOR</div>
             </div>
-            <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="w-20">
-        </div>
-
-        <button onclick="openScreen('withdraw-screen')" class="w-full bg-slate-800 py-4 rounded-2xl flex items-center justify-center gap-3 font-bold">
-            <i class="fas fa-wallet text-yellow-500"></i> Withdraw Funds
-        </button>
-    </div>
-
-    <div id="deposit-screen" class="modal-screen">
-        <div class="p-4 flex items-center gap-4 border-b border-slate-800">
-            <i onclick="closeScreen('deposit-screen')" class="fas fa-arrow-left"></i>
-            <span class="font-black uppercase">Send Payment</span>
-        </div>
-        <div class="p-6 space-y-6">
-            <div class="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-2xl">
-                <p class="text-[10px] text-yellow-500 font-black uppercase mb-2">Transfer to this account:</p>
-                <h2 class="text-xl font-black">03xx-xxxxxxx</h2> <p class="text-sm font-bold opacity-70">Account Name: YOUR NAME</p> </div>
-            <input type="number" id="dep-amt" class="pay-input" placeholder="Enter Amount Sent">
-            <input type="text" class="pay-input" placeholder="Transaction ID (TID)">
-            <button onclick="processDep()" class="w-full bg-yellow-500 text-black font-black py-4 rounded-xl mt-4">I HAVE SENT MONEY</button>
+            <div class="game-card">
+                <span class="hot-label">HOT</span>
+                <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="game-img" alt="Mines">
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400">MINES</div>
+            </div>
+            <div class="game-card">
+                <span class="hot-label">HOT</span>
+                <img src="https://i.ibb.co/hR0pX3G/plinko.jpg" class="game-img" alt="Plinko">
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400">PLINKO</div>
+            </div>
         </div>
     </div>
 
-    <div id="withdraw-screen" class="modal-screen">
-        <div class="p-4 flex items-center gap-4 border-b border-slate-800">
-            <i onclick="closeScreen('withdraw-screen')" class="fas fa-arrow-left"></i>
-            <span class="font-black">WITHDRAWAL REQUEST</span>
+    <div id="spribe-loader">
+        <div class="text-gray-500 text-[8px] tracking-[5px] uppercase mb-1">Powered by</div>
+        <div class="text-4xl font-black italic tracking-tighter">SPRIBE</div>
+        <div class="flex gap-2 mt-6">
+            <div class="loader-dot"></div><div class="loader-dot" style="animation-delay:0.2s"></div><div class="loader-dot" style="animation-delay:0.4s"></div>
         </div>
-        <div class="p-6 space-y-4">
-            <p class="text-xs font-bold text-gray-500 uppercase">Select Payment Method</p>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="method-btn active" onclick="selectMethod(this)">EasyPaisa</div>
-                <div class="method-btn" onclick="selectMethod(this)">JazzCash</div>
-            </div>
-            <input type="text" class="pay-input" placeholder="Your Account Number">
-            <input type="text" class="pay-input" placeholder="Account Holder Name">
-            <input type="number" id="wit-amt" class="pay-input" placeholder="Amount to Withdraw">
+    </div>
+
+    <div id="game" class="hidden p-3 min-h-screen flex flex-col">
+        <div class="flex justify-between items-center mb-2">
+            <button onclick="goHome()" class="text-gray-500"><i class="fas fa-chevron-left text-xl"></i></button>
+            <div class="text-red-600 font-black italic text-xs uppercase">Aviator <span class="text-white">VIP</span></div>
+            <span id="game-bal" class="text-emerald-400 font-bold">$8.94</span>
+        </div>
+
+        <div class="game-viewport mb-4">
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div id="mult-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl font-black z-20">1.00x</div>
+            <svg class="absolute inset-0 w-full h-full"><path id="air-curve" fill="rgba(225,29,72,0.15)" stroke="#e11d48" stroke-width="5" d="M 0 260"/></svg>
             
-            <button onclick="processWithdraw()" class="w-full bg-red-600 font-black py-4 rounded-xl mt-6">SUBMIT WITHDRAWAL</button>
+            <div id="plane-wrap">
+                <svg viewBox="0 0 100 40">
+                    <path d="M10 20 Q 30 10 80 15 L 95 20 L 80 25 Q 30 30 10 20" fill="#ef4444" stroke="white" stroke-width="1.5"/>
+                    <path class="propeller" d="M92 12 L92 28" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
         </div>
-    </div>
 
-    <div id="notify" class="fixed top-10 left-1/2 -translate-x-1/2 bg-white text-black p-4 rounded-2xl shadow-2xl z-[2000] hidden items-center gap-3 w-[90%]">
-        <i class="fas fa-clock text-orange-500 text-2xl"></i>
-        <div>
-            <h4 class="font-black text-sm">Withdrawal Pending!</h4>
-            <p class="text-[10px] opacity-70">Aapki request receive ho gayi hai. 24 ghante mein balance transfer ho jayega.</p>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
+                <input type="number" id="amt1" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold mb-2 rounded-lg py-2 outline-none border border-slate-700">
+                <button id="btn1" onclick="placeBet(1)" class="w-full bg-red-600 py-4 rounded-xl font-black shadow-[0_5px_0_#7f1d1d]">BET</button>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
+                <input type="number" id="amt2" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold mb-2 rounded-lg py-2 outline-none border border-slate-700">
+                <button id="btn2" onclick="placeBet(2)" class="w-full bg-red-600 py-4 rounded-xl font-black shadow-[0_5px_0_#7f1d1d]">BET</button>
+            </div>
         </div>
+
+        <div class="text-[10px] text-gray-500 mb-2 font-bold flex justify-between uppercase">
+            <span>All Bets</span>
+            <span class="text-emerald-500">Live Network</span>
+        </div>
+        <div id="bet-list" class="bet-history"></div>
     </div>
 
     <script>
-        function openScreen(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeScreen(id) { document.getElementById(id).style.display = 'none'; }
+        let balance = 8.94, multiplier = 1.0, activeRound = false;
+        let userBets = { 1: { on: false, cash: false, amt: 0 }, 2: { on: false, cash: false, amt: 0 } };
 
-        function selectMethod(el) {
-            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
+        function openAviator() {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('spribe-loader').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('spribe-loader').style.display = 'none';
+                document.getElementById('game').style.display = 'flex';
+                initCycle();
+            }, 3000);
         }
 
-        function processDep() {
-            let a = document.getElementById('dep-amt').value;
-            if(!a) { alert("Please enter amount"); return; }
-            alert("Payment Proof Submitted! Checking your TID...");
-            closeScreen('deposit-screen');
-        }
+        function goHome() { location.reload(); }
 
-        function processWithdraw() {
-            let a = document.getElementById('wit-amt').value;
-            if(!a || a < 1) { alert("Please enter valid amount"); return; }
+        function initCycle() {
+            activeRound = false; multiplier = 1.0;
+            document.getElementById('plane-wrap').style.display = 'none';
+            document.getElementById('mult-display').innerText = "1.00x";
+            document.getElementById('mult-display').style.color = "white";
+            document.getElementById('air-curve').setAttribute('d', 'M 0 260');
             
-            closeScreen('withdraw-screen');
-            const n = document.getElementById('notify');
-            n.style.display = 'flex';
-            setTimeout(() => { n.style.display = 'none'; }, 5000);
+            [1, 2].forEach(id => {
+                if(!userBets[id].on) {
+                    document.getElementById(`btn${id}`).innerText = "BET";
+                    document.getElementById(`btn${id}`).className = "w-full bg-red-600 py-4 rounded-xl font-black shadow-[0_5px_0_#7f1d1d]";
+                }
+            });
+
+            refreshNetwork();
+            setTimeout(takeOff, 5000);
+        }
+
+        function takeOff() {
+            activeRound = true;
+            document.getElementById('plane-wrap').style.display = 'block';
+            let crashPoint = (1.1 + Math.random() * 5).toFixed(2);
+
+            let flight = setInterval(() => {
+                multiplier += 0.01;
+                document.getElementById('mult-display').innerText = multiplier.toFixed(2) + "x";
+                
+                [1,2].forEach(id => {
+                    if(userBets[id].on && !userBets[id].cash) {
+                        document.getElementById(`btn${id}`).innerHTML = `CASHOUT<br>$${(userBets[id].amt * multiplier).toFixed(2)}`;
+                        document.getElementById(`btn${id}`).className = "w-full bg-yellow-500 text-black py-3 rounded-xl font-black shadow-[0_5px_0_#b45309]";
+                    }
+                });
+
+                let x = (multiplier - 1) * 90;
+                let y = 260 - ((multiplier - 1) * 65);
+                if(x < 300 && y > 30) {
+                    document.getElementById('plane-wrap').style.left = x + 'px';
+                    document.getElementById('plane-wrap').style.top = y + 'px';
+                    document.getElementById('air-curve').setAttribute('d', `M 0 260 Q ${x/2} 260 ${x} ${y+20}`);
+                }
+
+                if (multiplier >= crashPoint) { clearInterval(flight); explode(); }
+            }, 60);
+        }
+
+        function placeBet(id) {
+            let val = parseFloat(document.getElementById('amt'+id).value);
+            if(!activeRound && !userBets[id].on) {
+                userBets[id].on = true; userBets[id].amt = val;
+                document.getElementById(`btn${id}`).innerText = "WAITING...";
+                document.getElementById(`btn${id}`).className = "w-full bg-slate-700 py-4 rounded-xl font-black";
+            } else if (activeRound && userBets[id].on && !userBets[id].cash) {
+                userBets[id].cash = true;
+                balance += (userBets[id].amt * multiplier) - userBets[id].amt;
+                updateBalanceUI();
+                document.getElementById(`btn${id}`).innerText = "WIN!";
+                document.getElementById(`btn${id}`).className = "w-full bg-emerald-600 py-4 rounded-xl font-black";
+            }
+        }
+
+        function explode() {
+            document.getElementById('plane-wrap').style.display = 'none';
+            document.getElementById('mult-display').innerText = "FLEW AWAY!";
+            document.getElementById('mult-display').style.color = "#ef4444";
+            [1, 2].forEach(id => {
+                if(userBets[id].on && !userBets[id].cash) {
+                    balance -= userBets[id].amt;
+                    updateBalanceUI();
+                }
+                userBets[id].on = false; userBets[id].cash = false;
+            });
+            setTimeout(initCycle, 3000);
+        }
+
+        function updateBalanceUI() {
+            document.getElementById('home-bal').innerText = "$" + balance.toFixed(2);
+            document.getElementById('game-bal').innerText = "$" + balance.toFixed(2);
+        }
+
+        function refreshNetwork() {
+            const list = document.getElementById('bet-list');
+            const players = ["Ahmad_786", "Malik_VIP", "Zubi_King", "Sana_Pro", "Raja_007"];
+            list.innerHTML = "";
+            for(let i=0; i<7; i++) {
+                list.innerHTML += `<div class="bet-item"><span>${players[Math.floor(Math.random()*players.length)]}</span><span class="text-emerald-400">+$${(Math.random()*20).toFixed(2)}</span></div>`;
+            }
         }
     </script>
 </body>
