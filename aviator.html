@@ -3,182 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZS999 VIP - FINAL MASTER</title>
+    <title>ZS999 ULTRA - GLOBAL PLATFORM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0b0f1a; font-family: 'Inter', sans-serif; color: white; margin: 0; overflow: hidden; }
-        .btn-green { background: #00e676; color: #000; font-weight: 800; padding: 5px 15px; border-radius: 4px; transition: 0.2s; }
-        .btn-green:active { transform: scale(0.95); }
-        .btn-gray { background: #2d3343; color: white; font-weight: 800; padding: 5px 15px; border-radius: 4px; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600;900&display=swap');
         
-        /* Aviator Viewport */
-        .game-viewport { background: #131722; height: 320px; position: relative; border-radius: 15px; overflow: hidden; border: 1px solid #1e293b; margin: 10px; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 30px 30px; }
-        #plane-node { position: absolute; width: 80px; z-index: 100; display: none; filter: drop-shadow(0 0 15px #ff0000); }
+        body { background: #05080f; color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        .neon-text { text-shadow: 0 0 10px #facc15, 0 0 20px #facc15; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .glass-card:hover { border-color: #facc15; transform: translateY(-5px); }
         
-        /* History Chips */
-        .history-chip { font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); background: #1a1f2e; }
-        .chip-p { color: #a855f7; } /* Purple for low */
-        .chip-b { color: #3b82f6; } /* Blue for high */
+        /* Sidebar/Menu Animation */
+        #sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(-100%); }
+        #sidebar.open { transform: translateX(0); }
 
-        /* Modal Styling */
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; }
+        /* Game Icons Glow */
+        .game-icon { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; }
+        .hot-label { position: absolute; top: 8px; left: 8px; background: linear-gradient(to right, #ef4444, #f59e0b); font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 900; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="flex justify-between items-center p-3 border-b border-slate-800">
-        <div class="flex items-center gap-2">
-            <i class="fas fa-bars text-gray-400 cursor-pointer" onclick="toggleSettings()"></i>
-            <span class="text-red-600 font-black italic">AVIATOR <span class="text-white not-italic text-[10px]">PRO</span></span>
+    <nav class="sticky top-0 z-50 bg-[#0b0f1a] border-b border-slate-800 p-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <i onclick="toggleMenu()" class="fas fa-bars text-xl text-yellow-500 cursor-pointer"></i>
+            <h1 class="text-2xl font-black italic text-yellow-500 tracking-tighter neon-text" style="font-family: 'Orbitron';">ZS999</h1>
         </div>
         <div class="flex items-center gap-3">
-            <span id="balance" class="text-emerald-400 font-bold text-lg">$5.00</span>
-            <button onclick="showAlert('Deposit')" class="btn-green text-[10px]">DEPOSIT</button>
-            <button onclick="showAlert('Withdraw')" class="btn-gray text-[10px]">WITHDRAW</button>
-            <i onclick="toggleSettings()" class="fas fa-cog text-gray-500 cursor-pointer"></i>
-        </div>
-    </div>
-
-    <div class="flex gap-2 px-3 py-2 overflow-x-auto no-scrollbar" id="history-box">
-        <span class="history-chip chip-p">1.69x</span>
-        <span class="history-chip chip-b">4.11x</span>
-    </div>
-
-    <div class="game-viewport">
-        <div id="multiplier" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-7xl font-black z-20">1.00x</div>
-        <div id="status-text" class="absolute top-[40%] left-1/2 -translate-x-1/2 text-yellow-500 font-bold uppercase tracking-widest text-xs">Waiting for next round...</div>
-        
-        <svg class="absolute inset-0 w-full h-full"><path id="trail" fill="rgba(225,29,72,0.1)" stroke="#e11d48" stroke-width="4" d="M 0 320"/></svg>
-        
-        <div id="plane-node">
-            <img src="https://static.spribe.co/games/aviator/plane.svg" class="w-full">
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 px-4 pb-4">
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <button onclick="adjustBet(-1)" class="text-2xl text-yellow-500 font-bold">−</button>
-                <div class="text-center">
-                    <div id="bet-amount" class="text-2xl font-black">1</div>
-                </div>
-                <button onclick="adjustBet(1)" class="text-2xl text-yellow-500 font-bold">+</button>
+            <div class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-lg flex items-center gap-2">
+                <span class="text-emerald-400 font-bold">$<span id="main-balance">520.00</span></span>
             </div>
-            <button id="bet-btn" onclick="placeBet()" class="bg-red-600 hover:bg-red-700 w-40 py-4 rounded-xl font-black text-xl shadow-[0_5px_0_#7f1d1d]">BET</button>
+            <button onclick="showAction('Deposit')" class="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-4 py-1.5 rounded-md text-xs uppercase transition">Deposit</button>
+        </div>
+    </nav>
+
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] z-[60] p-6 shadow-2xl border-r border-slate-800">
+        <div class="flex justify-between items-center mb-10">
+            <span class="font-black text-yellow-500">MENU</span>
+            <i onclick="toggleMenu()" class="fas fa-times text-xl cursor-pointer"></i>
+        </div>
+        <div class="space-y-6">
+            <div onclick="location.reload()" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-home"></i> Home</div>
+            <div onclick="showAction('Profile')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-user"></i> My Profile</div>
+            <div onclick="showAction('Wallet')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-wallet"></i> Wallet</div>
+            <div onclick="showAction('Withdraw')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-money-bill-wave"></i> Withdraw</div>
+            <div onclick="showAction('Support')" class="flex items-center gap-4 text-gray-400 hover:text-white cursor-pointer"><i class="fas fa-headset"></i> 24/7 Support</div>
         </div>
     </div>
 
-    <div id="modal">
-        <div class="bg-slate-800 p-8 rounded-2xl text-center border border-slate-600">
-            <h2 id="modal-title" class="text-2xl font-bold mb-4"></h2>
-            <p class="text-gray-400 mb-6">This feature is coming soon in the next update!</p>
-            <button onclick="closeModal()" class="btn-green w-full py-2">OK</button>
+    <main class="p-4 space-y-6">
+        
+        <div class="w-full h-40 rounded-3xl overflow-hidden relative">
+            <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="w-full h-full object-cover opacity-50">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#05080f] to-transparent"></div>
+            <div class="absolute bottom-4 left-6">
+                <h2 class="text-2xl font-black uppercase italic">Mega Bonus!</h2>
+                <p class="text-emerald-400 font-bold text-sm">Get 200% on your first deposit</p>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-black uppercase tracking-widest text-gray-400"><i class="fas fa-fire text-red-500 mr-2"></i> Hot Games</h3>
+                <span class="text-xs text-yellow-500 font-bold">See All</span>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div onclick="alert('Launching Aviator...')" class="glass-card p-2 rounded-2xl relative cursor-pointer">
+                    <span class="hot-label">HOT</span>
+                    <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="game-icon">
+                    <div class="p-2 text-center text-xs font-black">AVIATOR</div>
+                </div>
+
+                <div onclick="alert('Launching Mines...')" class="glass-card p-2 rounded-2xl relative cursor-pointer">
+                    <span class="hot-label">NEW</span>
+                    <img src="https://static.spribe.co/games/mines/mines-logo.png" class="game-icon">
+                    <div class="p-2 text-center text-xs font-black">MINES</div>
+                </div>
+
+                <div onclick="alert('Launching Plinko...')" class="glass-card p-2 rounded-2xl relative cursor-pointer">
+                    <span class="hot-label">HOT</span>
+                    <img src="https://static.spribe.co/games/plinko/plinko-logo.png" class="game-icon">
+                    <div class="p-2 text-center text-xs font-black">PLINKO</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4">
+            <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase mb-3">
+                <span>Recent Winners</span>
+                <span class="text-emerald-500 animate-pulse">Live Tracking</span>
+            </div>
+            <div id="live-wins" class="space-y-3">
+                </div>
+        </div>
+    </main>
+
+    <div id="action-modal" class="fixed inset-0 bg-black/90 z-[100] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="bg-slate-900 border border-slate-700 p-8 rounded-3xl w-full max-w-sm">
+            <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i id="modal-icon" class="fas fa-wallet text-3xl text-yellow-500"></i>
+            </div>
+            <h2 id="modal-title" class="text-2xl font-black mb-2 uppercase"></h2>
+            <p class="text-gray-400 text-sm mb-6">Service is currently under maintenance. Please try again in 30 minutes.</p>
+            <button onclick="closeAction()" class="w-full bg-white text-black font-black py-3 rounded-xl">GOT IT</button>
         </div>
     </div>
 
     <script>
-        let balance = 5.00;
-        let currentBet = 1;
-        let isPlaying = false;
-        let mult = 1.0;
-        let gameLoop;
-
-        // UI Functions
-        function showAlert(type) {
-            document.getElementById('modal-title').innerText = type;
-            document.getElementById('modal').style.display = 'flex';
-        }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-        function toggleSettings() { showAlert('Settings'); }
-
-        function adjustBet(val) {
-            currentBet = Math.max(1, currentBet + val);
-            document.getElementById('bet-amount').innerText = currentBet;
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
-        function placeBet() {
-            if(isPlaying) return;
-            if(balance < currentBet) { alert("Insufficient Balance!"); return; }
+        function showAction(title) {
+            document.getElementById('modal-title').innerText = title;
+            const modal = document.getElementById('action-modal');
+            modal.style.display = 'flex';
             
-            balance -= currentBet;
-            updateBalance();
-            document.getElementById('bet-btn').innerText = "WAITING...";
-            document.getElementById('bet-btn').classList.add('opacity-50');
+            // Icon change based on action
+            const icon = document.getElementById('modal-icon');
+            if(title === 'Deposit') icon.className = "fas fa-plus-circle text-3xl text-emerald-500";
+            else if(title === 'Withdraw') icon.className = "fas fa-hand-holding-usd text-3xl text-red-500";
+            else icon.className = "fas fa-cog text-3xl text-yellow-500";
         }
 
-        function updateBalance() {
-            document.getElementById('balance').innerText = "$" + balance.toFixed(2);
+        function closeAction() {
+            document.getElementById('action-modal').style.display = 'none';
         }
 
-        // Game Logic
-        function startCycle() {
-            mult = 1.0;
-            isPlaying = false;
-            const plane = document.getElementById('plane-node');
-            const txt = document.getElementById('multiplier');
-            const status = document.getElementById('status-text');
-            const trail = document.getElementById('trail');
-            const btn = document.getElementById('bet-btn');
-
-            plane.style.display = 'none';
-            txt.innerText = "1.00x"; txt.style.color = "white";
-            status.style.display = 'block';
-            trail.setAttribute('d', 'M 0 320');
-
-            setTimeout(() => {
-                status.style.display = 'none';
-                plane.style.display = 'block';
-                isPlaying = true;
-                btn.innerText = "CASH OUT";
-                btn.style.background = "#fbbf24"; // Yellow for cashout
-                btn.style.boxShadow = "0 5px 0 #b45309";
-                btn.classList.remove('opacity-50');
-
-                let crashPoint = (1.1 + Math.random() * 4).toFixed(2);
-                
-                gameLoop = setInterval(() => {
-                    mult += 0.01;
-                    txt.innerText = mult.toFixed(2) + "x";
-                    
-                    let x = (mult - 1) * 90;
-                    let y = 320 - ((mult - 1) * 70);
-                    
-                    if(x < 350 && y > 20) {
-                        plane.style.left = x + 'px';
-                        plane.style.top = (y-20) + 'px';
-                        trail.setAttribute('d', `M 0 320 Q ${x/2} 320 ${x} ${y}`);
-                    }
-
-                    if(mult >= crashPoint) {
-                        clearInterval(gameLoop);
-                        txt.innerText = "FLEW AWAY!";
-                        txt.style.color = "#ef4444";
-                        plane.style.display = 'none';
-                        resetButton();
-                        updateHistory(mult.toFixed(2));
-                        setTimeout(startCycle, 4000);
-                    }
-                }, 70);
-            }, 3000);
+        // Live Winner Logic
+        function addLiveWinner() {
+            const list = document.getElementById('live-wins');
+            const users = ["Raja_007", "Zubi_VIP", "Malik_King", "Sana_Pro", "Jani_786"];
+            const amounts = ["$45.20", "$120.00", "$12.50", "$300.99"];
+            
+            const row = document.createElement('div');
+            row.className = "flex justify-between items-center text-sm border-b border-slate-800 pb-2 animate-pulse";
+            row.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-slate-800 rounded-full text-[10px] flex items-center justify-center">${users[Math.floor(Math.random()*users.length)][0]}</div>
+                    <span class="text-gray-300 font-medium">${users[Math.floor(Math.random()*users.length)]}</span>
+                </div>
+                <span class="text-emerald-400 font-black">+${amounts[Math.floor(Math.random()*amounts.length)]}</span>
+            `;
+            
+            list.prepend(row);
+            if(list.children.length > 5) list.removeChild(list.lastChild);
         }
 
-        function resetButton() {
-            const btn = document.getElementById('bet-btn');
-            btn.innerText = "BET";
-            btn.style.background = "#ef4444";
-            btn.style.boxShadow = "0 5px 0 #7f1d1d";
-        }
-
-        function updateHistory(val) {
-            const box = document.getElementById('history-box');
-            const chip = document.createElement('span');
-            chip.className = `history-chip ${val > 2 ? 'chip-b' : 'chip-p'}`;
-            chip.innerText = val + 'x';
-            box.prepend(chip);
-        }
-
-        startCycle();
+        setInterval(addLiveWinner, 2000);
     </script>
 </body>
 </html>
