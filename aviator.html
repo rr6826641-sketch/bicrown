@@ -3,179 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZS999 Ultra VIP - Final</title>
+    <title>ZS999 VIP - FINAL MASTER</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0b0f1a; font-family: 'Inter', sans-serif; color: white; margin: 0; overflow: hidden; }
+        body { background: #0b0f1a; font-family: 'Inter', sans-serif; color: white; margin: 0; overflow-x: hidden; }
         
-        /* Aviator Viewport */
-        .game-area { background: #131722; height: 320px; position: relative; border-radius: 20px; overflow: hidden; border: 2px solid #2d3343; margin: 10px; }
-        .grid-bg { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(#1e222d 1.5px, transparent 1.5px), linear-gradient(90deg, #1e222d 1.5px, transparent 1.5px); background-size: 40px 40px; }
-        
-        /* The REAL Red Plane Style */
-        #plane-box { position: absolute; width: 75px; z-index: 50; display: none; filter: drop-shadow(0 0 15px #ff0000); }
+        /* 1. Home Game Profiles (Pic 2 Fix) */
+        .game-grid-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3343; overflow: hidden; cursor: pointer; position: relative; height: 140px; transition: 0.3s; }
+        .game-grid-card:hover { border-color: #facc15; transform: scale(1.02); }
+        .game-grid-card img { width: 100%; height: 90px; object-fit: cover; }
+        .hot-badge { position: absolute; top: 6px; left: 6px; background: #ef4444; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 900; z-index: 10; }
+
+        /* 2. Aviator Engine (Pic 1 Fix) */
+        .game-viewport { background: #131722; height: 300px; position: relative; border-radius: 20px; overflow: hidden; border: 1px solid #1e293b; margin: 10px; }
+        #plane-node { position: absolute; width: 75px; z-index: 100; display: none; filter: drop-shadow(0 0 15px #ff0000); }
         .propeller { animation: spin 0.1s linear infinite; transform-origin: 90% 50%; }
         @keyframes spin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
 
-        /* History & Chips */
-        .history-bar { display: flex; gap: 8px; padding: 10px; overflow-x: auto; }
-        .chip { padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 900; }
-        .chip-p { background: rgba(147, 51, 234, 0.2); color: #a855f7; border: 1px solid #a855f7; }
-        .chip-b { background: rgba(37, 99, 235, 0.2); color: #3b82f6; border: 1px solid #3b82f6; }
+        /* 3. History Chips */
+        .history-chip { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); }
+        .chip-p { background: rgba(147, 51, 234, 0.2); color: #a855f7; }
+        .chip-b { background: rgba(37, 99, 235, 0.2); color: #3b82f6; }
 
-        /* Fake Bets List Animation */
-        .bets-scroll { height: 160px; overflow-y: hidden; background: #0f172a; border-radius: 15px; margin: 10px; border: 1px solid #1e293b; }
-        .bet-row { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid #1e2433; font-size: 11px; transition: 0.5s; }
+        /* 4. Unlimited Live Bets */
+        .bet-list-container { height: 180px; overflow-y: hidden; background: #0f172a; border-radius: 12px; border: 1px solid #1e293b; margin: 10px; }
+        .bet-item { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid #1e2433; font-size: 10px; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Loader */
+        #loading-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div class="flex justify-between items-center p-4">
-        <div class="flex items-center gap-3">
-            <i class="fas fa-bars text-yellow-500 text-lg"></i>
-            <span class="text-red-600 font-black italic">AVIATOR <span class="text-white not-italic text-xs">PRO</span></span>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="text-emerald-400 font-bold text-lg">$8.94</span>
-            <button class="bg-emerald-600 px-4 py-1 rounded-md font-bold text-xs uppercase shadow-lg">Deposit</button>
-            <i class="fas fa-cog text-gray-500 ml-2"></i>
-        </div>
-    </div>
-
-    <div id="history" class="history-bar no-scrollbar">
-        <span class="chip chip-p">1.69x</span>
-        <span class="chip chip-b">4.11x</span>
-        <span class="chip chip-p">2.48x</span>
-        <span class="chip chip-b">1.05x</span>
-        <span class="chip chip-p">12.4x</span>
-    </div>
-
-    <div class="game-area">
-        <div class="grid-bg"></div>
-        <div id="mult" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-7xl font-black z-20">1.00x</div>
-        
-        <svg class="absolute inset-0 w-full h-full z-10">
-            <path id="red-line" fill="rgba(225, 29, 72, 0.1)" stroke="#e11d48" stroke-width="5" stroke-linecap="round" d="M 0 320"/>
-        </svg>
-
-        <div id="plane-box">
-            <svg viewBox="0 0 100 40">
-                <path d="M10 20 Q 30 10 80 15 L 95 20 L 80 25 Q 30 30 10 20" fill="#ff0000" stroke="white" stroke-width="1.5"/>
-                <path class="propeller" d="M93 12 L93 28" stroke="white" stroke-width="3"/>
-                <circle cx="55" cy="18" r="3" fill="white" opacity="0.6"/>
-            </svg>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 px-3 mb-4">
-        <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-            <div class="flex justify-between items-center bg-black rounded-lg mb-2 px-3 py-1">
-                <i class="fas fa-minus text-xs text-gray-500"></i>
-                <span class="font-bold text-yellow-500">1.00</span>
-                <i class="fas fa-plus text-xs text-gray-500"></i>
+    <div id="home-view" class="p-4">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-bars text-yellow-500 text-xl"></i>
+                <h1 class="text-3xl font-black italic text-yellow-500">ZS999</h1>
             </div>
-            <button class="w-full bg-red-600 py-4 rounded-xl font-black text-xl shadow-[0_5px_0_#7f1d1d] active:shadow-none active:translate-y-1 transition-all">BET</button>
-        </div>
-        <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-            <div class="flex justify-between items-center bg-black rounded-lg mb-2 px-3 py-1">
-                <i class="fas fa-minus text-xs text-gray-500"></i>
-                <span class="font-bold text-yellow-500">1.00</span>
-                <i class="fas fa-plus text-xs text-gray-500"></i>
+            <div class="bg-slate-900 px-4 py-2 rounded-full border border-slate-700">
+                <span class="text-emerald-400 font-bold">$8.94</span>
             </div>
-            <button class="w-full bg-red-600 py-4 rounded-xl font-black text-xl shadow-[0_5px_0_#7f1d1d]">BET</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div onclick="launch('aviator')" class="game-grid-card">
+                <span class="hot-badge">HOT</span>
+                <img src="https://static.spribe.co/games/aviator/aviator-logo.png" alt="Aviator">
+                <div class="p-2 text-center text-xs font-bold text-gray-400">AVIATOR</div>
+            </div>
+            <div onclick="launch('mines')" class="game-grid-card">
+                <span class="hot-badge">NEW</span>
+                <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" alt="Mines">
+                <div class="p-2 text-center text-xs font-bold text-gray-400">MINES</div>
+            </div>
         </div>
     </div>
 
-    <div class="px-4 flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase">
-        <span>All Bets</span>
-        <span class="text-emerald-500">Live Network <i class="fas fa-circle text-[6px] animate-pulse"></i></span>
+    <div id="loading-screen">
+        <div class="text-gray-600 text-[8px] tracking-[5px] uppercase mb-1">Powered by</div>
+        <div class="text-4xl font-black italic text-white">SPRIBE</div>
+        <div class="flex gap-2 mt-6">
+            <div class="w-2 h-2 bg-red-600 rounded-full animate-bounce"></div>
+            <div class="w-2 h-2 bg-red-600 rounded-full animate-bounce" style="animation-delay:0.2s"></div>
+            <div class="w-2 h-2 bg-red-600 rounded-full animate-bounce" style="animation-delay:0.4s"></div>
+        </div>
     </div>
-    <div class="bets-scroll" id="live-bets"></div>
+
+    <div id="aviator-view" class="hidden min-h-screen flex flex-col">
+        <div class="flex justify-between items-center p-3">
+            <div class="flex items-center gap-2">
+                <i onclick="exitToHome()" class="fas fa-arrow-left text-gray-500 cursor-pointer"></i>
+                <span class="text-red-600 font-black italic">AVIATOR <span class="text-white not-italic text-[10px]">VIP</span></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-emerald-400 font-bold">$8.94</span>
+                <i class="fas fa-cog text-gray-500 ml-2"></i>
+            </div>
+        </div>
+
+        <div class="flex gap-2 px-3 mb-2 overflow-x-auto no-scrollbar" id="history-box">
+            <span class="history-chip chip-p">1.69x</span>
+            <span class="history-chip chip-b">4.11x</span>
+            <span class="history-chip chip-p">12.4x</span>
+        </div>
+
+        <div class="game-viewport">
+            <div id="multiplier" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-7xl font-black z-20">1.00x</div>
+            <svg class="absolute inset-0 w-full h-full"><path id="trail" fill="rgba(225,29,72,0.1)" stroke="#e11d48" stroke-width="5" d="M 0 300"/></svg>
+            <div id="plane-node">
+                <svg viewBox="0 0 100 40">
+                    <path d="M10 20 Q 30 10 80 15 L 95 20 L 80 25 Q 30 30 10 20" fill="#ff0000" stroke="white" stroke-width="1.5"/>
+                    <path class="propeller" d="M93 12 L93 28" stroke="white" stroke-width="3"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 px-2">
+            <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
+                <input type="number" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold mb-2 rounded-lg py-2 border border-slate-800">
+                <button class="w-full bg-red-600 py-4 rounded-xl font-black text-lg shadow-[0_5px_0_#7f1d1d]">BET</button>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
+                <input type="number" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold mb-2 rounded-lg py-2 border border-slate-800">
+                <button class="w-full bg-red-600 py-4 rounded-xl font-black text-lg shadow-[0_5px_0_#7f1d1d]">BET</button>
+            </div>
+        </div>
+
+        <div class="px-4 mt-4 flex justify-between items-center text-[9px] font-bold text-gray-500 uppercase">
+            <span>Live Bets</span>
+            <span class="text-emerald-500">Network Connected <i class="fas fa-circle text-[6px] animate-pulse"></i></span>
+        </div>
+        <div class="bet-list-container" id="fast-bets"></div>
+    </div>
 
     <script>
-        let multiplier = 1.0;
-        let isFlying = false;
+        let mult = 1.0;
+        
+        function launch(game) {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('loading-screen').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                if(game === 'aviator') {
+                    document.getElementById('aviator-view').classList.remove('hidden');
+                    runCycle();
+                    spawnBets();
+                }
+            }, 3000);
+        }
 
-        function init() {
-            isFlying = false;
-            multiplier = 1.0;
-            const plane = document.getElementById('plane-box');
-            const multText = document.getElementById('mult');
-            const line = document.getElementById('red-line');
+        function exitToHome() { location.reload(); }
 
+        function runCycle() {
+            mult = 1.0;
+            const plane = document.getElementById('plane-node');
+            const txt = document.getElementById('multiplier');
+            const trail = document.getElementById('trail');
             plane.style.display = 'none';
-            multText.innerText = "1.00x";
-            multText.style.color = "white";
-            line.setAttribute('d', 'M 0 320');
+            txt.innerText = "1.00x"; txt.style.color = "white";
+            trail.setAttribute('d', 'M 0 300');
 
-            setTimeout(startRound, 4000);
+            setTimeout(() => {
+                plane.style.display = 'block';
+                let crashPoint = (1.1 + Math.random() * 5).toFixed(2);
+                let loop = setInterval(() => {
+                    mult += 0.01;
+                    txt.innerText = mult.toFixed(2) + "x";
+                    
+                    let x = (mult - 1) * 85;
+                    let y = 300 - ((mult - 1) * 60);
+                    
+                    if(x < 350 && y > 20) {
+                        plane.style.left = x + 'px';
+                        plane.style.top = (y-20) + 'px';
+                        trail.setAttribute('d', `M 0 300 Q ${x/1.8} 300 ${x} ${y}`);
+                    }
+
+                    if(mult >= crashPoint) {
+                        clearInterval(loop);
+                        txt.innerText = "FLEW AWAY!";
+                        txt.style.color = "#ef4444";
+                        plane.style.display = 'none';
+                        updateHistory(mult.toFixed(2));
+                        setTimeout(runCycle, 3000);
+                    }
+                }, 60);
+            }, 4000);
         }
 
-        function startRound() {
-            isFlying = true;
-            const plane = document.getElementById('plane-box');
-            const multText = document.getElementById('mult');
-            const line = document.getElementById('red-line');
-            plane.style.display = 'block';
-
-            let crashPoint = (1.1 + Math.random() * 5).toFixed(2);
-
-            let timer = setInterval(() => {
-                multiplier += 0.01;
-                multText.innerText = multiplier.toFixed(2) + "x";
-
-                // Plane Movement Logic
-                let x = (multiplier - 1) * 80;
-                let y = 320 - ((multiplier - 1) * 60);
-
-                if (x < 350 && y > 30) {
-                    plane.style.left = x + 'px';
-                    plane.style.top = (y - 20) + 'px';
-                    line.setAttribute('d', `M 0 320 Q ${x/1.5} 320 ${x} ${y}`);
-                }
-
-                if (multiplier >= crashPoint) {
-                    clearInterval(timer);
-                    crash();
-                }
-            }, 65);
+        function updateHistory(val) {
+            const box = document.getElementById('history-box');
+            const chip = document.createElement('span');
+            chip.className = val > 2 ? 'history-chip chip-b' : 'history-chip chip-p';
+            chip.innerText = val + 'x';
+            box.prepend(chip);
         }
 
-        function crash() {
-            document.getElementById('plane-box').style.display = 'none';
-            document.getElementById('mult').innerText = "FLEW AWAY!";
-            document.getElementById('mult').style.color = "#ef4444";
-            
-            // Add to history
-            const hist = document.getElementById('history');
-            const newChip = document.createElement('span');
-            newChip.className = multiplier > 2 ? 'chip chip-b' : 'chip chip-p';
-            newChip.innerText = multiplier.toFixed(2) + 'x';
-            hist.prepend(newChip);
-
-            setTimeout(init, 3000);
-        }
-
-        // Unlimited Fake Bets Logic
-        function updateBets() {
-            const list = document.getElementById('live-bets');
-            const users = ["Zubi_King", "Malik_VIP", "Raja_007", "Jani_Pro", "Sana_786", "Don_99"];
-            
+        function spawnBets() {
+            const box = document.getElementById('fast-bets');
+            const names = ["Malik_VIP", "Zubi_786", "Jani_King", "Don_001", "Sana_Pro", "Raja_78"];
             setInterval(() => {
-                const user = users[Math.floor(Math.random()*users.length)];
-                const amt = (Math.random()*50).toFixed(2);
-                const row = document.createElement('div');
-                row.className = 'bet-row';
-                row.innerHTML = `<span>${user}</span><span class="text-emerald-400 font-bold">+$${amt}</span>`;
-                
-                list.prepend(row);
-                if(list.children.length > 15) list.removeChild(list.lastChild);
-            }, 1500);
+                let row = document.createElement('div');
+                row.className = 'bet-item';
+                row.innerHTML = `<span>${names[Math.floor(Math.random()*names.length)]}</span><span class="text-emerald-400 font-bold">+$${(Math.random()*25).toFixed(2)}</span>`;
+                box.prepend(row);
+                if(box.children.length > 15) box.removeChild(box.lastChild);
+            }, 1000);
         }
-
-        updateBets();
-        init();
     </script>
 </body>
 </html>
