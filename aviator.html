@@ -11,18 +11,13 @@
         .game-area { background: #131722; position: relative; border-radius: 20px; border: 2px solid #2d3343; overflow: hidden; height: 320px; width: 100%; max-width: 800px; margin: auto; }
         .grid-bg { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(#1e222d 1.5px, transparent 1.5px), linear-gradient(90deg, #1e222d 1.5px, transparent 1.5px); background-size: 40px 40px; transform: translate(-25%, -25%); z-index: 1; }
         
-        /* PLANE STYLE */
-        #plane-container { position: absolute; bottom: 30px; left: 30px; width: 65px; z-index: 50; display: none; }
-        .plane-glow { filter: drop-shadow(0 0 15px #ff0000); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
-        
+        #plane-container { position: absolute; bottom: 30px; left: 30px; width: 65px; z-index: 50; display: none; filter: drop-shadow(0 0 15px #ff0000); }
         #chart-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         #red-line { fill: rgba(225, 29, 72, 0.15); stroke: #e11d48; stroke-width: 4; stroke-linecap: round; }
         
         .multiplier { font-size: 65px; font-weight: 900; z-index: 20; text-shadow: 0 0 20px rgba(255,255,255,0.3); position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); }
         #sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: #0f172a; transition: 0.3s; z-index: 200; border-right: 1px solid #1e293b; }
         .nav-item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #1e293b; cursor: pointer; }
-        .nav-item:hover { background: #1e293b; color: #facc15; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
         
         /* 7S TIMER */
@@ -35,6 +30,12 @@
     </style>
 </head>
 <body class="flex flex-col items-center">
+
+    <div id="audioUnlock" class="fixed inset-0 bg-[#0b0f1a] z-[500] flex flex-col items-center justify-center text-center">
+        <h1 class="text-4xl font-black italic text-red-500 mb-6">AVIATOR <span class="text-white">PRO</span></h1>
+        <button onclick="unlockAudio()" class="bg-red-600 px-10 py-4 rounded-2xl text-xl font-black shadow-lg hover:scale-105 transition-all">ENTER GAME</button>
+        <p class="text-slate-500 mt-4 text-xs uppercase tracking-widest">Click to enable Sound & Engine</p>
+    </div>
 
     <div class="w-full max-w-[800px] flex justify-between items-center p-3 bg-slate-900 rounded-2xl mb-2 border border-slate-800 shadow-xl">
         <div class="flex items-center gap-4">
@@ -53,8 +54,8 @@
     <div id="sidebar">
         <div class="p-6 border-b border-slate-800"><h2 class="text-xl font-black text-yellow-500 italic">ZS999 MENU</h2></div>
         <div class="nav-item" onclick="toggleSidebar()"><i class="fas fa-plane"></i> <span>Aviator</span></div>
-        <div class="nav-item text-slate-400"><i class="fas fa-dice"></i> <span>Coming Soon</span></div>
-        <div class="nav-item" onclick="showModal('with')"><i class="fas fa-university"></i> <span>Withdraw Funds</span></div>
+        <div class="nav-item text-slate-500"><i class="fas fa-dice"></i> <span>Crazy777 (Soon)</span></div>
+        <div class="nav-item" onclick="showModal('with')"><i class="fas fa-university"></i> <span>Withdraw</span></div>
         <div class="nav-item" onclick="showModal('dep')"><i class="fas fa-wallet"></i> <span>Deposit</span></div>
     </div>
     <div id="overlay" class="fixed inset-0 bg-black/50 hidden z-[150]" onclick="toggleSidebar()"></div>
@@ -62,12 +63,12 @@
     <div class="game-area shadow-2xl">
         <div class="grid-bg"></div>
         <svg id="chart-svg"><path id="red-line" d="M 30 290" /></svg>
-        <div id="statusText" class="text-[10px] text-yellow-500 font-black absolute top-[15%] left-1/2 -translate-x-1/2 z-20 uppercase">Next Round in 7s...</div>
+        <div id="statusText" class="text-[10px] text-yellow-500 font-black absolute top-[15%] left-1/2 -translate-x-1/2 z-20 uppercase tracking-widest">Waiting for next round...</div>
         
-        <div id="plane-container" class="plane-glow">
+        <div id="plane-container">
             <svg viewBox="0 0 100 50">
-                <path d="M10 25 L30 20 L80 20 L95 25 L80 30 L30 30 Z" fill="#ff0000" />
-                <path d="M40 20 L50 5 L65 5 L55 20 Z" fill="#ff0000" />
+                <path d="M10 25 L30 20 L80 20 L95 25 L80 30 L30 30 Z" fill="#ff0000" stroke="white" stroke-width="1"/>
+                <path d="M40 20 L55 5 L70 5 L60 20 Z" fill="#ff0000" />
                 <circle cx="95" cy="25" r="3" fill="white" />
             </svg>
         </div>
@@ -83,33 +84,33 @@
                 <input type="number" id="amt" value="1" class="bg-transparent text-center text-2xl font-black outline-none w-20">
                 <button onclick="changeAmt(1)" class="w-10 h-10 text-2xl font-bold">+</button>
             </div>
-            <button onclick="placeBet()" id="pBtn" class="bg-red-600 py-4 rounded-2xl text-3xl font-black uppercase">BET</button>
+            <button onclick="placeBet()" id="pBtn" class="bg-red-600 py-4 rounded-2xl text-3xl font-black uppercase shadow-[0_6px_0_#7f1d1d] active:translate-y-1 active:shadow-none transition-all">BET</button>
         </div>
         <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800">
-             <div class="flex justify-between text-[10px] text-slate-500 font-black mb-2 uppercase"><span>Network Live</span><span id="target" class="text-emerald-500 italic">Wagered: $0 / $1000</span></div>
+            <div class="flex justify-between text-[10px] text-slate-500 font-black mb-2 uppercase"><span>Network Status</span><span id="target" class="text-emerald-500 italic">Play: $0 / $1000</span></div>
             <div id="fakeBets" class="flex flex-col gap-1 h-20 text-[11px] overflow-hidden"></div>
         </div>
     </div>
 
     <div id="withModal" class="modal">
         <div class="bg-slate-900 p-6 rounded-3xl border border-red-500 w-full max-w-sm">
-            <h2 class="font-black text-center mb-4 text-red-500 text-xl">WITHDRAW</h2>
-            <input type="text" placeholder="EasyPaisa/JazzCash Number" class="w-full bg-black p-3 rounded-xl mb-3 outline-none border border-slate-800">
-            <input type="number" id="withAmt" placeholder="Amount (Min $10)" class="w-full bg-black p-3 rounded-xl mb-3 outline-none border border-slate-800">
-            <button onclick="processWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black">REQUEST WITHDRAW</button>
-            <button onclick="closeModal()" class="w-full mt-2 text-slate-500 text-xs">CLOSE</button>
+            <h2 class="font-black text-center mb-4 text-red-500 text-xl italic">WITHDRAW CASH</h2>
+            <input type="text" placeholder="EasyPaisa/JazzCash Number" class="w-full bg-black p-3 rounded-xl mb-3 outline-none border border-slate-800 text-sm">
+            <input type="number" id="withAmt" placeholder="Amount (Min $10)" class="w-full bg-black p-3 rounded-xl mb-3 outline-none border border-slate-800 text-sm">
+            <button onclick="processWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black uppercase">Submit Request</button>
+            <button onclick="closeModal()" class="w-full mt-2 text-slate-500 text-xs font-bold">CLOSE</button>
         </div>
     </div>
 
     <div id="depModal" class="modal">
         <div class="bg-slate-900 p-6 rounded-3xl border border-emerald-500 w-full max-w-sm text-center">
-            <h2 class="font-black mb-4 text-emerald-400">DEPOSIT</h2>
-            <div class="bg-black p-4 rounded-xl mb-4 cursor-pointer" onclick="navigator.clipboard.writeText('03431793371'); alert('Copied!')">
-                <p class="text-2xl font-mono">03431793371</p>
-                <p class="text-[9px] text-emerald-500">Tap to Copy EasyPaisa</p>
+            <h2 class="font-black mb-4 text-emerald-400 italic">DEPOSIT FUNDS</h2>
+            <div class="bg-black p-4 rounded-xl mb-4 cursor-pointer border border-slate-700" onclick="navigator.clipboard.writeText('03431793371'); alert('Copied!')">
+                <p class="text-2xl font-mono text-white">03431793371</p>
+                <p class="text-[10px] text-emerald-500 mt-1 uppercase font-bold">Tap to Copy EasyPaisa ✅</p>
             </div>
-            <input type="text" placeholder="Transaction ID (TID)" class="w-full bg-black p-3 rounded-xl mb-4 outline-none border border-slate-800">
-            <button onclick="alert('Sent to Admin!') || closeModal()" class="w-full bg-emerald-600 py-4 rounded-xl font-black">SUBMIT TID</button>
+            <input type="text" placeholder="Transaction ID (TID)" class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none mb-4 text-sm">
+            <button onclick="alert('Sent for Approval!') || closeModal()" class="w-full bg-emerald-600 py-4 rounded-xl font-black">SUBMIT DEPOSIT</button>
         </div>
     </div>
 
@@ -131,6 +132,14 @@
         const linePath = document.getElementById('red-line');
         const plane = document.getElementById('plane-container');
 
+        // Unlock Audio & Start
+        function unlockAudio() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            document.getElementById('audioUnlock').style.display = 'none';
+            playSfx(440, 'sine', 0.1, 0.05); // Test sound
+            startNewCycle();
+        }
+
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
@@ -151,6 +160,7 @@
             isRoundActive = false; isBetPlaced = false; isCashedOut = false;
             linePath.setAttribute('d', 'M 30 290'); 
             plane.style.display = 'none';
+            document.getElementById('statusText').innerText = "Next Round in 7s...";
             document.getElementById('statusText').style.display = 'block';
             document.getElementById('mult').innerText = "1.00x";
             document.getElementById('mult').classList.remove('text-red-500');
@@ -163,7 +173,7 @@
             tLine.classList.add('animate-timer');
 
             document.getElementById('pBtn').innerText = "BET";
-            document.getElementById('pBtn').className = "bg-red-600 py-4 rounded-2xl text-3xl font-black uppercase";
+            document.getElementById('pBtn').className = "bg-red-600 py-4 rounded-2xl text-3xl font-black uppercase shadow-[0_6px_0_#7f1d1d]";
             
             setTimeout(startPlane, 7000);
         }
@@ -174,7 +184,7 @@
             if (amt > balance) return alert("Low Balance!");
             betAmount = amt; isBetPlaced = true;
             document.getElementById('pBtn').innerText = "WAITING...";
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            playSfx(300, 'sine', 0.2, 0.1);
         }
 
         function startPlane() {
@@ -188,15 +198,15 @@
             
             if (isBetPlaced) {
                 totalWagered += betAmount;
-                document.getElementById('target').innerText = `Wagered: $${totalWagered.toFixed(0)} / $1000`;
-                document.getElementById('pBtn').className = "bg-yellow-500 text-black py-4 rounded-2xl text-2xl font-black uppercase";
+                document.getElementById('target').innerText = `Play: $${totalWagered.toFixed(0)} / $1000`;
+                document.getElementById('pBtn').className = "bg-yellow-500 text-black py-4 rounded-2xl text-2xl font-black uppercase shadow-[0_6px_0_#b45309]";
                 document.getElementById('pBtn').innerHTML = `CASHOUT<br><span id="profit" class="text-[10px] font-bold">$0.00</span>`;
             }
 
             gameTimer = setInterval(() => {
                 mult += 0.01;
                 document.getElementById('mult').innerText = mult.toFixed(2) + "x";
-                playSfx(100 + (mult*20), 'sawtooth', 0.1, 0.02); 
+                playSfx(100 + (mult*25), 'sawtooth', 0.1, 0.02); // Engine sound
 
                 if (isBetPlaced && !isCashedOut) document.getElementById('profit').innerText = "CASH: $" + (betAmount * mult).toFixed(2);
                 
@@ -211,12 +221,12 @@
                 }
 
                 if (mult >= crashPoint) { clearInterval(gameTimer); endRound(); }
-            }, 65);
+            }, 60);
         }
 
         function cashout() {
             if (isCashedOut) return;
-            playSfx(600, 'sine', 0.3, 0.1);
+            playSfx(600, 'sine', 0.4, 0.1); // Win sound
             balance += (betAmount * mult) - betAmount;
             isCashedOut = true;
             document.getElementById('pBtn').innerHTML = `SUCCESS`;
@@ -224,7 +234,7 @@
         }
 
         function endRound() {
-            playSfx(80, 'triangle', 0.6, 0.2);
+            playSfx(80, 'triangle', 0.6, 0.2); // Crash sound
             plane.style.display = 'none';
             document.getElementById('mult').innerText = "FLEW AWAY!";
             document.getElementById('mult').classList.add('text-red-500');
@@ -239,22 +249,23 @@
         }
 
         function processWithdraw() {
+            let wAmt = parseFloat(document.getElementById('withAmt').value);
             if(totalWagered < 1000) return alert("Total gameplay of $1000 required!");
-            alert("Request Sent to Admin!"); closeModal();
+            if(wAmt < 10 || wAmt > balance) return alert("Invalid Amount!");
+            alert("Withdrawal Request Sent to Admin!"); closeModal();
         }
 
+        // Fake network activity
         setInterval(() => {
             if(!isRoundActive) return;
-            const names = ["Zubi_Pro", "Malik", "King_786", "VVIP_Jani"];
+            const names = ["Zubi_Pro", "Winner_99", "Jani_VVIP", "Malik_OP"];
             const list = document.getElementById('fakeBets');
             const div = document.createElement('div');
-            div.className = "flex justify-between bg-slate-950/50 p-2 rounded border-l-2 border-emerald-500 mb-1";
-            div.innerHTML = `<span>${names[Math.floor(Math.random()*4)]}</span> <span class="text-emerald-400 font-bold">+$${(Math.random() * 20).toFixed(2)}</span>`;
+            div.className = "flex justify-between bg-slate-950/50 p-2 rounded border-l-2 border-emerald-500 mb-1 animate-pulse";
+            div.innerHTML = `<span>${names[Math.floor(Math.random()*4)]}</span> <span class="text-emerald-400 font-bold">+$${(Math.random() * 30).toFixed(2)}</span>`;
             list.prepend(div);
             if(list.children.length > 5) list.lastChild.remove();
-        }, 3000);
-
-        startNewCycle();
+        }, 2500);
     </script>
 </body>
 </html>
