@@ -46,15 +46,6 @@
 
     <div id="history-bar" class="w-full max-w-[800px] mx-auto mb-2 rounded-xl"></div>
 
-    <div id="sidebar">
-        <div class="p-6 border-b border-slate-800"><h2 class="text-xl font-black text-yellow-500 italic">ZS999 MENU</h2></div>
-        <div class="nav-item" onclick="toggleSidebar()"><i class="fas fa-plane"></i> <span>Aviator</span></div>
-        <div class="nav-item text-slate-500"><i class="fas fa-dice"></i> <span>Blockchain (Soon)</span></div>
-        <div class="nav-item" onclick="showModal('with')"><i class="fas fa-university"></i> <span>Withdraw</span></div>
-        <div class="nav-item" onclick="showModal('dep')"><i class="fas fa-wallet"></i> <span>Deposit</span></div>
-    </div>
-    <div id="overlay" class="fixed inset-0 bg-black/50 hidden z-[150]" onclick="toggleSidebar()"></div>
-
     <div class="game-area shadow-2xl">
         <div class="grid-bg"></div>
         <svg id="chart-svg"><path id="red-line" d="M 30 290" /></svg>
@@ -79,57 +70,38 @@
             </div>
             <button onclick="placeBet()" id="pBtn" class="bg-red-600 py-5 rounded-2xl text-4xl font-black uppercase shadow-[0_6px_0_#7f1d1d] active:translate-y-1 active:shadow-none transition-all">BET</button>
         </div>
-        <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800">
+        <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800 overflow-hidden">
             <div class="flex justify-between text-[10px] text-slate-500 font-black mb-2 uppercase"><span>Network Live</span><span id="target" class="text-emerald-500 italic">Play: $0 / $1000</span></div>
-            <div id="fakeBets" class="flex flex-col gap-1 h-20 text-[11px] overflow-hidden"></div>
+            <div id="fakeBets" class="flex flex-col gap-1 h-20 text-[11px]"></div>
         </div>
     </div>
 
-    <div id="withModal" class="modal"><div class="bg-slate-900 p-6 rounded-3xl border border-red-500 w-full max-w-sm"><h2 class="font-black text-center mb-4 text-red-500 italic">WITHDRAW</h2><input type="text" placeholder="Number" class="w-full bg-black p-3 rounded-xl mb-3 border border-slate-800"><input type="number" id="withAmt" placeholder="Amount (Min $10)" class="w-full bg-black p-3 rounded-xl mb-3 border border-slate-800"><button onclick="processWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black">SUBMIT</button><button onclick="closeModal()" class="w-full mt-2 text-slate-500 text-xs">CLOSE</button></div></div>
-    <div id="depModal" class="modal"><div class="bg-slate-900 p-6 rounded-3xl border border-emerald-500 w-full max-w-sm text-center"><h2 class="font-black mb-4 text-emerald-400 italic">DEPOSIT</h2><div class="bg-black p-4 rounded-xl mb-4 border border-slate-700" onclick="navigator.clipboard.writeText('03431793371'); alert('Copied!')"><p class="text-2xl font-mono">03431793371</p><p class="text-[10px] text-emerald-500 mt-1 uppercase">Tap to Copy EasyPaisa ✅</p></div><input type="text" placeholder="TID" class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 mb-4"><button onclick="alert('Sent!') || closeModal()" class="w-full bg-emerald-600 py-4 rounded-xl font-black">SUBMIT</button></div></div>
-
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(freq, type, duration, vol) {
-            try {
-                const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                g.gain.setValueAtTime(vol, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(g); g.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
-        }
+        const engineSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); 
+        const crashSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+        const cashoutSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+        engineSound.loop = true;
 
         let balance = 5.00, mult = 1.0, crashPoint = 0, gameTimer, betAmount = 0;
         let isBetPlaced = false, isCashedOut = false, isRoundActive = false, totalWagered = 0;
         const historyBar = document.getElementById('history-bar');
 
-        // HISTORY LOGIC: Save to LocalStorage
+        function unlockAudio() {
+            document.getElementById('audioUnlock').style.display = 'none';
+            loadHistory();
+            startNewCycle();
+        }
+
         function loadHistory() {
             const saved = localStorage.getItem('zs999_history');
-            if (saved) {
-                JSON.parse(saved).forEach(val => addChipToUI(val));
-            }
+            if (saved) JSON.parse(saved).forEach(val => addChipToUI(val));
         }
-        function saveToStorage(val) {
-            let data = JSON.parse(localStorage.getItem('zs999_history') || '[]');
-            data.unshift(val);
-            if(data.length > 15) data.pop();
-            localStorage.setItem('zs999_history', JSON.stringify(data));
-        }
+
         function addChipToUI(val) {
             let chip = document.createElement('div');
             chip.className = `px-3 py-1 rounded-full text-[10px] font-black shrink-0 ${val > 2 ? 'bg-purple-600' : 'bg-blue-600'} border border-white/10`;
             chip.innerText = parseFloat(val).toFixed(2) + "x";
             historyBar.prepend(chip);
-        }
-
-        function unlockAudio() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            document.getElementById('audioUnlock').style.display = 'none';
-            loadHistory();
-            startNewCycle();
         }
 
         function startNewCycle() {
@@ -140,8 +112,8 @@
             document.getElementById('mult').innerText = "1.00x";
             document.getElementById('mult').style.color = "white";
             
-            const tLine = document.getElementById('timerLine');
             document.getElementById('timerBar').style.display = 'block';
+            const tLine = document.getElementById('timerLine');
             tLine.classList.remove('animate-timer');
             void tLine.offsetWidth; 
             tLine.classList.add('animate-timer');
@@ -158,7 +130,6 @@
             if (amt > balance) return alert("Low Balance!");
             betAmount = amt; isBetPlaced = true;
             document.getElementById('pBtn').innerText = "WAITING...";
-            playSfx(300, 'sine', 0.2, 0.1);
         }
 
         function startPlane() {
@@ -167,8 +138,12 @@
             document.getElementById('statusText').style.display = 'none';
             document.getElementById('plane-container').style.display = 'block';
             mult = 1.0; 
-            let r = Math.random() * 100;
-            crashPoint = (r < 10) ? 1.00 : (1 + Math.random() * 4).toFixed(2);
+            
+            // SOUND: Start Engine
+            engineSound.currentTime = 0;
+            engineSound.play();
+
+            crashPoint = (Math.random() < 0.1) ? 1.00 : (1 + Math.random() * 4).toFixed(2);
             
             if (isBetPlaced) {
                 totalWagered += betAmount;
@@ -179,7 +154,9 @@
             gameTimer = setInterval(() => {
                 mult += 0.01;
                 document.getElementById('mult').innerText = mult.toFixed(2) + "x";
-                playSfx(100 + (mult*20), 'sawtooth', 0.1, 0.02);
+                
+                // Dynamic Sound Pitch
+                engineSound.playbackRate = 1 + (mult / 15);
 
                 if (isBetPlaced && !isCashedOut) document.getElementById('pBtn').innerHTML = `CASHOUT<br><span class="text-xs font-bold">$${(betAmount * mult).toFixed(2)}</span>`;
                 
@@ -191,13 +168,19 @@
                     document.getElementById('red-line').setAttribute('d', `M 30 290 Q ${x/2 + 20} 290 ${x} ${y}`);
                 }
 
-                if (mult >= crashPoint) { clearInterval(gameTimer); endRound(); }
+                if (mult >= crashPoint) { 
+                    clearInterval(gameTimer); 
+                    // SOUND: Stop engine, play crash
+                    engineSound.pause();
+                    crashSound.play();
+                    endRound(); 
+                }
             }, 60);
         }
 
         function cashout() {
             if (isCashedOut) return;
-            playSfx(600, 'sine', 0.4, 0.1);
+            cashoutSound.play();
             balance += (betAmount * mult) - betAmount;
             isCashedOut = true;
             document.getElementById('pBtn').innerText = "SUCCESS";
@@ -205,40 +188,27 @@
         }
 
         function endRound() {
-            playSfx(80, 'triangle', 0.6, 0.2);
             document.getElementById('plane-container').style.display = 'none';
             document.getElementById('mult').innerText = "FLEW AWAY!";
             document.getElementById('mult').style.color = "#ef4444";
             
-            saveToStorage(crashPoint);
+            let data = JSON.parse(localStorage.getItem('zs999_history') || '[]');
+            data.unshift(crashPoint);
+            localStorage.setItem('zs999_history', JSON.stringify(data.slice(0,15)));
             addChipToUI(crashPoint);
 
-            if (isBetPlaced && !isCashedOut) { balance -= betAmount; document.getElementById('bal').innerText = "$" + balance.toFixed(2); }
+            if (isBetPlaced && !isCashedOut) { 
+                balance -= betAmount; 
+                document.getElementById('bal').innerText = "$" + balance.toFixed(2); 
+            }
             setTimeout(startNewCycle, 3000);
         }
 
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar'), ov = document.getElementById('overlay');
-            const isOpen = sb.style.left === '0px';
-            sb.style.left = isOpen ? '-280px' : '0px';
-            ov.style.display = isOpen ? 'none' : 'block';
-        }
-        function showModal(type) { closeModal(); document.getElementById(type+'Modal').style.display = 'flex'; }
-        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
         function changeAmt(v) { document.getElementById('amt').value = Math.max(1, parseInt(document.getElementById('amt').value) + v); }
-        function processWithdraw() { if(totalWagered < 1000) return alert("Wager $1000 first!"); alert("Requested!"); closeModal(); }
-
-        // Fake live network
-        setInterval(() => {
-            if(!isRoundActive) return;
-            const names = ["Zubi_Pro", "Malik_OP", "Jani_VVIP", "Winner_99"];
-            const list = document.getElementById('fakeBets');
-            const div = document.createElement('div');
-            div.className = "flex justify-between bg-black/40 p-2 rounded border-l-2 border-emerald-500 mb-1 animate-pulse";
-            div.innerHTML = `<span>${names[Math.floor(Math.random()*4)]}</span> <span class="text-emerald-400">+$${(Math.random() * 20).toFixed(2)}</span>`;
-            list.prepend(div);
-            if(list.children.length > 4) list.lastChild.remove();
-        }, 2000);
+        function toggleSidebar() { 
+            let s = document.getElementById('sidebar'); 
+            s.style.left = s.style.left === '0px' ? '-280px' : '0px'; 
+        }
     </script>
 </body>
 </html>
