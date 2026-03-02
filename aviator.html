@@ -38,6 +38,10 @@
         #spribe-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .loader-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* NEW WITHDRAW STYLES */
+        .method-card { background: #1a1f2e; border: 1px solid #2d3343; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .method-card.active { border-color: #ef4444; background: #2d1a1a; }
     </style>
 </head>
 <body>
@@ -80,8 +84,7 @@
             <span id="game-bal" class="text-emerald-400 font-bold">$0.00</span>
         </div>
 
-        <div id="crash-history" class="history-bar">
-            </div>
+        <div id="crash-history" class="history-bar"></div>
 
         <div class="game-viewport mb-3">
             <div id="mult-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl font-black z-20">1.00x</div>
@@ -118,8 +121,7 @@
 
         <div class="mt-4">
             <h3 class="text-[9px] font-bold text-gray-500 uppercase mb-2">Live Bets</h3>
-            <div class="live-bets-box" id="fake-bets-list">
-                </div>
+            <div class="live-bets-box" id="fake-bets-list"></div>
         </div>
     </div>
 
@@ -133,9 +135,29 @@
     </div>
 
     <div id="withdraw-modal" class="modal-screen">
-        <div class="flex justify-between items-center mb-10"><h2 class="text-xl font-bold">WITHDRAW</h2><button onclick="hideModal('withdraw-modal')"><i class="fas fa-times"></i></button></div>
-        <input type="number" id="w-amt" placeholder="Amount" class="w-full bg-slate-800 p-4 rounded-xl mb-4">
-        <button onclick="startWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black">WITHDRAW NOW</button>
+        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold uppercase">Withdraw Funds</h2><button onclick="hideModal('withdraw-modal')"><i class="fas fa-times"></i></button></div>
+        
+        <p class="text-[10px] text-gray-500 uppercase font-bold mb-3">Select Method</p>
+        <div class="grid grid-cols-3 gap-2 mb-6">
+            <div onclick="selectMethod('EasyPaisa')" id="m-EasyPaisa" class="method-card text-center active">
+                <i class="fas fa-mobile-alt text-emerald-500 mb-1"></i>
+                <p class="text-[9px] font-bold">EasyPaisa</p>
+            </div>
+            <div onclick="selectMethod('JazzCash')" id="m-JazzCash" class="method-card text-center">
+                <i class="fas fa-wallet text-orange-500 mb-1"></i>
+                <p class="text-[9px] font-bold">JazzCash</p>
+            </div>
+            <div onclick="selectMethod('Binance')" id="m-Binance" class="method-card text-center">
+                <i class="fab fa-bitcoin text-yellow-500 mb-1"></i>
+                <p class="text-[9px] font-bold">Binance</p>
+            </div>
+        </div>
+
+        <input type="number" id="w-amt" placeholder="Amount ($)" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-3 text-sm font-bold text-emerald-400">
+        <input type="text" id="w-account" placeholder="Account Number / Address" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-6 text-sm">
+        
+        <button onclick="startWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black shadow-lg shadow-red-900/20">WITHDRAW NOW</button>
+        <p class="text-center text-[9px] text-gray-600 mt-4 italic">Processing time: 2-24 Hours</p>
     </div>
 
     <div id="spribe-loader">
@@ -147,12 +169,12 @@
         let balance = localStorage.getItem('zs_bal') ? parseFloat(localStorage.getItem('zs_bal')) : 5.00;
         let multiplier = 1.0, activeRound = false, crashPoint = 0;
         let userBets = { 1: { on: false, cash: false, amt: 0 }, 2: { on: false, cash: false, amt: 0 } };
+        let selectedMethod = "EasyPaisa";
         const names = ["Ali", "Khan", "Sana", "Don", "Zubi", "Malik", "Raja", "Ahmad", "Wicky", "Mani", "Sajid", "Hamza"];
 
         window.onload = () => {
             updateUI();
             startLiveUpdates();
-            // Pre-fill crash history
             for(let i=0; i<8; i++) addHistory((1 + Math.random()*3).toFixed(2));
         };
 
@@ -160,6 +182,26 @@
             document.getElementById('home-bal').innerText = "$" + balance.toFixed(2);
             document.getElementById('game-bal').innerText = "$" + balance.toFixed(2);
             localStorage.setItem('zs_bal', balance);
+        }
+
+        // --- NEW WITHDRAWAL FUNCTIONS ---
+        function selectMethod(m) {
+            selectedMethod = m;
+            document.querySelectorAll('.method-card').forEach(el => el.classList.remove('active'));
+            document.getElementById('m-' + m).classList.add('active');
+        }
+
+        function startWithdraw() {
+            let amt = document.getElementById('w-amt').value;
+            let acc = document.getElementById('w-account').value;
+            if(!amt || amt < 1) { alert("Please enter valid amount!"); return; }
+            if(!acc) { alert("Please enter account details!"); return; }
+            if(amt > balance) { alert("Insufficient Balance!"); return; }
+
+            balance -= parseFloat(amt);
+            updateUI();
+            alert(`Withdrawal Request Submitted!\nMethod: ${selectedMethod}\nAmount: $${amt}\nStatus: Pending Verification`);
+            hideModal('withdraw-modal');
         }
 
         // --- NAVIGATION ---
@@ -179,7 +221,7 @@
             document.getElementById('home').style.display = 'block';
         }
 
-        // --- CORE GAME LOGIC ---
+        // --- CORE GAME LOGIC (Aviator) ---
         function addHistory(val) {
             const hist = document.getElementById('crash-history');
             const div = document.createElement('div');
@@ -213,7 +255,6 @@
                 multiplier += 0.01;
                 document.getElementById('mult-display').innerText = multiplier.toFixed(2) + "x";
                 
-                // Update buttons if betting
                 [1,2].forEach(id => {
                     if(userBets[id].on && !userBets[id].cash) {
                         document.getElementById(`btn${id}`).innerHTML = `CASHOUT<br>$${(userBets[id].amt * multiplier).toFixed(2)}`;
@@ -260,9 +301,7 @@
             }
         }
 
-        // --- FAKE LIVE UPDATES ---
         function startLiveUpdates() {
-            // Update Live Withdrawals (Home)
             setInterval(() => {
                 const list = document.getElementById('live-wit-list');
                 const name = names[Math.floor(Math.random()*names.length)] + "_***";
@@ -274,23 +313,17 @@
                 if(list.children.length > 5) list.lastChild.remove();
             }, 3000);
 
-            // Update Live Bets (Game)
             setInterval(() => {
                 if(!activeRound) return;
                 const list = document.getElementById('fake-bets-list');
                 const name = names[Math.floor(Math.random()*names.length)];
                 const amt = (Math.random()*50 + 1).toFixed(2);
-                const html = `<div class="bet-row">
-                    <span class="text-gray-300">${name}</span>
-                    <span class="text-white font-bold">$${amt}</span>
-                    <span class="text-gray-500">-</span>
-                </div>`;
+                const html = `<div class="bet-row"><span class="text-gray-300">${name}</span><span class="text-white font-bold">$${amt}</span><span class="text-gray-500">-</span></div>`;
                 list.insertAdjacentHTML('afterbegin', html);
                 if(list.children.length > 6) list.lastChild.remove();
             }, 1000);
         }
 
-        // --- BOT LOGIC ---
         function checkBotPass() {
             if(document.getElementById('bot-pass').value === "ZS999") {
                 document.getElementById('bot-login-inner').classList.add('hidden');
@@ -299,13 +332,10 @@
         }
         function getPrediction() {
             document.getElementById('ai-prediction').innerText = "SCANNING...";
-            setTimeout(() => {
-                document.getElementById('ai-prediction').innerText = crashPoint + "x";
-            }, 1000);
+            setTimeout(() => { document.getElementById('ai-prediction').innerText = crashPoint + "x"; }, 1000);
         }
 
         function submitDeposit() { alert("Request Sent! Balance will update after verification."); hideModal('deposit-modal'); }
-        function startWithdraw() { alert("Withdrawal Processing..."); hideModal('withdraw-modal'); }
     </script>
 </body>
 </html>
