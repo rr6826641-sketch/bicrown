@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZS999 VIP Official</title>
+    <title>ZS999 VIP - Official System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -12,23 +12,30 @@
         .game-card:hover { border-color: #facc15; transform: translateY(-5px); }
         .hot-label { position: absolute; top: 5px; left: 5px; background: #ef4444; color: white; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; z-index: 10; }
         .game-img { width: 100%; height: 100px; object-fit: cover; }
-        #spribe-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .loader-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        
+        /* Aviator Viewport */
         .game-viewport { background: #131722; border-radius: 20px; height: 260px; position: relative; overflow: hidden; border: 1px solid #1e293b; }
         #plane-wrap { position: absolute; width: 70px; z-index: 50; display: none; filter: drop-shadow(0 0 10px #ff0000); }
         .propeller { animation: spin 0.1s linear infinite; transform-origin: 85% 50%; }
         @keyframes spin { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
-        .bet-history { background: #0f172a; border-radius: 12px; height: 140px; overflow-y: auto; border: 1px solid #1e293b; }
-        .bet-item { display: flex; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid #1e293b; font-size: 10px; }
 
-        /* Bot Styling */
-        #bot-panel { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .bot-btn { width: 60px; height: 60px; background: #3b82f6; border-radius: 50%; display: flex; items-center; justify-content: center; box-shadow: 0 0 20px #3b82f6; cursor: pointer; border: 3px solid white; }
-        .bot-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 250px; background: #1e293b; border: 2px solid #3b82f6; border-radius: 15px; padding: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        /* Modals & Screens */
+        .modal-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 2000; display: none; flex-direction: column; padding: 20px; }
         
-        /* Full Screen Modals */
-        .modal-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 2000; display: none; flex-direction: column; p: 20px; }
+        /* Bot Styling */
+        #bot-panel { position: fixed; bottom: 20px; right: 20px; z-index: 3000; }
+        .bot-btn { width: 60px; height: 60px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #3b82f6; cursor: pointer; border: 3px solid white; }
+        .bot-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 260px; background: #1e293b; border: 2px solid #3b82f6; border-radius: 15px; padding: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+
+        /* Loader */
+        #spribe-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        
+        /* Withdraw List */
+        .wit-list-container { background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; border-radius: 10px; height: 120px; overflow: hidden; margin-top: 20px; }
+        .wit-track { animation: slideUp 10s linear infinite; }
+        @keyframes slideUp { 0% { transform: translateY(0); } 100% { transform: translateY(-100%); } }
     </style>
 </head>
 <body>
@@ -38,65 +45,75 @@
             <h1 class="text-3xl font-black italic text-yellow-500 tracking-tighter">ZS999</h1>
             <div class="flex flex-col items-end">
                 <div class="bg-slate-900 px-4 py-1 rounded-full border border-slate-700 mb-2">
-                    <span id="home-bal" class="text-emerald-400 font-bold">$8.94</span>
+                    <span id="home-bal" class="text-emerald-400 font-bold">$0.00</span>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="showModal('deposit-modal')" class="bg-emerald-600 px-3 py-1 rounded text-[10px] font-bold">DEPOSIT</button>
-                    <button onclick="showModal('withdraw-modal')" class="bg-slate-700 px-3 py-1 rounded text-[10px] font-bold">WITHDRAW</button>
+                    <button onclick="showModal('deposit-modal')" class="bg-emerald-600 px-3 py-1 rounded text-[10px] font-bold uppercase">Deposit</button>
+                    <button onclick="showModal('withdraw-modal')" class="bg-slate-700 px-3 py-1 rounded text-[10px] font-bold uppercase">Withdraw</button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 gap-3 mb-6">
             <div onclick="openAviator()" class="game-card">
                 <span class="hot-label">HOT</span>
                 <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="game-img">
-                <div class="p-2 text-[10px] text-center font-bold text-gray-400">AVIATOR</div>
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400 uppercase">Aviator VIP</div>
             </div>
+            <div class="game-card opacity-50">
+                <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="game-img">
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400 uppercase">Mines Pro</div>
             </div>
+        </div>
+
+        <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Live Withdrawals</h3>
+        <div class="wit-list-container">
+            <div class="wit-track p-3 text-[11px]" id="live-wit-list">
+                </div>
+        </div>
     </div>
 
-    <div id="deposit-modal" class="modal-screen p-6">
+    <div id="deposit-modal" class="modal-screen">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="text-xl font-bold">DEPOSIT</h2>
-            <button onclick="hideModal('deposit-modal')"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-bold uppercase">Deposit Funds</h2>
+            <button onclick="hideModal('deposit-modal')"><i class="fas fa-times text-xl"></i></button>
         </div>
-        <div class="bg-slate-900 p-6 rounded-2xl border border-emerald-500/30 text-center">
-            <p class="text-gray-400 text-sm mb-2">Transfer to EasyPaisa</p>
+        <div class="bg-slate-900 p-6 rounded-2xl border border-emerald-500/30 text-center mb-6">
+            <p class="text-gray-400 text-xs mb-2">Transfer to EasyPaisa</p>
             <h1 class="text-2xl font-black text-emerald-400">03431793371</h1>
-            <p class="text-[10px] mt-2 text-gray-500 uppercase">Send screenshot to admin after payment</p>
+            <p class="text-[10px] mt-2 text-gray-500 italic uppercase">Note: Manual Approval takes 10 mins</p>
         </div>
-        <button onclick="hideModal('deposit-modal')" class="w-full bg-emerald-600 py-4 rounded-xl mt-6 font-bold">DONE</button>
+        <input type="number" id="dep-amt" placeholder="Amount Sent" class="w-full bg-slate-800 p-4 rounded-xl mb-4 outline-none border border-slate-700">
+        <input type="text" id="dep-trx" placeholder="Transaction ID (TRX ID)" class="w-full bg-slate-800 p-4 rounded-xl mb-6 outline-none border border-slate-700">
+        <button onclick="submitDeposit()" class="w-full bg-emerald-600 py-4 rounded-xl font-black uppercase shadow-lg">Submit Payment</button>
     </div>
 
-    <div id="withdraw-modal" class="modal-screen p-6">
+    <div id="withdraw-modal" class="modal-screen">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="text-xl font-bold">WITHDRAW</h2>
-            <button onclick="hideModal('withdraw-modal')"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-bold uppercase">Withdraw</h2>
+            <button onclick="hideModal('withdraw-modal')"><i class="fas fa-times text-xl"></i></button>
         </div>
-        <div id="withdraw-content">
-            <input type="number" id="w-amt" placeholder="Enter Amount" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-4 outline-none">
-            <select class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-6 outline-none">
+        <div id="wit-main-content">
+            <input type="number" id="w-amt" placeholder="Amount to Withdraw" class="w-full bg-slate-800 p-4 rounded-xl mb-4 outline-none border border-slate-700">
+            <select class="w-full bg-slate-800 p-4 rounded-xl mb-6 outline-none border border-slate-700">
                 <option>EasyPaisa</option>
                 <option>JazzCash</option>
             </select>
-            <button onclick="startWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-bold">WITHDRAW NOW</button>
+            <button onclick="startWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black">WITHDRAW NOW</button>
         </div>
-        <div id="withdraw-status" class="hidden text-center py-10">
+        <div id="wit-status" class="hidden text-center py-20">
             <div id="w-loader" class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-yellow-500 border-t-transparent mb-4"></div>
-            <h3 id="w-text" class="text-xl font-bold text-yellow-500 italic">PENDING...</h3>
-            <p id="w-subtext" class="text-xs text-gray-500 mt-2">Checking Bank Gateway</p>
+            <h3 id="w-text" class="text-xl font-black text-yellow-500 italic">PENDING...</h3>
+            <p id="w-subtext" class="text-[10px] text-gray-500 mt-2">Checking Network Gateway</p>
         </div>
     </div>
 
-    <div id="game" class="hidden p-3 min-h-screen flex flex-col">
+    <div id="game-screen" class="hidden p-3 min-h-screen flex flex-col">
         <div class="flex justify-between items-center mb-2">
-            <button onclick="goHome()" class="text-gray-500"><i class="fas fa-chevron-left text-xl"></i></button>
-            <div class="text-red-600 font-black italic text-xs uppercase">Aviator <span class="text-white">VIP</span></div>
-            <span id="game-bal" class="text-emerald-400 font-bold">$8.94</span>
+            <button onclick="goHome()" class="text-gray-500"><i class="fas fa-chevron-left text-xl"></i> Back</button>
+            <span id="game-bal" class="text-emerald-400 font-bold">$0.00</span>
         </div>
         <div class="game-viewport mb-4">
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
             <div id="mult-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl font-black z-20">1.00x</div>
             <svg class="absolute inset-0 w-full h-full"><path id="air-curve" fill="rgba(225,29,72,0.15)" stroke="#e11d48" stroke-width="5" d="M 0 260"/></svg>
             <div id="plane-wrap"><svg viewBox="0 0 100 40"><path d="M10 20 Q 30 10 80 15 L 95 20 L 80 25 Q 30 30 10 20" fill="#ef4444" stroke="white" stroke-width="1.5"/><path class="propeller" d="M92 12 L92 28" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div>
@@ -104,76 +121,120 @@
         <div class="grid grid-cols-2 gap-3 mb-4">
             <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
                 <input type="number" id="amt1" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold mb-2 rounded-lg py-2">
-                <button id="btn1" onclick="placeBet(1)" class="w-full bg-red-600 py-4 rounded-xl font-black shadow-[0_5px_0_#7f1d1d]">BET</button>
+                <button id="btn1" onclick="placeBet(1)" class="w-full bg-red-600 py-4 rounded-xl font-black">BET</button>
             </div>
             <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
                 <input type="number" id="amt2" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold mb-2 rounded-lg py-2">
-                <button id="btn2" onclick="placeBet(2)" class="w-full bg-red-600 py-4 rounded-xl font-black shadow-[0_5px_0_#7f1d1d]">BET</button>
+                <button id="btn2" onclick="placeBet(2)" class="w-full bg-red-600 py-4 rounded-xl font-black">BET</button>
             </div>
         </div>
-        <div id="bet-list" class="bet-history"></div>
     </div>
 
     <div id="bot-panel">
         <div onclick="toggleBot()" class="bot-btn"><i class="fas fa-robot text-2xl"></i></div>
         <div id="bot-window" class="bot-window">
             <div id="bot-login">
-                <input type="password" id="bot-pass" placeholder="Password" class="w-full bg-black p-2 rounded mb-2 text-xs border border-blue-500">
-                <button onclick="checkBotPass()" class="w-full bg-blue-600 text-[10px] font-bold py-2 rounded">LOGIN BOT</button>
+                <h3 class="text-xs font-bold text-blue-400 mb-3 uppercase tracking-widest">AI Auth</h3>
+                <input type="password" id="bot-pass" placeholder="Password" class="w-full bg-black p-3 rounded-lg mb-3 text-xs border border-blue-900 outline-none">
+                <button onclick="checkBotPass()" class="w-full bg-blue-600 text-[10px] font-bold py-3 rounded-lg uppercase">Unlock Bot</button>
             </div>
             <div id="bot-content" class="hidden text-center">
-                <p class="text-[10px] text-blue-400 font-bold mb-2 uppercase">AI Prediction Engine</p>
-                <div class="bg-black/50 p-4 rounded-xl border border-blue-500">
-                    <span class="text-[10px] text-gray-400">NEXT CRASH:</span>
-                    <h2 id="ai-prediction" class="text-2xl font-black text-white">READY</h2>
+                <div class="bg-black/50 p-4 rounded-xl border border-blue-500 mb-4">
+                    <p class="text-[9px] text-gray-500 uppercase">Predicting Crash...</p>
+                    <h2 id="ai-prediction" class="text-3xl font-black text-blue-400">READY</h2>
                 </div>
-                <button onclick="getPrediction()" class="w-full bg-blue-600 mt-4 py-2 rounded-lg font-bold text-xs">GET SIGNAL</button>
+                <button onclick="getPrediction()" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-xs uppercase">Get Signal</button>
             </div>
         </div>
     </div>
 
+    <div id="spribe-loader">
+        <div class="text-4xl font-black italic tracking-tighter">SPRIBE</div>
+        <div class="flex gap-2 mt-6">
+            <div class="loader-dot"></div><div class="loader-dot" style="animation-delay:0.2s"></div><div class="loader-dot" style="animation-delay:0.4s"></div>
+        </div>
+    </div>
+
     <script>
-        // Load Balance from LocalStorage
-        let balance = localStorage.getItem('zs_bal') ? parseFloat(localStorage.getItem('zs_bal')) : 8.94;
+        // --- DATA & INITIALIZATION ---
+        let balance = localStorage.getItem('zs_bal') ? parseFloat(localStorage.getItem('zs_bal')) : 0;
         let multiplier = 1.0, activeRound = false, crashPoint = 0;
         let userBets = { 1: { on: false, cash: false, amt: 0 }, 2: { on: false, cash: false, amt: 0 } };
 
-        function updateBalanceUI() {
+        window.onload = () => {
+            if(!localStorage.getItem('zs_init')) {
+                balance = 5.00; // Reward
+                localStorage.setItem('zs_bal', balance);
+                localStorage.setItem('zs_init', 'true');
+                alert("🎁 Welcome! $5 Reward added to your wallet.");
+            }
+            updateUI();
+            generateWithdrawList();
+        };
+
+        function updateUI() {
             document.getElementById('home-bal').innerText = "$" + balance.toFixed(2);
             document.getElementById('game-bal').innerText = "$" + balance.toFixed(2);
             localStorage.setItem('zs_bal', balance);
         }
-        updateBalanceUI();
 
+        // --- NAVIGATION ---
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function hideModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function startWithdraw() {
-            let amt = document.getElementById('w-amt').value;
-            if(amt > balance) { alert("Insufficient Balance!"); return; }
-            document.getElementById('withdraw-content').classList.add('hidden');
-            document.getElementById('withdraw-status').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('w-loader').style.display = 'none';
-                document.getElementById('w-text').innerText = "SUCCESSFUL";
-                document.getElementById('w-text').className = "text-xl font-bold text-emerald-500 italic";
-                document.getElementById('w-subtext').innerText = "Withdrawal sent to your wallet. Bank may take 12-24h to update your ledger.";
-                balance -= parseFloat(amt);
-                updateBalanceUI();
-            }, 5000);
-        }
-
+        
         function openAviator() {
             document.getElementById('home').style.display = 'none';
             document.getElementById('spribe-loader').style.display = 'flex';
             setTimeout(() => {
                 document.getElementById('spribe-loader').style.display = 'none';
-                document.getElementById('game').style.display = 'flex';
+                document.getElementById('game-screen').style.display = 'flex';
                 initCycle();
-            }, 2000);
+            }, 2500);
+        }
+        function goHome() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('home').style.display = 'block';
         }
 
+        // --- DEPOSIT & WITHDRAW ---
+        function submitDeposit() {
+            let trx = document.getElementById('dep-trx').value;
+            if(!trx) { alert("Please enter TRX ID!"); return; }
+            alert("✅ Request Submitted! Balance will be added after TRX verification.");
+            hideModal('deposit-modal');
+        }
+
+        function startWithdraw() {
+            let amt = document.getElementById('w-amt').value;
+            if(amt > balance || amt < 1) { alert("Invalid Amount!"); return; }
+            
+            document.getElementById('wit-main-content').classList.add('hidden');
+            document.getElementById('wit-status').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('w-loader').style.display = 'none';
+                document.getElementById('w-text').innerText = "SUCCESSFUL";
+                document.getElementById('w-text').className = "text-xl font-black text-emerald-500 italic";
+                document.getElementById('w-subtext').innerText = "Transaction finalized by Spribe Network. Check your mobile wallet.";
+                balance -= parseFloat(amt);
+                updateUI();
+            }, 5000);
+        }
+
+        function generateWithdrawList() {
+            const names = ["Ahmad", "Zubi", "Malik", "Raja", "Sana", "Khan", "Ali", "Don"];
+            const list = document.getElementById('live-wit-list');
+            for(let i=0; i<15; i++) {
+                let name = names[Math.floor(Math.random()*names.length)] + "_***";
+                let amt = (Math.random()*100 + 10).toFixed(2);
+                list.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-800">
+                    <span class="text-gray-400">${name}</span>
+                    <span class="text-emerald-500 font-bold">+$${amt}</span>
+                </div>`;
+            }
+        }
+
+        // --- GAME CORE ---
         function initCycle() {
             activeRound = false; multiplier = 1.0;
             crashPoint = (1.1 + Math.random() * 5).toFixed(2);
@@ -184,7 +245,7 @@
             [1, 2].forEach(id => {
                 if(!userBets[id].on) {
                     document.getElementById(`btn${id}`).innerText = "BET";
-                    document.getElementById(`btn${id}`).className = "w-full bg-red-600 py-4 rounded-xl font-black shadow-[0_5px_0_#7f1d1d]";
+                    document.getElementById(`btn${id}`).className = "w-full bg-red-600 py-4 rounded-xl font-black";
                 }
             });
             setTimeout(takeOff, 4000);
@@ -199,7 +260,7 @@
                 [1,2].forEach(id => {
                     if(userBets[id].on && !userBets[id].cash) {
                         document.getElementById(`btn${id}`).innerHTML = `CASHOUT<br>$${(userBets[id].amt * multiplier).toFixed(2)}`;
-                        document.getElementById(`btn${id}`).className = "w-full bg-yellow-500 text-black py-3 rounded-xl font-black shadow-[0_5px_0_#b45309]";
+                        document.getElementById(`btn${id}`).className = "w-full bg-yellow-500 text-black py-3 rounded-xl font-black";
                     }
                 });
                 let x = (multiplier - 1) * 90;
@@ -222,9 +283,9 @@
             } else if (activeRound && userBets[id].on && !userBets[id].cash) {
                 userBets[id].cash = true;
                 balance += (userBets[id].amt * multiplier) - userBets[id].amt;
-                updateBalanceUI();
+                updateUI();
                 document.getElementById(`btn${id}`).innerText = "WIN!";
-                document.getElementById(`btn${id}`).className = "w-full bg-emerald-600 py-4 rounded-xl font-black shadow-none";
+                document.getElementById(`btn${id}`).className = "w-full bg-emerald-600 py-4 rounded-xl font-black";
             }
         }
 
@@ -233,18 +294,13 @@
             document.getElementById('mult-display').innerText = "FLEW AWAY!";
             document.getElementById('mult-display').style.color = "#ef4444";
             [1, 2].forEach(id => {
-                if(userBets[id].on && !userBets[id].cash) { balance -= userBets[id].amt; updateBalanceUI(); }
+                if(userBets[id].on && !userBets[id].cash) { balance -= userBets[id].amt; updateUI(); }
                 userBets[id].on = false; userBets[id].cash = false;
             });
             setTimeout(initCycle, 3000);
         }
 
-        function goHome() { 
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('home').style.display = 'block';
-        }
-
-        // BOT LOGIC
+        // --- BOT ---
         function toggleBot() { 
             let win = document.getElementById('bot-window');
             win.style.display = win.style.display === 'block' ? 'none' : 'block';
