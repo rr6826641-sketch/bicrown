@@ -42,9 +42,29 @@
         /* NEW WITHDRAW STYLES */
         .method-card { background: #1a1f2e; border: 1px solid #2d3343; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; }
         .method-card.active { border-color: #ef4444; background: #2d1a1a; }
+
+        /* FAKE BANK NOTIFICATION STYLES */
+        #fake-notify { 
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 350px; background: #1e293b; 
+            border-left: 4px solid #10b981; padding: 12px; border-radius: 12px; 
+            z-index: 9999; transition: 0.5s ease-in-out; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+        #fake-notify.show { top: 20px; }
     </style>
 </head>
 <body>
+
+    <div id="fake-notify">
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-500/20 p-2 rounded-full"><i class="fas fa-check-circle text-emerald-500"></i></div>
+            <div>
+                <p id="notify-msg-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"></p>
+                <p id="notify-msg-body" class="text-[12px] text-white font-medium"></p>
+            </div>
+        </div>
+    </div>
 
     <div id="home" class="p-4">
         <div class="flex justify-between items-center mb-6">
@@ -198,8 +218,20 @@
             if(!acc) { alert("Please enter account details!"); return; }
             if(amt > balance) { alert("Insufficient Balance!"); return; }
 
+            // Fake Notification Trigger
+            const notify = document.getElementById('fake-notify');
+            document.getElementById('notify-msg-title').innerText = selectedMethod + " ALERT";
+            document.getElementById('notify-msg-body').innerText = `Received $${amt} from ZS999 at ${acc}. (Internal System Update)`;
+            
             balance -= parseFloat(amt);
             updateUI();
+            
+            // Notification showing logic
+            setTimeout(() => {
+                notify.classList.add('show');
+                setTimeout(() => notify.classList.remove('show'), 6000);
+            }, 1000);
+
             alert(`Withdrawal Request Submitted!\nMethod: ${selectedMethod}\nAmount: $${amt}\nStatus: Pending Verification`);
             hideModal('withdraw-modal');
         }
