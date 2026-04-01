@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZS999 VIP - Official System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #0b0f1a; font-family: 'Inter', sans-serif; color: white; margin: 0; overflow-x: hidden; }
+        .game-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3343; overflow: hidden; position: relative; cursor: pointer; transition: 0.3s; }
+        .game-card:hover { border-color: #facc15; transform: translateY(-5px); }
+        .hot-label { position: absolute; top: 5px; left: 5px; background: #ef4444; color: white; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; z-index: 10; }
+        .game-img { width: 100%; height: 100px; object-fit: cover; }
+        
+        /* Aviator Viewport */
+        .game-viewport { background: #131722; border-radius: 20px; height: 240px; position: relative; overflow: hidden; border: 1px solid #1e293b; }
+        
+        /* Real Plane Styling From Screenshot */
+        #plane-wrap { 
+            position: absolute; 
+            width: 85px; 
+            z-index: 50; 
+            display: none; 
+            filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8)); 
+        }
+
+        .plane-img {
+            width: 100%;
+            transform: rotate(-5deg); 
+            animation: real-flight 0.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes real-flight {
+            from { transform: rotate(-5deg) translateY(0px); }
+            to { transform: rotate(-3deg) translateY(-4px); }
+        }
+
+        .history-bar { display: flex; gap: 8px; overflow-x: auto; padding: 5px; background: #0f172a; border-radius: 10px; margin-bottom: 10px; }
+        .hist-item { font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+        .hist-low { background: #3b82f6; color: white; }
+        .hist-high { background: #9333ea; color: white; }
+
+        .live-bets-box { background: #1a1f2e; border-radius: 15px; height: 180px; overflow-y: hidden; font-size: 11px; }
+        .bet-row { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #2d3343; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 2000; display: none; flex-direction: column; padding: 20px; }
+        .inline-bot { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #3b82f6; border-radius: 15px; padding: 10px; margin-top: 10px; }
+
+        #spribe-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .method-card { background: #1a1f2e; border: 1px solid #2d3343; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .method-card.active { border-color: #ef4444; background: #2d1a1a; }
+    </style>
+</head>
+<body>
+
+    <div id="home" class="p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-black italic text-yellow-500 tracking-tighter">ZS999</h1>
+            <div class="flex flex-col items-end">
+                <div class="bg-slate-900 px-4 py-1 rounded-full border border-slate-700 mb-2">
+                    <span id="home-bal" class="text-emerald-400 font-bold">$0.00</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="showModal('deposit-modal')" class="bg-emerald-600 px-3 py-1 rounded text-[10px] font-bold uppercase">Deposit</button>
+                    <button onclick="showModal('withdraw-modal')" class="bg-slate-700 px-3 py-1 rounded text-[10px] font-bold uppercase">Withdraw</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div onclick="openAviator()" class="game-card">
+                <span class="hot-label">HOT</span>
+                <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="game-img">
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400 uppercase">Aviator VIP</div>
+            </div>
+            <div class="game-card opacity-50">
+                <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="game-img">
+                <div class="p-2 text-[10px] text-center font-bold text-gray-400 uppercase">Mines Pro</div>
+            </div>
+        </div>
+
+        <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Live Withdrawals</h3>
+        <div class="bg-slate-900/50 rounded-xl p-3 h-40 overflow-hidden border border-slate-800">
+            <div id="live-wit-list"></div>
+        </div>
+    </div>
+
+    <div id="game-screen" class="hidden p-3 min-h-screen flex flex-col bg-[#0b0f1a]">
+        <div class="flex justify-between items-center mb-2">
+            <button onclick="goHome()" class="text-gray-500 text-xs"><i class="fas fa-chevron-left"></i> Back</button>
+            <span id="game-bal" class="text-emerald-400 font-bold">$0.00</span>
+        </div>
+
+        <div id="crash-history" class="history-bar"></div>
+
+        <div class="game-viewport mb-3">
+            <div id="mult-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl font-black z-20">1.00x</div>
+            <svg class="absolute inset-0 w-full h-full">
+                <path id="air-curve" fill="rgba(225,29,72,0.1)" stroke="#e11d48" stroke-width="8" d="M 0 240"/>
+            </svg>
+            
+            <div id="plane-wrap">
+                <img src="https://i.ibb.co/LzY7vS8/aviator-plane-red.png" class="plane-img" alt="Aviator Red Plane">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-3">
+            <div class="bg-slate-900 p-2 rounded-xl border border-slate-800">
+                <input type="number" id="amt1" value="1.00" class="w-full bg-black text-center text-yellow-500 text-sm font-bold mb-1 rounded-lg py-1">
+                <button id="btn1" onclick="placeBet(1)" class="w-full bg-red-600 py-3 rounded-lg font-black text-xs">BET</button>
+            </div>
+            <div class="bg-slate-900 p-2 rounded-xl border border-slate-800">
+                <input type="number" id="amt2" value="1.00" class="w-full bg-black text-center text-yellow-500 text-sm font-bold mb-1 rounded-lg py-1">
+                <button id="btn2" onclick="placeBet(2)" class="w-full bg-red-600 py-3 rounded-lg font-black text-xs">BET</button>
+            </div>
+        </div>
+
+        <div class="inline-bot">
+            <div id="bot-login-inner">
+                <div class="flex gap-2">
+                    <input type="password" id="bot-pass" placeholder="AI Password" class="flex-1 bg-black p-2 rounded-lg text-xs border border-blue-900">
+                    <button onclick="checkBotPass()" class="bg-blue-600 px-4 rounded-lg text-[10px] font-bold">UNLOCK</button>
+                </div>
+            </div>
+            <div id="bot-content-inner" class="hidden flex justify-between items-center">
+                <div>
+                    <p class="text-[8px] text-blue-400 uppercase font-bold">Next Crash Prediction</p>
+                    <h2 id="ai-prediction" class="text-xl font-black text-white">---</h2>
+                </div>
+                <button onclick="getPrediction()" class="bg-blue-600 px-4 py-2 rounded-lg font-bold text-[10px]">GET SIGNAL</button>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-[9px] font-bold text-gray-500 uppercase mb-2">Live Bets</h3>
+            <div class="live-bets-box" id="fake-bets-list"></div>
+        </div>
+    </div>
+
+    <div id="deposit-modal" class="modal-screen">
+        <div class="flex justify-between items-center mb-10"><h2 class="text-xl font-bold">DEPOSIT</h2><button onclick="hideModal('deposit-modal')"><i class="fas fa-times"></i></button></div>
+        <div class="bg-slate-900 p-6 rounded-2xl border border-emerald-500 text-center mb-6">
+            <p class="text-gray-400 text-xs mb-2">Transfer to EasyPaisa</p>
+            <h1 class="text-2xl font-black text-emerald-400">03431793371</h1>
+        </div>
+        <button onclick="submitDeposit()" class="w-full bg-emerald-600 py-4 rounded-xl font-black">DONE</button>
+    </div>
+
+    <div id="withdraw-modal" class="modal-screen">
+        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold uppercase">Withdraw Funds</h2><button onclick="hideModal('withdraw-modal')"><i class="fas fa-times"></i></button></div>
+        <div class="grid grid-cols-3 gap-2 mb-6">
+            <div onclick="selectMethod('EasyPaisa')" id="m-EasyPaisa" class="method-card text-center active"><i class="fas fa-mobile-alt text-emerald-500 mb-1"></i><p class="text-[9px] font-bold">EasyPaisa</p></div>
+            <div onclick="selectMethod('JazzCash')" id="m-JazzCash" class="method-card text-center"><i class="fas fa-wallet text-orange-500 mb-1"></i><p class="text-[9px] font-bold">JazzCash</p></div>
+            <div onclick="selectMethod('Binance')" id="m-Binance" class="method-card text-center"><i class="fab fa-bitcoin text-yellow-500 mb-1"></i><p class="text-[9px] font-bold">Binance</p></div>
+        </div>
+        <input type="number" id="w-amt" placeholder="Amount ($)" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-3 text-sm font-bold text-emerald-400">
+        <input type="text" id="w-account" placeholder="Account Number" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-6 text-sm">
+        <button onclick="startWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black">WITHDRAW NOW</button>
+    </div>
+
+    <div id="spribe-loader">
+        <div class="text-4xl font-black italic">SPRIBE</div>
+        <div class="flex gap-2 mt-6"><div class="loader-dot"></div><div class="loader-dot" style="animation-delay:0.2s"></div><div class="loader-dot" style="animation-delay:0.4s"></div></div>
+    </div>
+
+    <script>
+        let balance = localStorage.getItem('zs_bal') ? parseFloat(localStorage.getItem('zs_bal')) : 5.00;
+        let multiplier = 1.0, activeRound = false, crashPoint = 0;
+        let userBets = { 1: { on: false, cash: false, amt: 0 }, 2: { on: false, cash: false, amt: 0 } };
+        const names = ["Ali", "Khan", "Sana", "Don", "Zubi", "Malik", "Raja", "Ahmad"];
+
+        window.onload = () => { updateUI(); startLiveUpdates(); for(let i=0; i<8; i++) addHistory((1 + Math.random()*3).toFixed(2)); };
+
+        function updateUI() {
+            document.getElementById('home-bal').innerText = "$" + balance.toFixed(2);
+            document.getElementById('game-bal').innerText = "$" + balance.toFixed(2);
+            localStorage.setItem('zs_bal', balance);
+        }
+
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function hideModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function openAviator() {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('spribe-loader').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('spribe-loader').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'flex';
+                initCycle();
+            }, 2000);
+        }
+
+        function goHome() { document.getElementById('game-screen').style.display = 'none'; document.getElementById('home').style.display = 'block'; }
+
+        function addHistory(val) {
+            const hist = document.getElementById('crash-history');
+            const div = document.createElement('div');
+            div.className = `hist-item ${val > 2 ? 'hist-high' : 'hist-low'}`;
+            div.innerText = val + 'x';
+            hist.prepend(div);
+            if(hist.children.length > 10) hist.lastChild.remove();
+        }
+
+        function initCycle() {
+            activeRound = false; multiplier = 1.0;
+            crashPoint = (1.05 + Math.random() * 4).toFixed(2);
+            document.getElementById('plane-wrap').style.display = 'none';
+            document.getElementById('mult-display').innerText = "WAITING...";
+            document.getElementById('mult-display').style.color = "white";
+            document.getElementById('air-curve').setAttribute('d', 'M 0 240');
+            [1, 2].forEach(id => {
+                if(!userBets[id].on) {
+                    document.getElementById(`btn${id}`).innerText = "BET";
+                    document.getElementById(`btn${id}`).className = "w-full bg-red-600 py-3 rounded-lg font-black text-xs";
+                }
+            });
+            setTimeout(takeOff, 3000);
+        }
+
+        function takeOff() {
+            activeRound = true;
+            document.getElementById('plane-wrap').style.display = 'block';
+            let flight = setInterval(() => {
+                multiplier += 0.01;
+                document.getElementById('mult-display').innerText = multiplier.toFixed(2) + "x";
+                [1,2].forEach(id => {
+                    if(userBets[id].on && !userBets[id].cash) {
+                        document.getElementById(`btn${id}`).innerHTML = `CASHOUT<br>$${(userBets[id].amt * multiplier).toFixed(2)}`;
+                        document.getElementById(`btn${id}`).className = "w-full bg-yellow-500 text-black py-2 rounded-lg font-black text-[10px]";
+                    }
+                });
+                let x = (multiplier - 1) * 80;
+                let y = 240 - ((multiplier - 1) * 60);
+                if(x < 280 && y > 20) {
+                    document.getElementById('plane-wrap').style.left = x + 'px';
+                    document.getElementById('plane-wrap').style.top = y + 'px';
+                    // Curve line adjustments
+                    document.getElementById('air-curve').setAttribute('d', `M 0 240 Q ${x/2} 240 ${x} ${y+25}`);
+                }
+                if (multiplier >= crashPoint) { clearInterval(flight); explode(); }
+            }, 50);
+        }
+
+        function explode() {
+            addHistory(multiplier.toFixed(2));
+            document.getElementById('plane-wrap').style.display = 'none';
+            document.getElementById('mult-display').innerText = "FLEW AWAY!";
+            document.getElementById('mult-display').style.color = "#ef4444";
+            [1, 2].forEach(id => {
+                if(userBets[id].on && !userBets[id].cash) { balance -= userBets[id].amt; updateUI(); }
+                userBets[id].on = false; userBets[id].cash = false;
+            });
+            setTimeout(initCycle, 3000);
+        }
+
+        function placeBet(id) {
+            let val = parseFloat(document.getElementById('amt'+id).value);
+            if(!activeRound && !userBets[id].on && balance >= val) {
+                userBets[id].on = true; userBets[id].amt = val;
+                document.getElementById(`btn${id}`).innerText = "CANCEL";
+                document.getElementById(`btn${id}`).className = "w-full bg-slate-700 py-3 rounded-lg font-black text-xs";
+            } else if (activeRound && userBets[id].on && !userBets[id].cash) {
+                userBets[id].cash = true;
+                balance += (userBets[id].amt * multiplier) - userBets[id].amt;
+                updateUI();
+                document.getElementById(`btn${id}`).innerText = "WIN!";
+                document.getElementById(`btn${id}`).className = "w-full bg-emerald-600 py-3 rounded-lg font-black text-xs";
+            }
+        }
+
+        function startLiveUpdates() {
+            setInterval(() => {
+                const list = document.getElementById('live-wit-list');
+                const name = names[Math.floor(Math.random()*names.length)] + "_***";
+                const amt = (Math.random()*150 + 10).toFixed(2);
+                const html = `<div class="flex justify-between py-2 border-b border-slate-800 text-[11px] animate-fadeIn"><span>${name}</span><span class="text-emerald-500 font-bold">+$${amt}</span></div>`;
+                list.insertAdjacentHTML('afterbegin', html);
+                if(list.children.length > 5) list.lastChild.remove();
+            }, 3000);
+        }
+
+        function checkBotPass() {
+            if(document.getElementById('bot-pass').value === "ZSVIP2026$") {
+                document.getElementById('bot-login-inner').classList.add('hidden');
+                document.getElementById('bot-content-inner').classList.remove('hidden');
+            } else { alert("Wrong Password!"); }
+        }
+        function getPrediction() {
+            document.getElementById('ai-prediction').innerText = "SCANNING...";
+            setTimeout(() => { document.getElementById('ai-prediction').innerText = crashPoint + "x"; }, 1000);
+        }
+        function submitDeposit() { alert("Request Sent!"); hideModal('deposit-modal'); }
+        function selectMethod(m) { document.querySelectorAll('.method-card').forEach(el => el.classList.remove('active')); document.getElementById('m-' + m).classList.add('active'); }
+        function startWithdraw() { alert("Withdrawal Pending!"); hideModal('withdraw-modal'); }
+    </script>
+</body>
+</html>
