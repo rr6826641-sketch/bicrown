@@ -1,405 +1,143 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Aviator Pro - ZS999 Master System</title>
-
+    <title>ZS999 Multi-Game System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <style>
-
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-
+        body { background: #0b0c0d; font-family: 'Roboto', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
+        .main-app { width: 100%; height: 100vh; display: grid; grid-template-columns: 250px 1fr; }
         
+        /* Sidebar */
+        .sidebar { background: #141516; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { background: #1b1c1d; padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #333; transition: 0.3s; }
+        .nav-btn.active { background: #d91d1d; border-color: #ff4d4d; }
 
-        body { background-color: #0b0c0d; font-family: 'Inter', sans-serif; color: #fff; margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        /* Balance & Withdraw */
+        .top-bar { background: #1b1c1d; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .withdraw-btn { background: #ff007a; padding: 5px 15px; border-radius: 5px; font-weight: bold; font-size: 12px; }
 
+        /* Game Containers */
+        .game-container { display: none; height: calc(100vh - 60px); position: relative; padding: 20px; }
+        .game-container.active { display: block; }
 
+        /* Mines Grid */
+        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-width: 400px; margin: auto; }
+        .mine-tile { background: #2c2d2e; aspect-ratio: 1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.2s; }
+        .mine-tile:hover { background: #3a3b3c; }
 
-        .app-container {
-
-            width: 98%; height: 95vh; background: #141516; border-radius: 12px;
-
-            display: grid; grid-template-columns: 280px 1fr 300px;
-
-            box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative; border: 1px solid #222;
-
-        }
-
-
-
-        /* --- Top Navigation & Balance --- */
-
-        .top-nav {
-
-            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-
-            z-index: 100; display: flex; gap: 15px; align-items: center;
-
-        }
-
-        .balance-card {
-
-            background: #1b1c1d; border: 2px solid #28a745; padding: 6px 25px;
-
-            border-radius: 30px; color: #28a745; font-weight: 900; font-size: 18px;
-
-            box-shadow: 0 0 15px rgba(40, 167, 69, 0.2);
-
-        }
-
-
-
-        /* --- Game Area --- */
-
-        .game-view { background: #000; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-
-        .canvas-container { flex: 1; position: relative; background: radial-gradient(circle at bottom left, #300 0%, #000 70%); }
-
+        /* Bot Overlay */
+        .bot-box { background: rgba(0,0,0,0.9); border: 1px solid #3b82f6; padding: 10px; border-radius: 10px; position: absolute; bottom: 20px; left: 20px; width: 200px; z-index: 100; }
         
-
-        #multiplier {
-
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-
-            font-size: 90px; font-weight: 900; z-index: 10; text-shadow: 0 0 20px rgba(255,255,255,0.2);
-
-        }
-
-
-
-        #plane-box { position: absolute; width: 80px; z-index: 30; display: none; transition: transform 0.1s linear; }
-
-        .plane-img { width: 100%; filter: drop-shadow(0 0 15px red); }
-
-        
-
-        svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
-
-
-
-        /* --- Controls & 7 Buttons --- */
-
-        .control-panel { background: #1b1c1d; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid #333; }
-
-        .bet-box { background: #141516; padding: 12px; border-radius: 12px; border: 1px solid #2a2b2c; }
-
-        
-
-        .quick-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px 0; }
-
-        .q-btn { background: #2a2b2c; border-radius: 6px; padding: 5px; font-size: 12px; font-weight: bold; border: 1px solid #333; }
-
-        .q-btn:hover { background: #3a3b3c; border-color: #555; }
-
-
-
-        .main-bet-btn {
-
-            background: #28a745; width: 100%; height: 55px; border-radius: 10px;
-
-            font-size: 20px; font-weight: 900; text-transform: uppercase; color: white;
-
-            box-shadow: 0 4px 0 #1e7e34; transition: 0.1s;
-
-        }
-
-        .main-bet-btn:active { transform: translateY(3px); box-shadow: none; }
-
-
-
-        /* --- Sidebar & History --- */
-
-        .sidebar { background: #141516; border-right: 1px solid #222; display: flex; flex-direction: column; font-size: 12px; }
-
-        .history-strip { height: 45px; background: #101112; display: flex; align-items: center; gap: 8px; padding: 0 15px; overflow-x: auto; scrollbar-width: none; }
-
-        .hist-chip { padding: 3px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; }
-
-        .blue { background: #3b82f6; } .purple { background: #9333ea; }
-
+        /* Aviator Curve */
+        #aviator-canvas { background: #000; height: 300px; border-radius: 10px; position: relative; overflow: hidden; margin-bottom: 20px; }
+        #plane-icon { position: absolute; width: 50px; display: none; z-index: 10; filter: drop-shadow(0 0 10px red); }
     </style>
-
 </head>
-
 <body>
 
-
-
-    <div class="app-container">
-
-        <div class="sidebar">
-
-            <div class="p-4 border-b border-gray-800 font-bold text-gray-400">LIVE BETS</div>
-
-            <div id="live-bets" class="flex-1 overflow-y-auto p-2 space-y-2"></div>
-
+<div class="main-app">
+    <div class="sidebar">
+        <div class="text-red-600 font-black text-2xl mb-5 text-center">SPRIBE</div>
+        <div class="nav-btn active" onclick="showGame('aviator', this)">Aviator</div>
+        <div class="nav-btn" onclick="showGame('mines', this)">Mines</div>
+        <div class="mt-auto p-3 bg-black rounded text-[10px] text-gray-500">
+            Easypaisa Deposit: 03431793371
         </div>
-
-
-
-        <div class="game-view">
-
-            <div class="top-nav">
-
-                <div class="balance-card">$ <span id="balance">5.00</span></div>
-
-            </div>
-
-
-
-            <div class="history-strip" id="history-bar"></div>
-
-
-
-            <div class="canvas-container" id="canvas-area">
-
-                <div id="multiplier">1.00x</div>
-
-                <svg>
-
-                    <path id="curve-path" fill="rgba(255,0,0,0.1)" stroke="#d91d1d" stroke-width="5" d="M 0 400" />
-
-                </svg>
-
-                <div id="plane-box">
-
-                    <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img">
-
-                </div>
-
-            </div>
-
-
-
-            <div class="control-panel">
-
-                <div class="bet-box">
-
-                    <div class="flex justify-between items-center bg-black rounded p-2">
-
-                        <span class="text-xs text-gray-500 uppercase">Amount</span>
-
-                        <input type="number" value="1.00" class="bg-transparent text-yellow-500 font-bold w-20 text-center outline-none">
-
-                    </div>
-
-                    <div class="quick-btns">
-
-                        <button class="q-btn">1</button><button class="q-btn">2</button>
-
-                        <button class="q-btn">5</button><button class="q-btn">10</button>
-
-                    </div>
-
-                    <button class="main-bet-btn">BET</button>
-
-                </div>
-
-
-
-                <div class="bet-box">
-
-                    <div class="flex justify-between items-center bg-black rounded p-2">
-
-                        <span class="text-xs text-gray-500 uppercase">Amount</span>
-
-                        <input type="number" value="2.00" class="bg-transparent text-yellow-500 font-bold w-20 text-center outline-none">
-
-                    </div>
-
-                    <div class="quick-btns">
-
-                        <button class="q-btn">10</button><button class="q-btn">20</button>
-
-                        <button class="q-btn">50</button><button class="q-btn">100</button>
-
-                    </div>
-
-                    <button class="main-bet-btn" style="background: #28a745;">BET</button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="sidebar" style="border-right:none; border-left: 1px solid #222;">
-
-            <div class="p-4 border-b border-gray-800 font-bold text-gray-400 flex justify-between">
-
-                <span>CHAT</span>
-
-                <i class="fas fa-users text-blue-500"></i>
-
-            </div>
-
-            <div id="chat-box" class="flex-1 p-3 overflow-y-auto space-y-3"></div>
-
-            <div class="p-3"><input type="text" placeholder="Say something..." class="w-full bg-black border border-gray-800 rounded-lg p-2 text-xs"></div>
-
-        </div>
-
     </div>
 
+    <div class="flex flex-col">
+        <div class="top-bar">
+            <div class="flex items-center gap-2">
+                <div class="bg-black px-4 py-1 rounded-full border border-green-500 text-green-500 font-bold">
+                    $ <span id="balance">5.00</span>
+                </div>
+                <button class="bg-green-600 px-3 py-1 rounded text-xs font-bold">DEPOSIT</button>
+            </div>
+            <button class="withdraw-btn" onclick="alert('EasyPaisa Withdraw: Enter Number')">WITHDRAW</button>
+        </div>
 
+        <div id="aviator-game" class="game-container active">
+            <div id="aviator-canvas">
+                <div id="mult-display" class="absolute inset-0 flex items-center justify-center text-6xl font-black">1.00x</div>
+                <img id="plane-icon" src="https://n1.vavada.net/img/games/spribe/aviator/plane.png">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-[#141516] p-4 rounded-xl border border-gray-800">
+                    <input type="number" value="1.00" class="w-full bg-black p-2 rounded mb-2 text-yellow-500 font-bold text-center">
+                    <button class="w-full bg-green-500 h-12 rounded-lg font-bold text-xl">BET</button>
+                </div>
+                <div class="bg-[#141516] p-4 rounded-xl border border-gray-800">
+                    <input type="number" value="2.00" class="w-full bg-black p-2 rounded mb-2 text-yellow-500 font-bold text-center">
+                    <button class="w-full bg-green-500 h-12 rounded-lg font-bold text-xl">BET</button>
+                </div>
+            </div>
+            <div class="bot-box">
+                <div class="text-[10px] text-blue-400 mb-1 font-bold">AVIATOR AI BOT</div>
+                <input type="password" id="pass-avi" placeholder="Password" class="w-full bg-black p-1 text-xs rounded border border-gray-700 mb-1">
+                <div id="pred-avi" class="text-center font-bold text-white">READY</div>
+            </div>
+        </div>
 
-    <script>
+        <div id="mines-game" class="game-container">
+            <div class="mines-grid" id="mines-grid">
+                </div>
+            <div class="max-width-[400px] mt-10 p-4 bg-[#141516] rounded-xl border border-gray-800 mx-auto">
+                <div class="text-center text-gray-500 text-xs mb-2">Mines: 3</div>
+                <button class="w-full bg-green-500 h-12 rounded-lg font-bold text-xl">BET</button>
+            </div>
+            <div class="bot-box">
+                <div class="text-[10px] text-yellow-400 mb-1 font-bold">MINES AI BOT</div>
+                <input type="password" id="pass-min" placeholder="Password" class="w-full bg-black p-1 text-xs rounded border border-gray-700 mb-1">
+                <div id="pred-min" class="text-center font-bold text-white">READY</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        let currentMult = 1.0;
+<script>
+    const PASS = "ZSVIP2026$";
+    let balance = 507.25;
 
-        let crashPoint = 0;
+    // Navigation
+    function showGame(game, btn) {
+        document.querySelectorAll('.game-container').forEach(g => g.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(game + '-game').classList.add('active');
+        btn.classList.add('active');
+    }
 
-        let isRunning = false;
+    // Mines Logic
+    const grid = document.getElementById('mines-grid');
+    for(let i=0; i<25; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'mine-tile';
+        tile.onclick = () => tile.innerHTML = Math.random() > 0.2 ? '💎' : '💣';
+        grid.appendChild(tile);
+    }
 
-        const h = 400; // base height
-
-
-
-        function initCycle() {
-
-            isRunning = false;
-
-            currentMult = 1.0;
-
-            crashPoint = (1 + Math.random() * 4).toFixed(2);
-
-            
-
-            document.getElementById('multiplier').innerText = "WAITING...";
-
-            document.getElementById('multiplier').style.color = "#aaa";
-
-            document.getElementById('plane-box').style.display = 'none';
-
-            document.getElementById('curve-path').setAttribute('d', `M 0 ${h}`);
-
-            
-
-            setTimeout(startFlight, 4000);
-
+    // Bot Logic
+    document.getElementById('pass-avi').oninput = (e) => {
+        if(e.target.value === PASS) {
+            document.getElementById('pred-avi').innerText = (1.5 + Math.random()*5).toFixed(2) + "x";
         }
-
-
-
-        function startFlight() {
-
-            isRunning = true;
-
-            document.getElementById('multiplier').style.color = "#fff";
-
-            document.getElementById('plane-box').style.display = 'block';
-
-
-
-            let timer = setInterval(() => {
-
-                if(currentMult >= crashPoint) {
-
-                    clearInterval(timer);
-
-                    crash();
-
-                } else {
-
-                    currentMult += 0.01 * (currentMult * 0.5);
-
-                    updateUI(currentMult);
-
-                }
-
-            }, 50);
-
+    }
+    document.getElementById('pass-min').oninput = (e) => {
+        if(e.target.value === PASS) {
+            document.getElementById('pred-min').innerText = "SAFE: Row 2, Col 3";
         }
+    }
 
+    // Simple Aviator Animation
+    let mult = 1.00;
+    setInterval(() => {
+        if(mult > 3.0) mult = 1.00;
+        mult += 0.01;
+        document.getElementById('mult-display').innerText = mult.toFixed(2) + "x";
+    }, 100);
 
-
-        function updateUI(m) {
-
-            document.getElementById('multiplier').innerText = m.toFixed(2) + "x";
-
-            
-
-            let x = Math.min((m - 1) * 60, window.innerWidth * 0.45);
-
-            let y = h - Math.min(Math.pow(m - 1, 1.4) * 50, 320);
-
-
-
-            const plane = document.getElementById('plane-box');
-
-            plane.style.left = x + 'px';
-
-            plane.style.top = y + 'px';
-
-
-
-            const path = document.getElementById('curve-path');
-
-            path.setAttribute('d', `M 0 ${h} Q ${x/2} ${h} ${x} ${y+20}`);
-
-        }
-
-
-
-        function crash() {
-
-            document.getElementById('multiplier').style.color = "#ff0000";
-
-            document.getElementById('multiplier').innerText = "FLEW AWAY!";
-
-            addHistory(parseFloat(crashPoint));
-
-            setTimeout(initCycle, 3000);
-
-        }
-
-
-
-        function addHistory(val) {
-
-            const bar = document.getElementById('history-bar');
-
-            const color = val < 2 ? 'blue' : 'purple';
-
-            const html = `<div class="hist-chip ${color}">${val.toFixed(2)}x</div>`;
-
-            bar.insertAdjacentHTML('afterbegin', html);
-
-        }
-
-
-
-        // Fake Chat & Bets
-
-        setInterval(() => {
-
-            const names = ["Romi", "Z***9", "Alex", "User77", "Lucky"];
-
-            const msgs = ["Big win!", "Wow 5x", "Crashed too early", "Let's go"];
-
-            document.getElementById('chat-box').insertAdjacentHTML('beforeend', `<div class="text-[10px]"><span class="text-blue-400 font-bold">${names[Math.floor(Math.random()*5)]}:</span> ${msgs[Math.floor(Math.random()*4)]}</div>`);
-
-            document.getElementById('chat-box').scrollTop = 9999;
-
-        }, 3000);
-
-
-
-        window.onload = initCycle;
-
-    </script>
-
+</script>
 </body>
-
 </html>
