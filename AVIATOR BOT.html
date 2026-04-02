@@ -20,265 +20,178 @@
 
         .aviator-app {
             width: 95%; height: 90vh;
-            background-color: #141516;
-            border-radius: 8px;
-            display: grid;
-            grid-template-columns: 260px 1fr 280px; 
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            background-color: #141516; border-radius: 8px;
+            display: grid; grid-template-columns: 260px 1fr 280px;
+            overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
         }
 
-        /* Left Sidebar */
-        .bet-list { background-color: #141516; border-right: 1px solid #292a2b; display: flex; flex-direction: column; font-size: 11px; }
-        .bet-tabs { display: flex; padding: 5px; border-bottom: 1px solid #292a2b; justify-content: space-around; }
-        .bet-tab { color: #aaa; padding: 5px 10px; cursor: pointer; border-radius: 20px;}
-        .bet-tab.active { background-color: #2c2d2e; color: #fff; }
-        .bet-rows { flex: 1; overflow-y: scroll; scrollbar-width: none; }
-        .bet-rows::-webkit-scrollbar { display: none; }
-        .bet-item { display: grid; grid-template-columns: 24px 1fr 40px 50px; gap: 5px; padding: 6px 10px; border-bottom: 1px solid #1f2021; align-items: center; }
-        .user-avatar { width: 18px; height: 18px; border-radius: 50%; background: #333; }
-        .mult-tag { background: #9333ea; color: white; padding: 1px 4px; border-radius: 4px; font-weight: bold; text-align: center;}
-        .win-amt { color: #2ecc71; font-weight: bold; }
+        /* Balance Display */
+        .top-balance {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            background: #101112; border: 1px solid #28a745;
+            padding: 4px 20px; border-radius: 20px; color: #28a745;
+            font-weight: bold; z-index: 100; font-size: 14px;
+        }
 
-        /* Middle Section */
-        .game-main { display: flex; flex-direction: column; position: relative; }
-        .history-bar { height: 40px; background-color: #1a1b1c; border-bottom: 1px solid #292a2b; display: flex; align-items: center; padding: 0 10px; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-        .hist-val { font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
-        .hist-low { background-color: #3b82f6; } 
-        .hist-high { background-color: #9333ea; }
+        .game-canvas {
+            flex: 1; background-color: #000; position: relative;
+            background-image: radial-gradient(circle at center, #2a0a0a 0%, #000 70%);
+            overflow: hidden;
+        }
 
-        /* Canvas & Plane */
-        .game-canvas { flex: 1; background-color: #000; position: relative; background-image: radial-gradient(circle at center, #2a0a0a 0%, #000 70%); overflow: hidden; }
-        #mult-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: 900; color: #fff; z-index: 10; }
-        
-        #plane-wrap { position: absolute; width: 80px; z-index: 20; display: none; transition: transform 0.1s linear; }
+        #mult-display {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 70px; font-weight: 900; color: #fff; z-index: 10;
+        }
+
+        #plane-wrap { position: absolute; width: 65px; z-index: 20; display: none; }
         .plane-img { width: 100%; filter: drop-shadow(0 0 10px #ff0000); }
-
         #air-curve-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
 
-        /* Controls */
-        .bet-controls { height: 120px; background-color: #1a1b1c; border-top: 1px solid #292a2b; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .bet-block { background-color: #141516; border-radius: 8px; padding: 8px; display: flex; align-items: center; gap: 10px; }
-        .amount-input { background: #000; color: #ffc107; font-weight: bold; width: 80px; text-align: center; border-radius: 4px; padding: 4px; }
-        .bet-btn { background-color: #2ecc71; color: #fff; font-weight: bold; flex: 2; height: 100%; border-radius: 8px; font-size: 18px; text-transform: uppercase; }
+        /* Quick Bet Buttons Styling */
+        .quick-bet-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px;
+        }
+        .q-btn {
+            background: #212224; border: 1px solid #333; color: #ccc;
+            font-size: 10px; padding: 4px; border-radius: 4px; transition: 0.2s;
+        }
+        .q-btn:hover { background: #333; color: #fff; }
 
-        /* Bot Overlay */
-        .bot-overlay { position: absolute; bottom: 130px; left: 10px; background: rgba(20,21,22,0.9); border: 1px solid #3b82f6; padding: 8px; border-radius: 8px; z-index: 100; font-size: 11px; display: flex; gap: 5px; align-items: center; }
-        .bot-input { background: #000; border: 1px solid #333; padding: 3px; border-radius: 4px; color: #fff; width: 80px; }
+        .bet-btn {
+            background-color: #2ecc71; color: #fff; font-weight: bold;
+            width: 100%; height: 60px; border-radius: 8px; font-size: 16px;
+            text-transform: uppercase; margin-top: 5px;
+        }
 
-        /* Chat */
-        .chat-section { background-color: #141516; border-left: 1px solid #292a2b; display: flex; flex-direction: column; font-size: 11px; }
-        .chat-messages { flex: 1; overflow-y: scroll; padding: 10px; scrollbar-width: none;}
+        /* Sidebar & Chat Styles */
+        .bet-list, .chat-section { background-color: #141516; font-size: 11px; display: flex; flex-direction: column; }
+        .history-bar { height: 35px; background: #1a1b1c; display: flex; align-items: center; padding: 0 10px; gap: 5px; overflow: hidden; }
+        .hist-val { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .hist-low { background: #3b82f6; } .hist-high { background: #9333ea; }
     </style>
 </head>
 <body>
 
     <div class="aviator-app">
-        <div class="bet-list">
-            <div class="bet-tabs">
-                <div class="bet-tab active">All Bets</div>
-                <div class="bet-tab">My Bets</div>
-                <div class="bet-tab">Top</div>
-            </div>
-            <div class="p-2 text-gray-600 font-bold">Total bets: <span id="total-bets-count" class="text-white">0</span></div>
-            <div class="bet-rows" id="bet-rows-container"></div>
+        <div class="top-balance">
+            <span id="user-balance">507.25</span> <span class="text-[10px] text-gray-400">USD</span>
         </div>
 
-        <div class="game-main">
-            <div class="history-bar" id="history-bar"></div>
+        <div class="bet-list">
+            <div class="p-3 border-b border-gray-800 text-center font-bold">ALL BETS</div>
+            <div id="bet-rows-container" class="flex-1 overflow-y-auto p-2"></div>
+        </div>
 
+        <div class="flex flex-col border-x border-gray-800">
+            <div class="history-bar" id="history-bar"></div>
+            
             <div class="game-canvas" id="canvas-area">
                 <div id="mult-display">1.00x</div>
                 <svg id="air-curve-svg">
-                    <path id="air-curve-path" fill="rgba(255,0,0,0.1)" stroke="#ff0000" stroke-width="4" d="M 0 400"/>
+                    <path id="air-curve-path" fill="rgba(255,0,0,0.15)" stroke="#ff0000" stroke-width="4" d="M 0 350"/>
                 </svg>
                 <div id="plane-wrap">
-                    <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img" id="main-plane" alt="Plane">
+                    <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img">
                 </div>
             </div>
 
-            <div class="bet-controls">
-                <div class="bet-block">
-                    <div class="text-center flex-1">
-                        <div class="text-gray-600 text-[10px]">Amount</div>
-                        <input type="number" value="1.00" class="amount-input">
+            <div class="p-3 bg-[#1a1b1c] grid grid-cols-2 gap-4">
+                <div class="bg-[#141516] p-2 rounded-lg border border-gray-800">
+                    <div class="flex justify-between items-center px-2">
+                        <span class="text-gray-500 text-[10px]">Amount</span>
+                        <input type="number" value="1.00" class="bg-black text-yellow-500 font-bold w-16 text-center rounded">
                     </div>
-                    <button class="bet-btn">Bet</button>
-                </div>
-                <div class="bet-block">
-                    <div class="text-center flex-1">
-                        <div class="text-gray-600 text-[10px]">Amount</div>
-                        <input type="number" value="1.00" class="amount-input">
+                    <div class="quick-bet-grid">
+                        <button class="q-btn">1</button><button class="q-2">2</button>
+                        <button class="q-btn">5</button><button class="q-btn">10</button>
                     </div>
-                    <button class="bet-btn">Bet</button>
+                    <button class="bet-btn">BET</button>
                 </div>
-            </div>
-            
-            <div class="bot-overlay">
-                <i class="fas fa-robot text-blue-400"></i>
-                <span>VIP BOT:</span>
-                <input type="password" id="bot-pass" placeholder="Password" class="bot-input">
-                <span id="ai-prediction" class="font-bold text-white">OFFLINE</span>
+                <div class="bg-[#141516] p-2 rounded-lg border border-gray-800">
+                    <div class="flex justify-between items-center px-2">
+                        <span class="text-gray-500 text-[10px]">Amount</span>
+                        <input type="number" value="1.00" class="bg-black text-yellow-500 font-bold w-16 text-center rounded">
+                    </div>
+                    <div class="quick-bet-grid">
+                        <button class="q-btn">10</button><button class="q-btn">20</button>
+                        <button class="q-btn">50</button><button class="q-btn">100</button>
+                    </div>
+                    <button class="bet-btn">BET</button>
+                </div>
             </div>
         </div>
 
         <div class="chat-section">
-            <div class="p-2 font-bold border-bottom border-gray-800">CHAT ROOM</div>
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="p-2 border-t border-gray-800">
-                <input type="text" placeholder="Send message..." class="w-full bg-black p-2 rounded text-[10px]">
-            </div>
+            <div class="p-3 border-b border-gray-800 font-bold">CHAT</div>
+            <div id="chat-messages" class="flex-1 p-2 overflow-y-auto"></div>
+            <div class="p-2"><input type="text" placeholder="Message..." class="w-full bg-black rounded p-1 text-[10px]"></div>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION & STATE ---
         let multiplier = 1.0;
-        let activeRound = false;
         let crashPoint = 0;
-        const botPassword = "ZSVIP2026$";
-        const fakeNames = ["Romi***", "Ali***", "Khan***", "Zeesh***", "Sami***", "John***", "King***"];
-        const messages = ["Big win!", "Flew away!", "Easy money", "Next is 10x", "Crashed lol", "Join VIP"];
+        const canvasHeight = 350;
 
-        // --- 2. CORE GAME LOGIC (Restoring 462-line Logic) ---
+        window.onload = () => {
+            initGameCycle();
+            // Initial Fake Data
+            for(let i=0; i<10; i++) addHistoryItem(1 + Math.random() * 3);
+        };
+
         function initGameCycle() {
-            activeRound = false;
             multiplier = 1.0;
-            crashPoint = generateCrashPoint();
-            
-            resetVisuals();
+            crashPoint = (Math.random() * 5 + 1).toFixed(2);
             document.getElementById('mult-display').innerText = "WAITING...";
             document.getElementById('mult-display').style.color = "#aaa";
-            document.getElementById('ai-prediction').innerText = "READY";
-            document.getElementById('bot-pass').value = "";
+            document.getElementById('plane-wrap').style.display = 'none';
+            document.getElementById('air-curve-path').setAttribute('d', `M 0 ${canvasHeight}`);
 
-            setTimeout(startFlight, 4000); // 4 sec waiting
-        }
-
-        function generateCrashPoint() {
-            let r = Math.random();
-            if (r < 0.1) return 1.0;
-            if (r < 0.7) return 1.1 + Math.random() * 1.4;
-            return 2.5 + Math.random() * 5.0;
+            setTimeout(startFlight, 3000);
         }
 
         function startFlight() {
-            activeRound = true;
             document.getElementById('mult-display').style.color = "#fff";
             document.getElementById('plane-wrap').style.display = 'block';
 
-            let flightInterval = setInterval(() => {
-                let speed = 0.01 + (multiplier * 0.003);
-                multiplier += speed;
-                
-                updatePlanePosition(multiplier);
+            let flight = setInterval(() => {
+                multiplier += 0.01 + (multiplier * 0.001);
+                updateVisuals(multiplier);
 
                 if (multiplier >= crashPoint) {
-                    clearInterval(flightInterval);
+                    clearInterval(flight);
                     endRound();
                 }
             }, 60);
         }
 
-        function updatePlanePosition(m) {
+        function updateVisuals(m) {
             document.getElementById('mult-display').innerText = m.toFixed(2) + "x";
-            
-            let canvas = document.getElementById('canvas-area');
-            let maxX = canvas.offsetWidth * 0.7;
-            let maxY = canvas.offsetHeight * 0.6;
-            
-            let x = Math.min((m - 1) * 45, maxX);
-            let y = maxY - Math.min(Math.pow((m-1), 1.5) * 20, maxY);
+            let x = Math.min((m - 1) * 40, window.innerWidth * 0.4);
+            // Y-axis logic fixed: starts at bottom (350) and goes UP
+            let y = canvasHeight - Math.min(Math.pow((m-1), 1.5) * 40, 280);
 
             let plane = document.getElementById('plane-wrap');
-            plane.style.left = x + "px";
-            plane.style.top = (canvas.offsetHeight - 100 - y) + "px";
+            plane.style.left = x + 'px';
+            plane.style.top = y + 'px';
 
-            // Draw Curve
-            let d = `M 0 ${canvas.offsetHeight} Q ${x/2} ${canvas.offsetHeight} ${x} ${canvas.offsetHeight - 80 - y}`;
-            document.getElementById('air-curve-path').setAttribute('d', d);
+            let path = document.getElementById('air-curve-path');
+            path.setAttribute('d', `M 0 ${canvasHeight} Q ${x/2} ${canvasHeight} ${x} ${y+15}`);
         }
 
         function endRound() {
-            addHistory(multiplier);
-            document.getElementById('mult-display').innerText = "FLEW AWAY!";
             document.getElementById('mult-display').style.color = "#ff0000";
-            document.getElementById('plane-wrap').style.display = 'none';
-            generateFakeCashouts(multiplier);
+            addHistoryItem(parseFloat(crashPoint));
             setTimeout(initGameCycle, 3000);
         }
 
-        // --- 3. BOT & DATA LOGIC (Restoring original features) ---
-        function startFakeData() {
-            // New Bets every 5 seconds
-            setInterval(() => {
-                const container = document.getElementById('bet-rows-container');
-                container.innerHTML = '';
-                let count = 15 + Math.floor(Math.random() * 10);
-                document.getElementById('total-bets-count').innerText = count;
-
-                for(let i=0; i<count; i++) {
-                    let name = fakeNames[Math.floor(Math.random()*fakeNames.length)];
-                    let amt = (Math.random()*500).toFixed(2);
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="bet-item">
-                            <div class="user-avatar"></div>
-                            <div class="text-gray-400">${name}</div>
-                            <div>${amt}</div>
-                            <div class="fake-cashout text-right">-</div>
-                        </div>
-                    `);
-                }
-            }, 5000);
-
-            // New Chat every 7 seconds
-            setInterval(() => {
-                const chat = document.getElementById('chat-messages');
-                let name = fakeNames[Math.floor(Math.random()*fakeNames.length)];
-                let msg = messages[Math.floor(Math.random()*messages.length)];
-                chat.insertAdjacentHTML('beforeend', `<div class="mb-1"><span class="text-gray-500 font-bold">${name}:</span> ${msg}</div>`);
-                chat.scrollTop = chat.scrollHeight;
-            }, 7000);
-        }
-
-        function generateFakeCashouts(final) {
-            const areas = document.querySelectorAll('.fake-cashout');
-            areas.forEach(area => {
-                if(Math.random() > 0.4) {
-                    let co = (1.1 + Math.random() * (final-1)).toFixed(2);
-                    if(co < final) {
-                        area.innerHTML = `<span class="mult-tag">${co}x</span>`;
-                    }
-                }
-            });
-        }
-
-        function addHistory(m) {
+        function addHistoryItem(val) {
             const bar = document.getElementById('history-bar');
-            let color = m < 2 ? 'hist-low' : 'hist-high';
-            bar.insertAdjacentHTML('afterbegin', `<div class="hist-val ${color}">${m.toFixed(2)}x</div>`);
+            const color = val < 2 ? 'hist-low' : 'hist-high';
+            bar.insertAdjacentHTML('afterbegin', `<div class="hist-val ${color}">${val.toFixed(2)}x</div>`);
         }
-
-        function resetVisuals() {
-            document.getElementById('plane-wrap').style.display = 'none';
-            document.getElementById('air-curve-path').setAttribute('d', 'M 0 400');
-        }
-
-        // Bot Password logic
-        document.getElementById('bot-pass').addEventListener('input', (e) => {
-            if(e.target.value === botPassword) {
-                document.getElementById('ai-prediction').innerText = "CALCULATING...";
-                setTimeout(() => {
-                    document.getElementById('ai-prediction').innerText = "CRASH @ " + crashPoint.toFixed(2) + "x";
-                    document.getElementById('ai-prediction').style.color = "#2ecc71";
-                }, 1000);
-            }
-        });
-
-        window.onload = () => {
-            startFakeData();
-            initGameCycle();
-        };
     </script>
 </body>
 </html>
