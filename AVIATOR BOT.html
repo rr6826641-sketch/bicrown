@@ -3,197 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six.game - Withdraw History & Notif</title>
+    <title>Six.game Pro - Complete System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background: #1a1d23; color: #fff; font-family: sans-serif; margin: 0; overflow-x: hidden; }
         .hidden { display: none !important; }
+        .game-card { background: #242932; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #333; cursor: pointer; }
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #1a1d23; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
         
-        /* Notification Style */
-        #notif-box { 
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
-            background: #27ae60; color: white; padding: 15px 25px; 
-            border-radius: 10px; z-index: 1000; transition: 0.6s ease-in-out; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #2ecc71;
-        }
-        #notif-box.show { top: 20px; }
-
-        /* Withdraw History Table */
-        .history-item { background: #242932; border-bottom: 1px solid #333; padding: 10px; font-size: 12px; }
-        .status-pending { color: #f1c40f; }
-        .status-success { color: #2ecc71; }
-
-        /* Game Elements */
-        .game-canvas { position: relative; height: 300px; background: #000; border-radius: 15px; overflow: hidden; margin: 10px; }
-        #plane { position: absolute; width: 45px; display: none; z-index: 50; }
-        .bet-btn { background: #2ecc71; width: 100%; height: 55px; border-radius: 10px; font-weight: bold; }
-        .bet-active { background: #f1c40f !important; color: #000; }
+        /* Play Page Styles */
+        .game-canvas { position: relative; height: 350px; background: radial-gradient(circle at bottom left, #2b0808 0%, #000 85%); margin: 10px; border-radius: 15px; overflow: hidden; }
+        #plane { position: absolute; width: 50px; z-index: 50; display: none; filter: drop-shadow(0 0 10px red); }
+        svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
+        
+        /* Bet States */
+        .bet-btn { background: #2ecc71; width: 100%; height: 60px; border-radius: 12px; font-weight: bold; font-size: 18px; }
+        .bet-active { background: #f1c40f !important; color: #000; border: 2px solid #fff; }
+        
+        /* Notification */
+        #notif { position: fixed; top: 20px; right: -300px; background: #2ecc71; color: #fff; padding: 15px; border-radius: 8px; z-index: 1000; transition: 0.5s; }
     </style>
 </head>
 <body>
 
-    <div id="notif-box">
-        <i class="fas fa-check-circle"></i> Withdraw Successful! Your funds are sent.
-    </div>
+    <div id="notif"><i class="fas fa-check-circle"></i> Withdraw Successful!</div>
 
-    <div id="page-play">
-        <div class="flex justify-between p-3 items-center">
-            <div class="text-[#f3ba2f] font-bold italic">Six.game</div>
-            <div class="flex gap-2">
-                <span class="bg-[#242932] px-3 py-1 rounded text-sm" id="bal-text">135.59 PKR</span>
-                <button onclick="openWithdraw()" class="bg-pink-600 px-3 py-1 rounded text-xs font-bold">Withdraw</button>
+    <div id="page-home">
+        <div class="flex justify-between items-center p-3 bg-[#1a1d23] sticky top-0 z-50">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-bars"></i>
+                <div class="text-[#f3ba2f] font-bold italic">Six.game</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+                <span class="bg-[#242932] px-2 py-1 rounded">Balance: <span id="main-bal">135.59</span></span>
+                <button onclick="alert('Deposit to: 03431793371')" class="bg-[#f3ba2f] text-black px-3 py-1 rounded font-bold">Deposit</button>
+                <button onclick="showWithdraw()" class="bg-pink-600 px-3 py-1 rounded font-bold">Withdraw</button>
             </div>
         </div>
+        <div class="p-3 grid grid-cols-3 gap-3">
+            <div class="game-card" onclick="showLoading()">
+                <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="p-4 bg-black">
+                <div class="absolute bottom-0 w-full bg-black/80 text-[10px] text-center py-1">AVIATOR</div>
+            </div>
+        </div>
+    </div>
 
+    <div id="page-loading" class="hidden h-screen bg-black flex flex-col items-center justify-center">
+        <h1 class="text-4xl font-black">SPRIBE</h1>
+        <div class="flex gap-2 mt-5">
+            <div class="w-3 h-3 bg-red-600 rounded-full animate-bounce"></div>
+            <div class="w-3 h-3 bg-red-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+        </div>
+    </div>
+
+    <div id="page-play" class="hidden">
+        <div class="flex justify-between p-3 border-b border-gray-800">
+            <button onclick="location.reload()" class="text-xs bg-gray-800 px-3 py-1 rounded-full">Lobby</button>
+            <div class="text-green-500 font-bold" id="game-bal">135.59 PKR</div>
+        </div>
         <div class="game-canvas">
-            <div id="mult" class="absolute top-1/3 left-1/2 -translate-x-1/2 text-5xl font-black z-10">1.00x</div>
+            <div id="mult-display" class="absolute top-1/3 left-1/2 -translate-x-1/2 text-6xl font-black z-10">1.00x</div>
+            <svg><path id="curve" fill="rgba(255,0,0,0.2)" stroke="#ff0000" stroke-width="4" d="M 0 350" /></svg>
             <img id="plane" src="https://n1.vavada.net/img/games/spribe/aviator/plane.png">
         </div>
-
-        <div class="p-3">
-            <div class="bg-[#1b1c1d] p-4 rounded-xl border border-gray-800">
-                <p class="text-[10px] text-gray-500 mb-1">Bet Amount</p>
-                <input type="number" id="bet-input" value="16.00" class="w-full bg-black text-yellow-500 font-bold p-2 rounded mb-2 outline-none">
-                <button id="main-bet-btn" onclick="handleBet()" class="bet-btn">BET</button>
+        <div class="grid grid-cols-2 gap-3 p-3">
+            <div class="bg-[#1b1c1d] p-3 rounded-xl border border-gray-800 text-center">
+                <input type="number" id="bet-amt" value="16.00" class="w-full bg-black text-yellow-500 text-center font-bold mb-2">
+                <button id="bet-btn" onclick="toggleBet()" class="bet-btn">BET</button>
+            </div>
+            <div class="bg-[#1b1c1d] p-3 rounded-xl border border-blue-900">
+                <p class="text-[10px] text-blue-400 font-bold">ZS AI BOT (V.5)</p>
+                <input type="password" id="bot-pass" placeholder="Password" class="w-full bg-black text-xs p-1 mt-1">
+                <button onclick="getPrediction()" class="w-full bg-blue-600 text-[10px] py-1 rounded-full mt-2">PREDICT</button>
+                <div id="bot-res" class="text-center font-bold mt-1">--x</div>
             </div>
         </div>
     </div>
 
-    <div id="withdraw-page" class="hidden fixed inset-0 bg-[#0b0c0d] z-[500] p-5 overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold">Withdrawal</h2>
-            <button onclick="closeWithdraw()" class="text-gray-400 text-2xl">&times;</button>
+    <div id="withdraw-modal" class="hidden fixed inset-0 bg-black/90 z-[200] p-5">
+        <h2 class="text-xl font-bold mb-4">Withdraw Funds</h2>
+        <select id="method" class="w-full bg-gray-800 p-3 rounded mb-3">
+            <option>Easypaisa</option>
+            <option>JazzCash</option>
+        </select>
+        <input type="number" id="w-amount" placeholder="Amount" class="w-full bg-gray-800 p-3 rounded mb-3">
+        <button onclick="processWithdraw()" class="w-full bg-pink-600 py-3 rounded font-bold">Request Withdraw</button>
+        <div class="mt-5">
+            <h3 class="text-sm text-gray-400 mb-2">History</h3>
+            <div id="w-history" class="text-xs text-gray-500">No recent history</div>
         </div>
-
-        <div class="bg-[#1a1d23] p-4 rounded-xl mb-6">
-            <label class="text-xs text-gray-400">Select Method</label>
-            <select id="w-method" class="w-full bg-black p-3 rounded mt-1 outline-none">
-                <option>Easypaisa</option>
-                <option>JazzCash</option>
-            </select>
-            
-            <label class="text-xs text-gray-400 mt-4 block">Amount (PKR)</label>
-            <input type="number" id="w-amt" placeholder="Min 500" class="w-full bg-black p-3 rounded mt-1 outline-none">
-            
-            <button onclick="submitWithdraw()" class="w-full bg-green-600 py-3 rounded-xl font-bold mt-5">Submit Request</button>
-        </div>
-
-        <h3 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Transaction History</h3>
-        <div id="history-list">
-            <p id="no-hist" class="text-xs text-gray-600 text-center mt-4">No records found.</p>
-        </div>
+        <button onclick="showWithdraw()" class="mt-5 text-gray-500">Close</button>
     </div>
 
     <script>
         let balance = 135.59;
-        let m = 1.00;
         let isBetting = false;
+        let m = 1.00;
 
-        // Start Plane
-        function startPlane() {
+        function showLoading() {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-loading').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('page-loading').classList.add('hidden');
+                document.getElementById('page-play').classList.remove('hidden');
+                startFlight();
+            }, 3000);
+        }
+
+        function startFlight() {
             m = 1.00;
-            let crash = (1.2 + Math.random() * 6).toFixed(2);
+            // 7-8 sec flight time logic
+            let crash = (1.5 + Math.random() * 5).toFixed(2);
             document.getElementById('plane').style.display = 'block';
-            let flight = setInterval(() => {
+            let loop = setInterval(() => {
                 if (m >= crash) {
-                    clearInterval(flight);
-                    document.getElementById('mult').innerText = "FLEW AWAY!";
+                    clearInterval(loop);
+                    document.getElementById('mult-display').innerText = m.toFixed(2) + "x FLEW!";
                     document.getElementById('plane').style.display = 'none';
-                    if(isBetting) stopBet(false);
-                    setTimeout(startPlane, 3000);
+                    if(isBetting) resetBet();
+                    setTimeout(startFlight, 3000);
                 } else {
                     m += 0.01;
-                    updateDisplay();
+                    updateUI(m);
                 }
-            }, 60);
+            }, 50); // Speed adjusted for 7-8 seconds average
         }
 
-        function updateDisplay() {
-            document.getElementById('mult').innerText = m.toFixed(2) + "x";
-            let x = Math.min((m - 1) * 50, 250);
-            let y = 300 - Math.min(Math.pow(m - 1, 1.3) * 40, 250);
+        function updateUI(val) {
+            document.getElementById('mult-display').innerText = val.toFixed(2) + "x";
+            let x = Math.min((val - 1) * 60, 300);
+            let y = 350 - Math.min(Math.pow(val - 1, 1.2) * 50, 300);
             document.getElementById('plane').style.left = x + 'px';
-            document.getElementById('plane').style.top = y + 'px';
+            document.getElementById('plane').style.top = (y - 30) + 'px';
+            document.getElementById('curve').setAttribute('d', `M 0 350 Q ${x/2} 350 ${x} ${y} L ${x} 350 L 0 350 Z`);
             
+            // Real-time cash update if betting
             if(isBetting) {
-                let amt = document.getElementById('bet-input').value;
-                document.getElementById('main-bet-btn').innerText = `CASH OUT (${(amt * m).toFixed(2)})`;
+                let amt = document.getElementById('bet-amt').value;
+                document.getElementById('bet-btn').innerText = `CASH OUT\n${(amt * val).toFixed(2)} PKR`;
             }
         }
 
-        function handleBet() {
-            let btn = document.getElementById('main-bet-btn');
+        function toggleBet() {
+            let btn = document.getElementById('bet-btn');
+            let amt = parseFloat(document.getElementById('bet-amt').value);
             if(!isBetting) {
                 isBetting = true;
+                balance -= amt;
+                updateBalanceDisplay();
                 btn.classList.add('bet-active');
             } else {
-                stopBet(true);
+                balance += (amt * m);
+                resetBet();
+                updateBalanceDisplay();
             }
         }
 
-        function stopBet(win) {
+        function resetBet() {
             isBetting = false;
-            let btn = document.getElementById('main-bet-btn');
+            let btn = document.getElementById('bet-btn');
             btn.classList.remove('bet-active');
             btn.innerText = "BET";
-            if(win) {
-                let amt = parseFloat(document.getElementById('bet-input').value);
-                balance += (amt * m);
-                document.getElementById('bal-text').innerText = balance.toFixed(2) + " PKR";
-            }
         }
 
-        // Withdraw Logic
-        function openWithdraw() { document.getElementById('withdraw-page').classList.remove('hidden'); }
-        function closeWithdraw() { document.getElementById('withdraw-page').classList.add('hidden'); }
+        function updateBalanceDisplay() {
+            document.getElementById('main-bal').innerText = balance.toFixed(2);
+            document.getElementById('game-bal').innerText = balance.toFixed(2) + " PKR";
+        }
 
-        function submitWithdraw() {
-            let amt = document.getElementById('w-amt').value;
-            let method = document.getElementById('w-method').value;
-            if(!amt || amt < 10) return alert("Paisa likho jani!");
+        function showWithdraw() {
+            document.getElementById('withdraw-modal').classList.toggle('hidden');
+        }
 
-            document.getElementById('no-hist').style.display = 'none';
-            let list = document.getElementById('history-list');
+        function processWithdraw() {
+            let amt = document.getElementById('w-amount').value;
+            let method = document.getElementById('method').value;
+            if(!amt) return;
             
-            // Record ID for history
-            let recordId = "WTR-" + Math.floor(Math.random() * 9000);
-            
-            let html = `
-                <div class="history-item flex justify-between items-center" id="${recordId}">
-                    <div>
-                        <p class="font-bold">${method}</p>
-                        <p class="text-[10px] text-gray-500">${new Date().toLocaleTimeString()}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-white">${amt} PKR</p>
-                        <p class="status-pending" id="stat-${recordId}">Pending...</p>
-                    </div>
-                </div>
-            `;
-            list.insertAdjacentHTML('afterbegin', html);
-            alert("Request sent! 4 min wait karein.");
-            closeWithdraw();
+            document.getElementById('w-history').innerHTML = `<div class='flex justify-between border-b border-gray-800 py-2'><span>${method}</span><span>${amt} PKR</span><span class='text-yellow-500'>Pending</span></div>`;
+            alert('Withdraw request sent!');
+            showWithdraw();
 
-            // 4 Minute Notification & Status Update
+            // 4 Minute Notification
             setTimeout(() => {
-                // Show Notification
-                let box = document.getElementById('notif-box');
-                box.classList.add('show');
-                
-                // Update History Status
-                let statText = document.getElementById('stat-' + recordId);
-                if(statText) {
-                    statText.innerText = "Successful";
-                    statText.className = "status-success";
-                }
-
-                // Hide Notification after 5 seconds
-                setTimeout(() => { box.classList.remove('show'); }, 5000);
-            }, 240000); // 240,000ms = 4 minutes
+                let notif = document.getElementById('notif');
+                notif.style.right = '20px';
+                setTimeout(() => notif.style.right = '-300px', 5000);
+            }, 240000); // 4 minutes = 240,000ms
         }
 
-        window.onload = startPlane;
+        function getPrediction() {
+            if(document.getElementById('bot-pass').value === "ZSVIP2026$") {
+                document.getElementById('bot-res').innerText = (1.8 + Math.random()*4).toFixed(2) + "x";
+            } else { alert("Wrong Pass!"); }
+        }
     </script>
 </body>
 </html>
