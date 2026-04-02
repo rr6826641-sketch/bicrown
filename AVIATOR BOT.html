@@ -9,318 +9,246 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
         
-        body { background-color: #1b1c1d; font-family: 'Roboto', sans-serif; color: #fff; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        body {
+            background-color: #1b1c1d;
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-        /* Main App Container */
         .aviator-app {
-            width: 98%; max-width: 1400px; height: 95vh;
-            background: #141516; border-radius: 12px;
-            display: grid; grid-template-columns: 280px 1fr 280px;
-            gap: 10px; padding: 10px; position: relative; z-index: 10;
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            background: #000;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
             border: 1px solid #333;
         }
 
-        /* Top Header Buttons */
-        .top-nav {
-            position: absolute; top: 15px; right: 20px;
-            display: flex; gap: 10px; z-index: 100;
-        }
-        .nav-btn {
-            padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 13px;
-            display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s;
-        }
-        .btn-deposit { background: #28a745; color: white; box-shadow: 0 0 10px rgba(40,167,69,0.4); }
-        .btn-withdraw { background: #e91e63; color: white; }
-        .nav-btn:hover { transform: scale(1.05); }
-
-        /* Deposit/Withdraw Modals */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 5000; display: flex; align-items: center; justify-content: center;
-        }
-        .modal-card {
-            background: #1b1c1d; border: 2px solid #ff0000; padding: 30px;
-            border-radius: 20px; text-align: center; width: 380px;
-            box-shadow: 0 0 30px rgba(255,0,0,0.4);
+        /* Header Styling */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: #141516;
+            border-bottom: 1px solid #222;
         }
 
-        /* Sidebar & Layout Elements */
-        .sidebar { background: #101112; border-radius: 10px; overflow-y: auto; font-size: 11px; padding: 5px; border: 1px solid #222; }
-        .bet-row { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #1f2021; }
-        .win-green { color: #28a745; font-weight: bold; }
+        .logo-section img { height: 25px; }
 
-        .game-main { display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .canvas-area {
-            flex: 1; background: #000; border-radius: 10px; position: relative;
-            overflow: hidden; border: 1px solid #222;
-            background-image: radial-gradient(circle at center, #2a0a0a 0%, #000 70%);
+        /* Main Game Area */
+        .game-container {
+            display: flex;
+            flex: 1;
+            padding: 10px;
+            gap: 10px;
         }
 
-        .multiplier-text {
-            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 85px; font-weight: 900; z-index: 100; text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        .stats-sidebar { width: 25%; background: #141516; border-radius: 10px; padding: 10px; overflow-y: auto; }
+
+        .display-area {
+            flex: 1;
+            background: radial-gradient(circle, #2c1114 0%, #000 100%);
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
-        #plane { position: absolute; width: 70px; z-index: 60; display: none; filter: drop-shadow(0 0 15px red); }
-
-        /* History Bar */
-        .history-bar {
-            height: 40px; background: #101112; border-radius: 20px;
-            display: flex; align-items: center; gap: 8px; padding: 0 15px; overflow-x: hidden; border: 1px solid #222;
+        /* Multiplier Text */
+        #multiplier {
+            font-size: 80px;
+            font-weight: 900;
+            z-index: 10;
         }
-        .history-tag { padding: 3px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; background: #2c2d2e; border: 1px solid #444; }
 
-        /* Bet Controls - Optimized Size */
-        .bet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 150px; }
-        .bet-box { 
-            background: #1b1c1d; border-radius: 15px; padding: 12px; 
-            border: 1px solid #333; display: flex; flex-direction: column; align-items: center;
+        /* Animated Plane */
+        #plane-wrapper {
+            position: absolute;
+            bottom: 15%;
+            left: 10%;
+            transition: all 0.1s linear;
+            z-index: 5;
         }
-        .amt-ctrl { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; background: #000; padding: 5px 15px; border-radius: 20px; border: 1px solid #444; }
-        .amt-btn { color: #888; font-size: 18px; cursor: pointer; }
-        
-        .main-bet-btn { 
-            background: #28a745; width: 90%; height: 60px; border-radius: 12px; 
-            font-weight: 900; font-size: 22px; box-shadow: 0 4px 0 #1e7e34;
-            transition: 0.1s;
-        }
-        .main-bet-btn.cashout { background: #ffc107 !important; color: #000; box-shadow: 0 4px 0 #d39e00; }
 
-        /* Bot Section */
-        .bot-box { 
-            position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.85);
-            border: 1px solid #3b82f6; padding: 12px; border-radius: 12px; z-index: 500;
+        .plane-img {
+            width: 100px;
+            filter: drop-shadow(0 0 10px red);
         }
-        .bot-input { background: #000; border: 1px solid #333; color: #fff; padding: 6px; width: 130px; border-radius: 6px; font-size: 12px; }
 
-        .hidden { display: none; }
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: #141516;
+        }
+
+        .bet-box {
+            flex: 1;
+            background: #222;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-bet {
+            background: #28a745;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .btn-withdraw { background: #d9534f; display: none; }
+
+        /* Notification */
+        #notif {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
 
-    <div id="deposit-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h1 class="text-3xl font-black text-red-600 mb-2 italic">DEPOSIT FUNDS</h1>
-            <p class="text-sm text-gray-400 mb-6">Send funds to activate your AI signals</p>
-            <div class="bg-black p-5 rounded-xl border border-gray-700 mb-6">
-                <p class="text-green-500 font-bold text-lg mb-1">EasyPaisa / JazzCash</p>
-                <p class="text-white font-mono text-2xl tracking-widest select-all">03431793371</p>
-                <p class="text-[11px] text-gray-500 mt-2 italic">Minimum Deposit: $5 (Rs. 1500)</p>
+<div id="notif">Withdrawal Successful! <span id="win-amt"></span></div>
+
+<div class="aviator-app">
+    <div class="header">
+        <div class="logo-section">
+            <span style="color:red; font-weight:bold;">Aviator</span>
+            <img src="https://spribe.co/assets/images/logo.svg" alt="Spribe" style="margin-left:10px; display:inline;">
+        </div>
+        <div>Balance: <span id="balance" class="text-green-500 font-bold">$507.25</span></div>
+    </div>
+
+    <div class="game-container">
+        <div class="stats-sidebar">
+            <h3 class="text-xs text-gray-500 mb-2">ALL BETS</h3>
+            <div id="bet-history" class="text-xs space-y-2">
+                </div>
+        </div>
+
+        <div class="display-area">
+            <div id="multiplier">1.00x</div>
+            
+            <div id="plane-wrapper">
+                <img src="https://i.ibb.co/5R3XyvP/plane.png" class="plane-img" alt="Plane">
             </div>
-            <button onclick="closeModal('deposit-modal')" class="w-full bg-red-600 py-3 rounded-xl font-black hover:bg-red-700 shadow-lg">I HAVE PAID</button>
         </div>
     </div>
 
-    <div id="withdraw-modal" class="modal-overlay hidden">
-        <div class="modal-card" style="border-color: #e91e63;">
-            <h1 class="text-3xl font-black text-pink-600 mb-2 italic">WITHDRAW</h1>
-            <p class="text-sm text-gray-400 mb-6">Enter your account details</p>
-            <input type="text" placeholder="Account Number" class="w-full bg-black border border-gray-700 p-3 rounded-lg mb-3 text-white">
-            <input type="number" placeholder="Amount" class="w-full bg-black border border-gray-700 p-3 rounded-lg mb-6 text-white">
-            <button onclick="closeModal('withdraw-modal')" class="w-full bg-pink-600 py-3 rounded-xl font-black">REQUEST WITHDRAW</button>
+    <div class="controls">
+        <div class="bet-box">
+            <div class="flex items-center gap-4">
+                <button onclick="changeAmt(-1)" class="bg-gray-700 px-3 rounded">-</button>
+                <input type="text" id="bet-input" value="1.00" class="bg-transparent text-center w-12 font-bold">
+                <button onclick="changeAmt(1)" class="bg-gray-700 px-3 rounded">+</button>
+            </div>
+            <button id="bet-btn" onclick="startBet()" class="btn-bet">BET</button>
+            <button id="cashout-btn" onclick="cashout()" class="btn-bet btn-withdraw">CASHOUT</button>
         </div>
     </div>
+</div>
 
-    <div class="aviator-app">
-        <div class="top-nav">
-            <div class="nav-btn btn-deposit" onclick="openModal('deposit-modal')">
-                <i class="fas fa-plus-circle"></i> DEPOSIT
-            </div>
-            <div class="nav-btn btn-withdraw" onclick="openModal('withdraw-modal')">
-                <i class="fas fa-wallet"></i> WITHDRAW
-            </div>
-        </div>
+<script>
+    let multiplier = 1.00;
+    let isFlying = false;
+    let interval;
+    let plane = document.getElementById('plane-wrapper');
+    let multText = document.getElementById('multiplier');
 
-        <div class="sidebar">
-            <div class="flex justify-around border-b border-gray-800 pb-2 mb-2 font-bold text-gray-500">
-                <span class="text-white border-b-2 border-red-600">All Bets</span>
-                <span>My Bets</span>
-            </div>
-            <div id="live-bets-list"></div>
-        </div>
+    function changeAmt(val) {
+        let input = document.getElementById('bet-input');
+        let curr = parseFloat(input.value);
+        if(curr + val >= 1) input.value = (curr + val).toFixed(2);
+    }
 
-        <div class="game-main">
-            <div class="history-bar" id="history">
-                <span class="history-tag" style="color:#9d5df1">1.50x</span>
-                <span class="history-tag" style="color:#4092ff">2.23x</span>
-                <span class="history-tag" style="color:#9d5df1">14.10x</span>
-            </div>
-
-            <div class="canvas-area">
-                <div id="mult-display" class="multiplier-text">WAITING...</div>
-                
-                <svg id="curve-container" style="position: absolute; bottom: 0; width: 100%; height: 100%;">
-                    <path id="curve-shadow" fill="rgba(255,0,0,0.15)" d="M 0 500 L 0 500 L 0 500 Z" />
-                    <path id="curve-line" fill="none" stroke="#ff0000" stroke-width="5" d="M 0 500 Q 0 500 0 500" />
-                </svg>
-
-                <img id="plane" src="https://i.ibb.co/L9L7m4L/aviator-plane.png">
-
-                <div class="bot-box">
-                    <div id="bot-login">
-                        <div class="text-[10px] text-blue-400 font-bold mb-1"><i class="fas fa-robot"></i> AI PREDICTOR</div>
-                        <input type="password" id="pass-field" placeholder="Enter Password" class="bot-input">
-                        <button onclick="unlockBot()" class="bg-blue-600 px-3 py-1.5 rounded-md text-[10px] font-black mt-2 w-full">UNLOCK</button>
-                    </div>
-                    <div id="bot-active" class="hidden text-center">
-                        <div class="text-[10px] text-green-400 font-bold mb-1">AI CONNECTED</div>
-                        <div id="prediction" class="text-white font-black text-2xl italic tracking-tighter">READY</div>
-                        <button onclick="getSignal()" class="bg-blue-600 w-full mt-2 text-[10px] py-1.5 rounded-md font-bold">NEXT SIGNAL</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bet-controls">
-                <div class="bet-box">
-                    <div class="amt-ctrl">
-                        <span class="amt-btn">-</span>
-                        <span class="font-black text-yellow-500">1.00 USD</span>
-                        <span class="amt-btn">+</span>
-                    </div>
-                    <button id="btn1" onclick="handleBet(1)" class="main-bet-btn">BET</button>
-                </div>
-                <div class="bet-box">
-                    <div class="amt-ctrl">
-                        <span class="amt-btn">-</span>
-                        <span class="font-black text-yellow-500">1.00 USD</span>
-                        <span class="amt-btn">+</span>
-                    </div>
-                    <button id="btn2" onclick="handleBet(2)" class="main-bet-btn">BET</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <div class="text-center font-bold text-gray-500 py-2 border-b border-gray-800">CHAT ROOM</div>
-            <div id="chat-box" class="h-full overflow-y-auto p-2"></div>
-        </div>
-
-        <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 px-6 py-1.5 rounded-full border border-green-500/50 z-50">
-            <span class="text-gray-400 text-xs">Balance:</span>
-            <span class="text-green-500 font-black ml-1" id="balance-txt">$500.00</span>
-        </div>
-    </div>
-
-    <script>
-        let balance = 500.00;
-        let currentMult = 1.00;
-        let isFlying = false;
-        let crashPoint = 0;
-        let bet1Active = false;
-        let bet2Active = false;
-
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); if(id==='deposit-modal') startNewRound(); }
-
-        function unlockBot() {
-            let p = document.getElementById('pass-field').value;
-            if(p === "easypaisa") {
-                document.getElementById('bot-login').classList.add('hidden');
-                document.getElementById('bot-active').classList.remove('hidden');
-            } else { alert("Wrong Password! Use 'easypaisa'"); }
-        }
-
-        function getSignal() {
-            document.getElementById('prediction').innerText = "WAITING...";
-            setTimeout(() => {
-                document.getElementById('prediction').innerText = crashPoint + "x";
-            }, 1000);
-        }
-
-        function startNewRound() {
-            if(isFlying) return;
-            isFlying = false;
-            currentMult = 1.00;
-            crashPoint = (1.1 + Math.random() * 4).toFixed(2);
+    function startBet() {
+        isFlying = true;
+        multiplier = 1.00;
+        document.getElementById('bet-btn').style.display = 'none';
+        document.getElementById('cashout-btn').style.display = 'block';
+        
+        interval = setInterval(() => {
+            multiplier += 0.01;
+            multText.innerText = multiplier.toFixed(2) + "x";
+            multText.style.color = "white";
             
-            document.getElementById('mult-display').innerText = "WAITING...";
-            document.getElementById('mult-display').style.color = "#888";
-            document.getElementById('plane').style.display = 'none';
-            
-            resetBetButtons();
-            setTimeout(launchPlane, 3000);
-        }
+            // Plane movement logic
+            let x = (multiplier - 1) * 50;
+            let y = (multiplier - 1) * 30;
+            plane.style.transform = `translate(${x}px, -${y}px)`;
 
-        function launchPlane() {
-            isFlying = true;
-            document.getElementById('plane').style.display = 'block';
-            document.getElementById('mult-display').style.color = "#fff";
-            
-            let start = Date.now();
-            let timer = setInterval(() => {
-                if(!isFlying) { clearInterval(timer); return; }
-                
-                let elapsed = (Date.now() - start) / 1000;
-                currentMult = Math.pow(1.18, elapsed);
-                document.getElementById('mult-display').innerText = currentMult.toFixed(2) + "x";
-
-                // Curve Logic
-                let x = Math.min(elapsed * 70, 600);
-                let y = 400 - Math.min(Math.pow(elapsed, 1.5) * 40, 350);
-                
-                document.getElementById('curve-line').setAttribute('d', `M 0 400 Q ${x/2} 400 ${x} ${y}`);
-                document.getElementById('curve-shadow').setAttribute('d', `M 0 400 Q ${x/2} 400 ${x} ${y} L ${x} 400 Z`);
-                document.getElementById('plane').style.left = (x - 30) + "px";
-                document.getElementById('plane').style.top = (y - 30) + "px";
-
-                if(bet1Active) updateBtn(1);
-                if(bet2Active) updateBtn(2);
-
-                if(currentMult >= crashPoint) {
-                    clearInterval(timer);
-                    doCrash();
-                }
-            }, 50);
-        }
-
-        function doCrash() {
-            isFlying = false;
-            document.getElementById('mult-display').innerText = "FLEW AWAY!";
-            document.getElementById('mult-display').style.color = "#ff3333";
-            document.getElementById('plane').style.display = 'none';
-            
-            if(bet1Active) { balance -= 1; bet1Active = false; }
-            if(bet2Active) { balance -= 1; bet2Active = false; }
-
-            updateBalanceUI();
-            setTimeout(startNewRound, 3000);
-        }
-
-        function handleBet(id) {
-            if(!isFlying) {
-                if(id===1) { bet1Active = true; document.getElementById('btn1').innerText = "WAITING..."; }
-                else { bet2Active = true; document.getElementById('btn2').innerText = "WAITING..."; }
-            } else {
-                let win = (1 * currentMult).toFixed(2);
-                balance += parseFloat(win);
-                if(id===1) { bet1Active = false; document.getElementById('btn1').innerText = "WIN $" + win; }
-                else { bet2Active = false; document.getElementById('btn2').innerText = "WIN $" + win; }
-                updateBalanceUI();
+            if (Math.random() < 0.005 && multiplier > 2) {
+                crash();
             }
-        }
+        }, 100);
+    }
 
-        function updateBtn(id) {
-            let btn = document.getElementById('btn' + id);
-            btn.className = "main-bet-btn cashout";
-            btn.innerHTML = `CASHOUT<br><span class='text-sm'>$${(1 * currentMult).toFixed(2)}</span>`;
-        }
+    function cashout() {
+        if(!isFlying) return;
+        let bet = parseFloat(document.getElementById('bet-input').value);
+        let win = bet * multiplier;
+        
+        // Show Success Notification
+        let notif = document.getElementById('notif');
+        document.getElementById('win-amt').innerText = "$" + win.toFixed(2);
+        notif.style.display = 'block';
+        setTimeout(() => { notif.style.display = 'none'; }, 3000);
 
-        function resetBetButtons() {
-            document.getElementById('btn1').className = "main-bet-btn";
-            document.getElementById('btn1').innerText = "BET";
-            document.getElementById('btn2').className = "main-bet-btn";
-            document.getElementById('btn2').innerText = "BET";
-        }
+        resetGame();
+    }
 
-        function updateBalanceUI() { document.getElementById('balance-txt').innerText = "$" + balance.toFixed(2); }
+    function crash() {
+        multText.style.color = "red";
+        multText.innerText = "FLEW AWAY!";
+        resetGame();
+    }
 
-        // Fake Data
-        setInterval(() => {
-            let list = document.getElementById('live-bets-list');
-            let row = `<div class="bet-row"><span>User_${Math.floor(Math.random()*999)}</span><span class="win-green">$${(Math.random()*20).toFixed(2)}</span></div>`;
-            list.innerHTML = row + list.innerHTML;
-            if(list.children.length > 15) list.lastChild.remove();
-        }, 1500);
-    </script>
+    function resetGame() {
+        clearInterval(interval);
+        isFlying = false;
+        setTimeout(() => {
+            multiplier = 1.00;
+            multText.innerText = "1.00x";
+            plane.style.transform = `translate(0px, 0px)`;
+            document.getElementById('bet-btn').style.display = 'block';
+            document.getElementById('cashout-btn').style.display = 'none';
+        }, 2000);
+    }
+
+    // Auto-fill Fake Bets for realism
+    const names = ["Romi_VIP", "Zohan_99", "Sara_Killer", "Max_Avi"];
+    setInterval(() => {
+        let div = document.createElement('div');
+        div.className = "flex justify-between border-b border-gray-800 pb-1";
+        div.innerHTML = `<span>${names[Math.floor(Math.random()*names.length)]}</span> <span class="text-green-500">$${(Math.random()*50).toFixed(2)}</span>`;
+        let history = document.getElementById('bet-history');
+        history.prepend(div);
+        if(history.children.length > 10) history.lastChild.remove();
+    }, 3000);
+</script>
+
 </body>
 </html>
