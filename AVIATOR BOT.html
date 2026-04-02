@@ -2,130 +2,170 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ZS999 PRO - Play Page Fixed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Six.game Professional - Aviator & Bot</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0b0c0d; color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; }
-        .app-grid { display: grid; grid-template-columns: 240px 1fr 280px; height: 100vh; }
+        body { background: #1a1d23; color: #fff; font-family: sans-serif; margin: 0; overflow-x: hidden; }
+        .hidden { display: none !important; }
         
-        /* AVIATOR PLAY AREA FIX */
-        #play-area-aviator { 
-            position: relative; height: 420px; background: #000; margin: 15px; 
-            border-radius: 15px; border: 1px solid #222; overflow: hidden;
-            background: radial-gradient(circle at bottom left, #2b0808 0%, #000 85%);
-        }
-        
-        #plane-icon { position: absolute; width: 60px; z-index: 50; display: none; filter: drop-shadow(0 0 12px red); }
-        #main-mult { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 85px; font-weight: 900; z-index: 10; }
-        svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
+        /* PAGE 1: HOME STYLES */
+        .game-card { background: #242932; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #333; cursor: pointer; }
+        .game-label { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); text-align: center; font-size: 10px; padding: 4px 0; font-weight: bold; }
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #1a1d23; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
 
-        .sidebar { background: #111; padding: 20px; border-right: 1px solid #222; }
-        .btn-nav { padding: 12px; background: #1b1c1d; border-radius: 10px; margin-bottom: 12px; cursor: pointer; text-align: center; border: 1px solid #333; }
-        .btn-nav.active { background: #d91d1d; border-color: #ff4d4d; font-weight: bold; }
-        
-        .bet-box { background: #1b1c1d; padding: 15px; border-radius: 15px; border: 1px solid #2a2a2a; text-align: center; }
-        .green-bet { background: #28a745; width: 100%; height: 55px; border-radius: 12px; font-size: 22px; font-weight: bold; margin-top: 10px; }
+        /* PAGE 2: LOADING STYLES */
+        #loading-screen { background: #000; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .dot { width: 10px; height: 10px; background: #333; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .dot.main { background: #e91e63; box-shadow: 0 0 15px #e91e63; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.3; } 40% { transform: scale(1.2); opacity: 1; } }
+
+        /* PAGE 3: PLAY PAGE STYLES */
+        #aviator-play-page { background: #0b0c0d; height: 100vh; display: flex; flex-direction: column; }
+        .game-canvas { position: relative; height: 350px; background: radial-gradient(circle at bottom left, #2b0808 0%, #000 85%); margin: 10px; border-radius: 15px; overflow: hidden; border: 1px solid #222; }
+        #plane { position: absolute; width: 50px; z-index: 50; display: none; filter: drop-shadow(0 0 10px red); }
+        #mult-display { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: 900; z-index: 10; }
+        svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
+        .bet-btn-green { background: #28a745; width: 100%; height: 60px; border-radius: 12px; font-size: 18px; font-weight: bold; border-bottom: 4px solid #1e7e34; }
     </style>
 </head>
 <body>
 
-<div class="app-grid">
-    <div class="sidebar">
-        <h1 class="text-red-600 text-3xl font-black text-center mb-10">SPRIBE</h1>
-        <div class="btn-nav active">Aviator</div>
-        <div class="btn-nav">Mines</div>
-        <div class="mt-auto text-[10px] text-gray-500">Easypaisa: 03431793371</div>
-    </div>
-
-    <div class="flex flex-col">
-        <div class="flex justify-between p-4 items-center">
-            <div class="bg-black border border-green-500 px-6 py-1 rounded-full text-green-500 font-bold">$ 507.25</div>
-            <button class="bg-pink-600 px-4 py-1 rounded-full font-bold text-xs">WITHDRAW</button>
-        </div>
-
-        <div id="play-area-aviator">
-            <div id="main-mult">1.00x</div>
-            <svg>
-                <path id="graph-path" fill="rgba(255,0,0,0.1)" stroke="#ff0000" stroke-width="5" d="M 0 420" />
-            </svg>
-            <img id="plane-icon" src="https://n1.vavada.net/img/games/spribe/aviator/plane.png">
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 px-4">
-            <div class="bet-box">
-                <span class="text-[10px] text-gray-400">Amount</span>
-                <input type="number" value="1.00" class="w-full bg-black text-center text-yellow-500 font-bold p-1 rounded outline-none">
-                <button class="green-bet">BET</button>
+    <div id="page-home">
+        <div class="flex justify-between items-center p-3 bg-[#1a1d23] sticky top-0 z-50">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-bars text-xl"></i>
+                <div class="text-[#f3ba2f] font-bold italic text-lg">Six.game</div>
             </div>
-            <div class="bet-box">
-                <span class="text-[10px] text-gray-400">Amount</span>
-                <input type="number" value="2.00" class="w-full bg-black text-center text-yellow-500 font-bold p-1 rounded outline-none">
-                <button class="green-bet">BET</button>
+            <div class="flex items-center gap-2">
+                <div class="bg-[#242932] px-3 py-1 rounded-full flex items-center gap-2 border border-yellow-500/30">
+                    <span class="text-sm font-bold">135.59 PKR</span>
+                </div>
+                <button class="bg-[#f3ba2f] text-black px-4 py-1 rounded-md font-bold text-sm">Deposit</button>
             </div>
         </div>
-    </div>
 
-    <div class="sidebar" style="border-left: 1px solid #222;">
-        <div class="text-xs text-gray-500 border-b border-gray-800 pb-2 mb-4">CHAT ROOM</div>
-        <div class="flex-1"></div>
-        <div class="bg-[#1b1c1d] p-4 rounded-xl border border-blue-600">
-            <p class="text-[10px] text-blue-400 font-bold">ZS AI BOT (V.5)</p>
-            <input type="password" id="pass" placeholder="Password" class="w-full bg-black p-2 rounded text-xs mt-2 outline-none">
-            <button class="w-full bg-blue-600 text-[10px] py-2 rounded-full mt-2 font-bold" onclick="getPred()">GET PREDICTION</button>
-            <div id="pred-out" class="text-center text-2xl font-black mt-2">--x</div>
+        <div class="px-3 mt-4">
+            <div class="flex items-center gap-2 mb-3">
+                <i class="fas fa-fire text-orange-500"></i><span class="font-bold">Hot Games</span>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="game-card border-orange-500/50" onclick="showLoading()">
+                    <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="p-4 bg-black">
+                    <div class="game-label text-red-500">AVIATOR</div>
+                </div>
+                <div class="game-card"><img src="https://img.freepik.com/premium-vector/bomb-icon-game-style_24911-46033.jpg"><div class="game-label">MINES</div></div>
+                <div class="game-card"><img src="https://img.freepik.com/free-vector/cricket-stadium-with-player-action_1308-34440.jpg"><div class="game-label">CRICKET</div></div>
+            </div>
+        </div>
+
+        <div class="nav-bottom">
+            <div class="text-center text-yellow-500"><i class="fas fa-home"></i><p class="text-[10px]">Home</p></div>
+            <div class="text-center text-gray-500"><i class="fas fa-gift"></i><p class="text-[10px]">Offers</p></div>
+            <div class="text-center text-gray-500"><i class="fas fa-user"></i><p class="text-[10px]">Profile</p></div>
         </div>
     </div>
-</div>
 
-<script>
-    let m = 1.00;
-    let crash = (1.2 + Math.random() * 4).toFixed(2);
-    const canvasH = 420;
+    <div id="loading-screen" class="hidden">
+        <div class="text-center">
+            <p class="text-[10px] text-gray-600 tracking-widest uppercase mb-2">Powered by</p>
+            <h1 class="text-4xl font-black flex items-center gap-2"><span class="w-8 h-8 bg-white rounded-full"></span> SPRIBE</h1>
+            <p class="text-[8px] text-gray-500 mt-1">INSIGHTFUL ENTERTAINMENT</p>
+        </div>
+        <div class="flex gap-2 mt-10">
+            <div class="dot" style="animation-delay: -0.32s"></div>
+            <div class="dot main" style="animation-delay: -0.16s"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
 
-    function startFlight() {
-        m = 1.00;
-        crash = (1.1 + Math.random() * 5).toFixed(2);
-        document.getElementById('plane-icon').style.display = 'block';
-        document.getElementById('main-mult').style.color = '#fff';
-        
-        let loop = setInterval(() => {
-            if (m >= crash) {
-                clearInterval(loop);
-                document.getElementById('main-mult').innerText = m.toFixed(2) + "x FLEW AWAY!";
-                document.getElementById('main-mult').style.color = '#ff0000';
-                document.getElementById('plane-icon').style.display = 'none';
-                setTimeout(startFlight, 3000);
-            } else {
-                m += 0.01 * (m * 0.4);
-                updateFrame(m);
-            }
-        }, 60);
-    }
+    <div id="aviator-play-page" class="hidden">
+        <div class="flex justify-between p-3 items-center border-b border-gray-800">
+            <div class="bg-black/50 px-3 py-1 rounded-full text-xs" onclick="showHome()">
+                <i class="fas fa-home"></i> Lobby
+            </div>
+            <div class="text-green-500 font-bold text-sm">135.59 PKR</div>
+        </div>
 
-    function updateFrame(val) {
-        document.getElementById('main-mult').innerText = val.toFixed(2) + "x";
-        let x = Math.min((val - 1) * 70, 700);
-        let y = canvasH - Math.min(Math.pow(val - 1, 1.4) * 45, 380);
-        
-        const plane = document.getElementById('plane-icon');
-        plane.style.left = x + 'px';
-        plane.style.top = (y - 30) + 'px';
+        <div class="flex gap-2 px-3 py-2 overflow-x-auto text-[10px] no-scrollbar">
+            <span class="bg-purple-900/40 text-purple-400 px-2 rounded-full">10.07x</span>
+            <span class="bg-blue-900/40 text-blue-400 px-2 rounded-full">2.01x</span>
+            <span class="bg-purple-900/40 text-purple-400 px-2 rounded-full">12.09x</span>
+        </div>
 
-        const path = document.getElementById('graph-path');
-        path.setAttribute('d', `M 0 ${canvasH} Q ${x/2} ${canvasH} ${x} ${y}`);
-    }
+        <div class="game-canvas">
+            <div id="mult-display">1.00x</div>
+            <svg><path id="curve" fill="rgba(255,0,0,0.1)" stroke="#ff0000" stroke-width="4" d="M 0 350" /></svg>
+            <img id="plane" src="https://n1.vavada.net/img/games/spribe/aviator/plane.png">
+        </div>
 
-    function getPred() {
-        const p = document.getElementById('pass').value;
-        if(p === "ZSVIP2026$") {
-            document.getElementById('pred-out').innerText = (1.5 + Math.random()*5).toFixed(2) + "x";
-            document.getElementById('pred-out').style.color = "#2ecc71";
-        } else {
-            alert("Wrong Password!");
+        <div class="grid grid-cols-2 gap-3 px-3 mt-2">
+            <div class="bg-[#1b1c1d] p-3 rounded-xl border border-gray-800">
+                <input type="number" value="16.00" class="w-full bg-black text-center font-bold p-1 rounded mb-2">
+                <button class="bet-btn-green">BET <br><span class="text-xs">16.00 PKR</span></button>
+            </div>
+            <div class="bg-[#1b1c1d] p-3 rounded-xl border border-blue-600 shadow-lg shadow-blue-900/20">
+                <p class="text-[10px] text-blue-400 font-bold">ZS AI BOT (V.5)</p>
+                <input type="password" id="bot-pass" placeholder="Password" class="w-full bg-black p-1 rounded text-xs mt-1 outline-none">
+                <button onclick="getPrediction()" class="w-full bg-blue-600 text-[10px] py-1 rounded-full mt-2 font-bold">GET PREDICTION</button>
+                <div id="bot-res" class="text-center text-xl font-black mt-1 text-white">--x</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('loading-screen').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('aviator-play-page').classList.remove('hidden');
+                startFlight();
+            }, 3000);
         }
-    }
 
-    window.onload = startFlight;
-</script>
+        function showHome() {
+            document.getElementById('aviator-play-page').classList.add('hidden');
+            document.getElementById('page-home').classList.remove('hidden');
+        }
+
+        let m = 1.00;
+        let crash = 2.50;
+        function startFlight() {
+            m = 1.00;
+            crash = (1.1 + Math.random() * 5).toFixed(2);
+            document.getElementById('plane').style.display = 'block';
+            let loop = setInterval(() => {
+                if (m >= crash) {
+                    clearInterval(loop);
+                    document.getElementById('mult-display').innerText = m.toFixed(2) + "x FLEW!";
+                    document.getElementById('plane').style.display = 'none';
+                    setTimeout(startFlight, 3000);
+                } else {
+                    m += 0.01 * (m * 0.4);
+                    updateUI(m);
+                }
+            }, 60);
+        }
+
+        function updateUI(val) {
+            document.getElementById('mult-display').innerText = val.toFixed(2) + "x";
+            let x = Math.min((val - 1) * 60, 300);
+            let y = 350 - Math.min(Math.pow(val - 1, 1.4) * 40, 300);
+            document.getElementById('plane').style.left = x + 'px';
+            document.getElementById('plane').style.top = (y - 25) + 'px';
+            document.getElementById('curve').setAttribute('d', `M 0 350 Q ${x/2} 350 ${x} ${y}`);
+        }
+
+        function getPrediction() {
+            const pass = document.getElementById('bot-pass').value;
+            const res = document.getElementById('bot-res');
+            if(pass === "ZSVIP2026$") {
+                res.innerText = (1.5 + Math.random()*5).toFixed(2) + "x";
+                res.style.color = "#2ecc71";
+            } else { alert("Ghalat Password Jani!"); }
+        }
+    </script>
 </body>
 </html>
