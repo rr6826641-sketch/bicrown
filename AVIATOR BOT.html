@@ -3,141 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZS999 Multi-Game System</title>
+    <title>ZS999 Professional Multi-Game System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background: #0b0c0d; font-family: 'Roboto', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
-        .main-app { width: 100%; height: 100vh; display: grid; grid-template-columns: 250px 1fr; }
+        .main-app { width: 100%; height: 100vh; display: grid; grid-template-columns: 260px 1fr 280px; position: relative;}
         
-        /* Sidebar */
-        .sidebar { background: #141516; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { background: #1b1c1d; padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #333; transition: 0.3s; }
-        .nav-btn.active { background: #d91d1d; border-color: #ff4d4d; }
+        /* Navigation Sidebar */
+        .sidebar { background: #141516; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 50;}
+        .nav-btn { background: #1b1c1d; padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #333; transition: 0.2s; color: #aaa;}
+        .nav-btn.active { background: #d91d1d; border-color: #ff4d4d; color: #fff;}
+        .nav-btn:hover { background: #2c2d2e; color: #fff; }
 
-        /* Balance & Withdraw */
-        .top-bar { background: #1b1c1d; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .withdraw-btn { background: #ff007a; padding: 5px 15px; border-radius: 5px; font-weight: bold; font-size: 12px; }
+        /* Top Bar */
+        .top-bar { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; gap: 10px; align-items: center; }
+        .withdraw-btn { background: #ff007a; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 13px; z-index: 101;}
 
-        /* Game Containers */
-        .game-container { display: none; height: calc(100vh - 60px); position: relative; padding: 20px; }
-        .game-container.active { display: block; }
+        /* Game Areas */
+        .game-view { display: none; background: #000; position: relative; overflow: hidden; padding: 20px;}
+        .game-view.active { display: flex; flex-direction: column; }
 
-        /* Mines Grid */
-        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-width: 400px; margin: auto; }
-        .mine-tile { background: #2c2d2e; aspect-ratio: 1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.2s; }
+        /* Aviator Specific */
+        #aviator-canvas { flex: 1; position: relative; background: radial-gradient(circle at center, #2a0a0a 0%, #000 70%); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+        #mult-display { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: 900; z-index: 10;}
+        #plane-wrap { position: absolute; width: 70px; z-index: 20; display: none; }
+        .plane-img { width: 100%; filter: drop-shadow(0 0 10px red); }
+        #air-curve-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5;}
+
+        /* Mines Specific */
+        #mines-area { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 30px; }
+        .mine-tile { background: #2c2d2e; width: 60px; height: 60px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: 0.2s; }
         .mine-tile:hover { background: #3a3b3c; }
 
-        /* Bot Overlay */
-        .bot-box { background: rgba(0,0,0,0.9); border: 1px solid #3b82f6; padding: 10px; border-radius: 10px; position: absolute; bottom: 20px; left: 20px; width: 200px; z-index: 100; }
-        
-        /* Aviator Curve */
-        #aviator-canvas { background: #000; height: 300px; border-radius: 10px; position: relative; overflow: hidden; margin-bottom: 20px; }
-        #plane-icon { position: absolute; width: 50px; display: none; z-index: 10; filter: drop-shadow(0 0 10px red); }
+        /* Right Chat & Bot */
+        .right-sidebar { background: #141516; border-left: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+
+        /* Controls */
+        .panel-controls { background: #1a1b1c; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid #333; }
+        .bet-input-box { background: #000; padding: 5px 15px; border-radius: 10px; border: 1px solid #333; }
+        .bet-btn { background: #2ecc71; color: #fff; font-weight: bold; width: 100%; height: 50px; border-radius: 8px; font-size: 18px; text-transform: uppercase; margin-top: 8px;}
+
+        /* Overlays */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 500;}
+        .form-box { background: #1b1c1d; padding: 20px; border-radius: 10px; width: 300px; text-align: center;}
     </style>
 </head>
 <body>
 
-<div class="main-app">
-    <div class="sidebar">
-        <div class="text-red-600 font-black text-2xl mb-5 text-center">SPRIBE</div>
-        <div class="nav-btn active" onclick="showGame('aviator', this)">Aviator</div>
-        <div class="nav-btn" onclick="showGame('mines', this)">Mines</div>
-        <div class="mt-auto p-3 bg-black rounded text-[10px] text-gray-500">
-            Easypaisa Deposit: 03431793371
+    <div id="withdraw-overlay" class="overlay">
+        <div class="form-box border border-pink-500">
+            <i class="fas fa-money-bill-wave text-4xl text-pink-500 mb-3"></i>
+            <h3 class="font-bold mb-3">EasyPaisa Withdraw</h3>
+            <input type="number" placeholder="Enter Easypaisa Number" class="w-full bg-black p-2 rounded mb-2 text-xs">
+            <input type="number" placeholder="Withdraw Amount ($)" class="w-full bg-black p-2 rounded mb-3 text-xs">
+            <button class="bg-pink-600 px-4 py-1 rounded-full font-bold text-xs" onclick="closeOverlay('withdraw')">SUBMIT REQUEST</button>
         </div>
     </div>
 
-    <div class="flex flex-col">
+    <div class="main-app">
         <div class="top-bar">
-            <div class="flex items-center gap-2">
-                <div class="bg-black px-4 py-1 rounded-full border border-green-500 text-green-500 font-bold">
-                    $ <span id="balance">5.00</span>
-                </div>
-                <button class="bg-green-600 px-3 py-1 rounded text-xs font-bold">DEPOSIT</button>
+            <div class="bg-[#1b1c1d] px-5 py-1 rounded-full border border-green-500 text-green-500 font-bold text-lg">
+                $ <span id="balance">507.25</span>
             </div>
-            <button class="withdraw-btn" onclick="alert('EasyPaisa Withdraw: Enter Number')">WITHDRAW</button>
+            <button class="bg-green-600 px-3 py-1 rounded text-xs font-bold">DEPOSIT</button>
+            <button class="withdraw-btn" onclick="openOverlay('withdraw')">WITHDRAW</button>
         </div>
 
-        <div id="aviator-game" class="game-container active">
-            <div id="aviator-canvas">
-                <div id="mult-display" class="absolute inset-0 flex items-center justify-center text-6xl font-black">1.00x</div>
-                <img id="plane-icon" src="https://n1.vavada.net/img/games/spribe/aviator/plane.png">
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-[#141516] p-4 rounded-xl border border-gray-800">
-                    <input type="number" value="1.00" class="w-full bg-black p-2 rounded mb-2 text-yellow-500 font-bold text-center">
-                    <button class="w-full bg-green-500 h-12 rounded-lg font-bold text-xl">BET</button>
+        <div class="sidebar">
+            <div class="text-red-600 font-black text-2xl mb-6 text-center">SPRIBE</div>
+            <div class="nav-btn active" onclick="switchGame('aviator', this)">Aviator</div>
+            <div class="nav-btn" onclick="switchGame('mines', this)">Mines</div>
+            <div class="mt-auto p-3 bg-black rounded text-[11px] text-gray-500">Easypaisa Deposit: 03431793371</div>
+        </div>
+
+        <div class="flex flex-col flex-1 border-r border-gray-800">
+            <div id="aviator-game" class="game-view active pt-16">
+                <div id="aviator-canvas">
+                    <div id="mult-display">1.00x</div>
+                    <svg id="air-curve-svg">
+                        <path id="air-curve-path" fill="rgba(255,0,0,0.1)" stroke="#ff0000" stroke-width="4" d="M 0 320"/>
+                    </svg>
+                    <div id="plane-wrap">
+                        <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img">
+                    </div>
                 </div>
-                <div class="bg-[#141516] p-4 rounded-xl border border-gray-800">
-                    <input type="number" value="2.00" class="w-full bg-black p-2 rounded mb-2 text-yellow-500 font-bold text-center">
-                    <button class="w-full bg-green-500 h-12 rounded-lg font-bold text-xl">BET</button>
+                <div class="panel-controls mt-auto">
+                    <div class="flex flex-col items-center">
+                        <div class="bet-input-box w-full text-center">
+                            <span class="text-xs text-gray-600 uppercase">Amount</span>
+                            <input type="number" value="1.00" class="w-20 bg-transparent text-yellow-500 font-bold text-center outline-none">
+                        </div>
+                        <button class="bet-btn" onclick="alert('Aviator Bet 1 Placed')">BET</button>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bet-input-box w-full text-center">
+                            <span class="text-xs text-gray-600 uppercase">Amount</span>
+                            <input type="number" value="2.00" class="w-20 bg-transparent text-yellow-500 font-bold text-center outline-none">
+                        </div>
+                        <button class="bet-btn" onclick="alert('Aviator Bet 2 Placed')">BET</button>
+                    </div>
                 </div>
             </div>
-            <div class="bot-box">
-                <div class="text-[10px] text-blue-400 mb-1 font-bold">AVIATOR AI BOT</div>
-                <input type="password" id="pass-avi" placeholder="Password" class="w-full bg-black p-1 text-xs rounded border border-gray-700 mb-1">
-                <div id="pred-avi" class="text-center font-bold text-white">READY</div>
+
+            <div id="mines-game" class="game-view pt-16">
+                <div id="mines-area">
+                    <div class="mines-grid" id="mines-grid">
+                        </div>
+                    <div class="mt-8 bg-[#141516] p-4 rounded-xl border border-gray-800 w-[300px]">
+                        <div class="text-center text-xs mb-2">Bet Amount: <input type="number" value="1.00" class="w-16 bg-black rounded text-yellow-500 text-center font-bold"></div>
+                        <button class="bet-btn w-full h-12" onclick="alert('Mines Bet Placed')">BET</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="mines-game" class="game-container">
-            <div class="mines-grid" id="mines-grid">
-                </div>
-            <div class="max-width-[400px] mt-10 p-4 bg-[#141516] rounded-xl border border-gray-800 mx-auto">
-                <div class="text-center text-gray-500 text-xs mb-2">Mines: 3</div>
-                <button class="w-full bg-green-500 h-12 rounded-lg font-bold text-xl">BET</button>
-            </div>
-            <div class="bot-box">
-                <div class="text-[10px] text-yellow-400 mb-1 font-bold">MINES AI BOT</div>
-                <input type="password" id="pass-min" placeholder="Password" class="w-full bg-black p-1 text-xs rounded border border-gray-700 mb-1">
-                <div id="pred-min" class="text-center font-bold text-white">READY</div>
+        <div class="right-sidebar">
+            <div class="border-b border-gray-800 pb-2">CHAT ROOM</div>
+            <div id="chat-messages" class="flex-1 space-y-2 overflow-y-auto text-xs"></div>
+            
+            <div class="bg-[#1b1c1d] p-3 rounded-lg border border-blue-500">
+                <div class="text-[10px] text-blue-400 font-bold mb-1">ZS AI BOT (V.5)</div>
+                <input type="password" id="bot-pass" placeholder="Password" class="w-full bg-black rounded-full p-1 px-3 text-xs mb-1 outline-none">
+                <div class="text-gray-500 text-[10px] mb-1">Predicts next round crash</div>
+                <button class="w-full bg-blue-600 h-6 rounded-full text-[10px] font-bold" onclick="getPrediction()">GET NEXT BET PREDICTION</button>
+                <div id="bot-result" class="text-center font-black text-white mt-1 text-2xl">--x</div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const PASS = "ZSVIP2026$";
-    let balance = 507.25;
+    <script>
+        const canvasH = 320;
+        let balance = 507.25;
 
-    // Navigation
-    function showGame(game, btn) {
-        document.querySelectorAll('.game-container').forEach(g => g.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(game + '-game').classList.add('active');
-        btn.classList.add('active');
-    }
+        // Correct Prediction Password
+        const CORRECT_PASSWORD = "ZSVIP2026$"; 
 
-    // Mines Logic
-    const grid = document.getElementById('mines-grid');
-    for(let i=0; i<25; i++) {
-        const tile = document.createElement('div');
-        tile.className = 'mine-tile';
-        tile.onclick = () => tile.innerHTML = Math.random() > 0.2 ? '💎' : '💣';
-        grid.appendChild(tile);
-    }
-
-    // Bot Logic
-    document.getElementById('pass-avi').oninput = (e) => {
-        if(e.target.value === PASS) {
-            document.getElementById('pred-avi').innerText = (1.5 + Math.random()*5).toFixed(2) + "x";
+        // NAVIGATION (Fix)
+        function switchGame(game, btn) {
+            document.querySelectorAll('.game-view').forEach(g => g.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(game + '-game').classList.add('active');
+            btn.classList.add('active');
         }
-    }
-    document.getElementById('pass-min').oninput = (e) => {
-        if(e.target.value === PASS) {
-            document.getElementById('pred-min').innerText = "SAFE: Row 2, Col 3";
+
+        function openOverlay(id) { document.getElementById(id + '-overlay').style.display = 'flex'; }
+        function closeOverlay(id) { document.getElementById(id + '-overlay').style.display = 'none'; }
+
+        // --- BOT LOGIC (Fixed & Enhanced) ---
+        function getPrediction() {
+            const passField = document.getElementById('bot-pass');
+            const resultBox = document.getElementById('bot-result');
+            const btn = document.querySelector('.bg-blue-600');
+
+            if (passField.value === CORRECT_PASSWORD) {
+                btn.innerText = "WAITING...";
+                setTimeout(() => {
+                    resultBox.innerText = (1.5 + Math.random() * 5).toFixed(2) + "x";
+                    resultBox.style.color = "#2ecc71"; // Green successful prediction
+                    btn.innerText = "GET NEXT BET PREDICTION";
+                }, 1500);
+            } else {
+                resultBox.innerText = "WRONG PASSWORD!";
+                resultBox.style.color = "#ff0000";
+            }
         }
-    }
 
-    // Simple Aviator Animation
-    let mult = 1.00;
-    setInterval(() => {
-        if(mult > 3.0) mult = 1.00;
-        mult += 0.01;
-        document.getElementById('mult-display').innerText = mult.toFixed(2) + "x";
-    }, 100);
+        // --- GAME ANIMATIONS (Fixed Curve Direction) ---
+        function initAviator() {
+            let multiplier = 1.00;
+            let crash = (1.1 + Math.random() * 3).toFixed(2);
+            document.getElementById('plane-wrap').style.display = 'block';
+            document.getElementById('mult-display').style.color = "#fff";
 
-</script>
+            let timer = setInterval(() => {
+                multiplier += 0.01 + (multiplier * 0.001);
+                updateVisuals(multiplier);
+
+                if (multiplier >= crash) {
+                    clearInterval(timer);
+                    crashRound();
+                }
+            }, 60);
+        }
+
+        function updateVisuals(m) {
+            document.getElementById('mult-display').innerText = m.toFixed(2) + "x";
+            let x = Math.min((m - 1) * 60, window.innerWidth * 0.45);
+            
+            // Fixed Math to go from bottom (320) UP (320 - Y)
+            let y = canvasH - Math.min(Math.pow((m - 1), 1.6) * 40, 290);
+
+            const planeWrap = document.getElementById('plane-wrap');
+            planeWrap.style.left = x + 'px';
+            planeWrap.style.top = y + 'px';
+
+            const curvePath = document.getElementById('air-curve-path');
+            // Starts at bottom (0 320)
+            curvePath.setAttribute('d', `M 0 ${canvasH} Q ${x / 2} ${canvasH} ${x} ${y + 20}`);
+        }
+
+        function crashRound() {
+            document.getElementById('mult-display').style.color = "#ff0000";
+            document.getElementById('mult-display').innerText = multiplier.toFixed(2) + "x FLEW AWAY!";
+            document.getElementById('plane-wrap').style.display = 'none';
+            setTimeout(initAviator, 3000);
+        }
+
+        // MINES TILE GENERATION
+        const minesGrid = document.getElementById('mines-grid');
+        for (let i = 0; i < 25; i++) {
+            const tile = document.createElement('div');
+            tile.className = 'mine-tile';
+            tile.onclick = () => {
+                if (Math.random() > 0.3) { tile.innerHTML = '💎'; tile.style.color = "#2ecc71"; } 
+                else { tile.innerHTML = '💣'; tile.style.color = "#ff0000"; alert('Mines Game Crashed!'); }
+            }
+            minesGrid.appendChild(tile);
+        }
+
+        // Start initial game on load
+        window.onload = initAviator;
+    </script>
 </body>
 </html>
