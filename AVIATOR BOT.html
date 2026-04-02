@@ -9,216 +9,276 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
         
-        body { background-color: #1b1c1d; font-family: 'Roboto', sans-serif; color: #fff; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
-
-        /* 1. Loading Screen Style */
-        #spribe-loader {
-            position: fixed; inset: 0; background: #000; z-index: 1000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        body { 
+            background-color: #1b1c1d; 
+            font-family: 'Roboto', sans-serif; 
+            color: #fff; 
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
         }
-        .loader-bar { width: 200px; height: 4px; background: #333; border-radius: 10px; margin-top: 20px; overflow: hidden; }
-        .loader-progress { width: 0%; height: 100%; background: #ff0000; transition: width 0.3s; }
 
-        /* Main App */
         .aviator-app {
-            display: none; width: 100%; height: 100vh; background-color: #141516;
-            grid-template-columns: 260px 1fr 280px; overflow: hidden;
+            width: 95%; height: 90vh;
+            background-color: #141516;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 260px 1fr 280px; 
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-        /* Tabs & Buttons */
-        .bet-tab { color: #aaa; padding: 5px 10px; cursor: pointer; border-radius: 20px; font-size: 12px; }
+        /* Left Sidebar */
+        .bet-list { background-color: #141516; border-right: 1px solid #292a2b; display: flex; flex-direction: column; font-size: 11px; }
+        .bet-tabs { display: flex; padding: 5px; border-bottom: 1px solid #292a2b; justify-content: space-around; }
+        .bet-tab { color: #aaa; padding: 5px 10px; cursor: pointer; border-radius: 20px;}
         .bet-tab.active { background-color: #2c2d2e; color: #fff; }
-        
-        .game-canvas { flex: 1; background-color: #000; position: relative; overflow: hidden; background-image: radial-gradient(circle at center, #2a0a0a 0%, #000 70%); }
-        #mult-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: 900; z-index: 10; }
-        
-        /* 7. Bet Button Styling */
-        .quick-amt-btn { background: #212224; border: 1px solid #333; border-radius: 20px; padding: 2px 8px; font-size: 10px; cursor: pointer; }
-        .bet-btn { background-color: #2ecc71; border-radius: 8px; font-size: 16px; transition: 0.2s; }
-        .bet-btn:active { transform: scale(0.95); }
+        .bet-rows { flex: 1; overflow-y: scroll; scrollbar-width: none; }
+        .bet-rows::-webkit-scrollbar { display: none; }
+        .bet-item { display: grid; grid-template-columns: 24px 1fr 40px 50px; gap: 5px; padding: 6px 10px; border-bottom: 1px solid #1f2021; align-items: center; }
+        .user-avatar { width: 18px; height: 18px; border-radius: 50%; background: #333; }
+        .mult-tag { background: #9333ea; color: white; padding: 1px 4px; border-radius: 4px; font-weight: bold; text-align: center;}
+        .win-amt { color: #2ecc71; font-weight: bold; }
 
-        /* Withdraw Modal */
-        #withdraw-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+        /* Middle Section */
+        .game-main { display: flex; flex-direction: column; position: relative; }
+        .history-bar { height: 40px; background-color: #1a1b1c; border-bottom: 1px solid #292a2b; display: flex; align-items: center; padding: 0 10px; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+        .hist-val { font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
+        .hist-low { background-color: #3b82f6; } 
+        .hist-high { background-color: #9333ea; }
+
+        /* Canvas & Plane */
+        .game-canvas { flex: 1; background-color: #000; position: relative; background-image: radial-gradient(circle at center, #2a0a0a 0%, #000 70%); overflow: hidden; }
+        #mult-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: 900; color: #fff; z-index: 10; }
         
-        .plane-img { width: 60px; filter: drop-shadow(0 0 10px #ff0000); position: absolute; z-index: 20; display: none; }
+        #plane-wrap { position: absolute; width: 80px; z-index: 20; display: none; transition: transform 0.1s linear; }
+        .plane-img { width: 100%; filter: drop-shadow(0 0 10px #ff0000); }
+
         #air-curve-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
+
+        /* Controls */
+        .bet-controls { height: 120px; background-color: #1a1b1c; border-top: 1px solid #292a2b; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+        .bet-block { background-color: #141516; border-radius: 8px; padding: 8px; display: flex; align-items: center; gap: 10px; }
+        .amount-input { background: #000; color: #ffc107; font-weight: bold; width: 80px; text-align: center; border-radius: 4px; padding: 4px; }
+        .bet-btn { background-color: #2ecc71; color: #fff; font-weight: bold; flex: 2; height: 100%; border-radius: 8px; font-size: 18px; text-transform: uppercase; }
+
+        /* Bot Overlay */
+        .bot-overlay { position: absolute; bottom: 130px; left: 10px; background: rgba(20,21,22,0.9); border: 1px solid #3b82f6; padding: 8px; border-radius: 8px; z-index: 100; font-size: 11px; display: flex; gap: 5px; align-items: center; }
+        .bot-input { background: #000; border: 1px solid #333; padding: 3px; border-radius: 4px; color: #fff; width: 80px; }
+
+        /* Chat */
+        .chat-section { background-color: #141516; border-left: 1px solid #292a2b; display: flex; flex-direction: column; font-size: 11px; }
+        .chat-messages { flex: 1; overflow-y: scroll; padding: 10px; scrollbar-width: none;}
     </style>
 </head>
 <body>
 
-    <div id="spribe-loader">
-        <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" width="80">
-        <h2 class="text-red-600 font-black italic text-2xl mt-4">SPRIBE</h2>
-        <div class="loader-bar"><div class="loader-progress" id="load-box"></div></div>
-    </div>
-
-    <div class="aviator-app" id="main-game">
-        <div class="flex flex-col border-r border-gray-800 text-[11px]">
-            <div class="p-3 flex justify-between items-center bg-[#1a1b1c]">
-                <span class="text-green-500 font-bold">Balance: $<span id="user-balance">100.00</span></span>
-                <button onclick="showWithdraw()" class="bg-blue-600 px-2 py-1 rounded">Withdraw</button>
-            </div>
-            <div class="flex justify-around p-2 border-b border-gray-800">
+    <div class="aviator-app">
+        <div class="bet-list">
+            <div class="bet-tabs">
                 <div class="bet-tab active">All Bets</div>
                 <div class="bet-tab">My Bets</div>
+                <div class="bet-tab">Top</div>
             </div>
-            <div id="bet-rows-container" class="flex-1 overflow-y-auto"></div>
+            <div class="p-2 text-gray-600 font-bold">Total bets: <span id="total-bets-count" class="text-white">0</span></div>
+            <div class="bet-rows" id="bet-rows-container"></div>
         </div>
 
-        <div class="flex flex-col">
-            <div class="h-10 bg-[#1a1b1c] flex items-center px-4 gap-2 overflow-x-auto" id="history-bar"></div>
-            
+        <div class="game-main">
+            <div class="history-bar" id="history-bar"></div>
+
             <div class="game-canvas" id="canvas-area">
                 <div id="mult-display">1.00x</div>
-                <svg id="air-curve-svg"><path id="air-curve-path" fill="rgba(255,0,0,0.1)" stroke="#ff0000" stroke-width="4" d="M 0 400"/></svg>
-                <img id="plane-img" src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img">
+                <svg id="air-curve-svg">
+                    <path id="air-curve-path" fill="rgba(255,0,0,0.1)" stroke="#ff0000" stroke-width="4" d="M 0 400"/>
+                </svg>
+                <div id="plane-wrap">
+                    <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img" id="main-plane" alt="Plane">
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 p-3 bg-[#1a1b1c] h-32">
-                <div class="bg-[#141516] rounded-xl p-2 flex items-center gap-3">
-                    <div class="flex flex-col items-center">
-                        <div class="flex gap-1 mb-2">
-                             <button class="quick-amt-btn" onclick="setAmt(0, 1)">$1</button>
-                             <button class="quick-amt-btn" onclick="setAmt(0, 10)">$10</button>
-                             <button class="quick-amt-btn" onclick="setAmt(0, 50)">$50</button>
-                             <button class="quick-amt-btn" onclick="setAmt(0, 100)">$100</button>
-                        </div>
-                        <input type="number" id="amt-0" value="1.00" class="w-20 bg-black text-yellow-500 text-center rounded border border-gray-700">
+            <div class="bet-controls">
+                <div class="bet-block">
+                    <div class="text-center flex-1">
+                        <div class="text-gray-600 text-[10px]">Amount</div>
+                        <input type="number" value="1.00" class="amount-input">
                     </div>
-                    <button class="bet-btn flex-1 h-full font-black text-lg">BET</button>
-                    <div class="flex flex-col text-[9px] gap-1">
-                        <span>AUTO</span>
-                        <input type="checkbox" class="accent-green-500">
-                    </div>
+                    <button class="bet-btn">Bet</button>
                 </div>
-                <div class="bg-[#141516] rounded-xl p-2 flex items-center gap-3">
-                    <div class="flex flex-col items-center">
-                        <div class="flex gap-1 mb-2">
-                             <button class="quick-amt-btn" onclick="setAmt(1, 1)">$1</button>
-                             <button class="quick-amt-btn" onclick="setAmt(1, 10)">$10</button>
-                             <button class="quick-amt-btn" onclick="setAmt(1, 100)">$100</button>
-                        </div>
-                        <input type="number" id="amt-1" value="1.00" class="w-20 bg-black text-yellow-500 text-center rounded border border-gray-700">
+                <div class="bet-block">
+                    <div class="text-center flex-1">
+                        <div class="text-gray-600 text-[10px]">Amount</div>
+                        <input type="number" value="1.00" class="amount-input">
                     </div>
-                    <button class="bet-btn flex-1 h-full font-black text-lg bg-green-600">BET</button>
+                    <button class="bet-btn">Bet</button>
                 </div>
+            </div>
+            
+            <div class="bot-overlay">
+                <i class="fas fa-robot text-blue-400"></i>
+                <span>VIP BOT:</span>
+                <input type="password" id="bot-pass" placeholder="Password" class="bot-input">
+                <span id="ai-prediction" class="font-bold text-white">OFFLINE</span>
             </div>
         </div>
 
-        <div class="border-l border-gray-800 flex flex-col text-[11px]">
-            <div class="p-3 font-bold border-b border-gray-800">CHAT</div>
-            <div id="chat-messages" class="flex-1 p-2 overflow-y-auto"></div>
-        </div>
-    </div>
-
-    <div id="withdraw-modal">
-        <div class="bg-[#1a1b1c] p-6 rounded-lg w-80 border border-gray-700">
-            <h3 class="text-xl font-bold mb-4">EasyPaisa Withdrawal</h3>
-            <label class="text-xs text-gray-400">EasyPaisa Number</label>
-            <input type="text" id="wp-num" placeholder="03XXXXXXXXX" class="w-full bg-black p-2 rounded mb-4 border border-gray-800">
-            <label class="text-xs text-gray-400">Amount to Withdraw</label>
-            <input type="number" id="wp-amt" placeholder="Amount" class="w-full bg-black p-2 rounded mb-6 border border-gray-800">
-            <button onclick="processWithdraw()" class="w-full bg-green-600 py-2 rounded font-bold">Withdraw Now</button>
-            <button onclick="closeWithdraw()" class="w-full mt-2 text-gray-500 text-sm">Cancel</button>
-            <div id="withdraw-history" class="mt-4 text-[10px] text-gray-500 italic"></div>
+        <div class="chat-section">
+            <div class="p-2 font-bold border-bottom border-gray-800">CHAT ROOM</div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="p-2 border-t border-gray-800">
+                <input type="text" placeholder="Send message..." class="w-full bg-black p-2 rounded text-[10px]">
+            </div>
         </div>
     </div>
 
     <script>
+        // --- 1. CONFIGURATION & STATE ---
         let multiplier = 1.0;
-        let crashPoint = 0;
         let activeRound = false;
+        let crashPoint = 0;
+        const botPassword = "ZSVIP2026$";
+        const fakeNames = ["Romi***", "Ali***", "Khan***", "Zeesh***", "Sami***", "John***", "King***"];
+        const messages = ["Big win!", "Flew away!", "Easy money", "Next is 10x", "Crashed lol", "Join VIP"];
 
-        // 2. Loading Logic
-        function startLoading() {
-            let prog = 0;
-            let bar = document.getElementById('load-box');
-            let interval = setInterval(() => {
-                prog += Math.random() * 10;
-                bar.style.width = prog + '%';
-                if(prog >= 100) {
-                    clearInterval(interval);
-                    document.getElementById('spribe-loader').style.display = 'none';
-                    document.getElementById('main-game').style.display = 'grid';
-                    initGameCycle();
-                }
-            }, 200);
-        }
-
-        // 7. Set Amount Buttons
-        function setAmt(index, val) {
-            document.getElementById(`amt-${index}`).value = val.toFixed(2);
-        }
-
-        // 4. Withdraw Logic
-        function showWithdraw() { document.getElementById('withdraw-modal').style.display = 'flex'; }
-        function closeWithdraw() { document.getElementById('withdraw-modal').style.display = 'none'; }
-        
-        function processWithdraw() {
-            let num = document.getElementById('wp-num').value;
-            let amt = document.getElementById('wp-amt').value;
-            if(!num || !amt) return alert("Please fill details");
-            
-            document.getElementById('withdraw-history').innerText = `Pending: $${amt} to ${num}...`;
-            
-            setTimeout(() => {
-                alert(`Success! $${amt} sent to ${num} via EasyPaisa`);
-                document.getElementById('withdraw-history').innerText = `Last: $${amt} (Success)`;
-                closeWithdraw();
-            }, 3000);
-        }
-
-        // Core Game Engine (Optimized)
+        // --- 2. CORE GAME LOGIC (Restoring 462-line Logic) ---
         function initGameCycle() {
+            activeRound = false;
             multiplier = 1.0;
-            crashPoint = (Math.random() * 5 + 1).toFixed(2);
+            crashPoint = generateCrashPoint();
+            
+            resetVisuals();
             document.getElementById('mult-display').innerText = "WAITING...";
             document.getElementById('mult-display').style.color = "#aaa";
-            document.getElementById('plane-img').style.display = 'none';
-            
-            setTimeout(startFlight, 4000);
+            document.getElementById('ai-prediction').innerText = "READY";
+            document.getElementById('bot-pass').value = "";
+
+            setTimeout(startFlight, 4000); // 4 sec waiting
+        }
+
+        function generateCrashPoint() {
+            let r = Math.random();
+            if (r < 0.1) return 1.0;
+            if (r < 0.7) return 1.1 + Math.random() * 1.4;
+            return 2.5 + Math.random() * 5.0;
         }
 
         function startFlight() {
             activeRound = true;
             document.getElementById('mult-display').style.color = "#fff";
-            document.getElementById('plane-img').style.display = 'block';
-            
-            let flyInterval = setInterval(() => {
-                multiplier += 0.01 * (multiplier * 0.5);
-                updateUI(multiplier);
+            document.getElementById('plane-wrap').style.display = 'block';
+
+            let flightInterval = setInterval(() => {
+                let speed = 0.01 + (multiplier * 0.003);
+                multiplier += speed;
                 
-                if(multiplier >= crashPoint) {
-                    clearInterval(flyInterval);
-                    document.getElementById('mult-display').innerText = multiplier.toFixed(2) + "x";
-                    document.getElementById('mult-display').style.color = "#ff0000";
-                    document.getElementById('plane-img').style.display = 'none';
-                    addHistory(multiplier);
-                    setTimeout(initGameCycle, 3000);
+                updatePlanePosition(multiplier);
+
+                if (multiplier >= crashPoint) {
+                    clearInterval(flightInterval);
+                    endRound();
                 }
             }, 60);
         }
 
-        function updateUI(m) {
+        function updatePlanePosition(m) {
             document.getElementById('mult-display').innerText = m.toFixed(2) + "x";
-            let x = Math.min((m-1) * 60, window.innerWidth * 0.5);
-            let y = 400 - (Math.pow((m-1)/4, 2) * 300);
             
-            let img = document.getElementById('plane-img');
-            img.style.left = x + 'px';
-            img.style.top = y + 'px';
+            let canvas = document.getElementById('canvas-area');
+            let maxX = canvas.offsetWidth * 0.7;
+            let maxY = canvas.offsetHeight * 0.6;
             
-            let d = `M 0 400 Q ${x/2} 400 ${x} ${y+10}`;
+            let x = Math.min((m - 1) * 45, maxX);
+            let y = maxY - Math.min(Math.pow((m-1), 1.5) * 20, maxY);
+
+            let plane = document.getElementById('plane-wrap');
+            plane.style.left = x + "px";
+            plane.style.top = (canvas.offsetHeight - 100 - y) + "px";
+
+            // Draw Curve
+            let d = `M 0 ${canvas.offsetHeight} Q ${x/2} ${canvas.offsetHeight} ${x} ${canvas.offsetHeight - 80 - y}`;
             document.getElementById('air-curve-path').setAttribute('d', d);
         }
 
-        function addHistory(m) {
-            let bar = document.getElementById('history-bar');
-            let color = m > 2 ? 'bg-purple-600' : 'bg-blue-600';
-            bar.insertAdjacentHTML('afterbegin', `<span class="${color} text-[10px] px-2 rounded-full font-bold">${m.toFixed(2)}x</span>`);
+        function endRound() {
+            addHistory(multiplier);
+            document.getElementById('mult-display').innerText = "FLEW AWAY!";
+            document.getElementById('mult-display').style.color = "#ff0000";
+            document.getElementById('plane-wrap').style.display = 'none';
+            generateFakeCashouts(multiplier);
+            setTimeout(initGameCycle, 3000);
         }
 
-        window.onload = startLoading;
+        // --- 3. BOT & DATA LOGIC (Restoring original features) ---
+        function startFakeData() {
+            // New Bets every 5 seconds
+            setInterval(() => {
+                const container = document.getElementById('bet-rows-container');
+                container.innerHTML = '';
+                let count = 15 + Math.floor(Math.random() * 10);
+                document.getElementById('total-bets-count').innerText = count;
+
+                for(let i=0; i<count; i++) {
+                    let name = fakeNames[Math.floor(Math.random()*fakeNames.length)];
+                    let amt = (Math.random()*500).toFixed(2);
+                    container.insertAdjacentHTML('beforeend', `
+                        <div class="bet-item">
+                            <div class="user-avatar"></div>
+                            <div class="text-gray-400">${name}</div>
+                            <div>${amt}</div>
+                            <div class="fake-cashout text-right">-</div>
+                        </div>
+                    `);
+                }
+            }, 5000);
+
+            // New Chat every 7 seconds
+            setInterval(() => {
+                const chat = document.getElementById('chat-messages');
+                let name = fakeNames[Math.floor(Math.random()*fakeNames.length)];
+                let msg = messages[Math.floor(Math.random()*messages.length)];
+                chat.insertAdjacentHTML('beforeend', `<div class="mb-1"><span class="text-gray-500 font-bold">${name}:</span> ${msg}</div>`);
+                chat.scrollTop = chat.scrollHeight;
+            }, 7000);
+        }
+
+        function generateFakeCashouts(final) {
+            const areas = document.querySelectorAll('.fake-cashout');
+            areas.forEach(area => {
+                if(Math.random() > 0.4) {
+                    let co = (1.1 + Math.random() * (final-1)).toFixed(2);
+                    if(co < final) {
+                        area.innerHTML = `<span class="mult-tag">${co}x</span>`;
+                    }
+                }
+            });
+        }
+
+        function addHistory(m) {
+            const bar = document.getElementById('history-bar');
+            let color = m < 2 ? 'hist-low' : 'hist-high';
+            bar.insertAdjacentHTML('afterbegin', `<div class="hist-val ${color}">${m.toFixed(2)}x</div>`);
+        }
+
+        function resetVisuals() {
+            document.getElementById('plane-wrap').style.display = 'none';
+            document.getElementById('air-curve-path').setAttribute('d', 'M 0 400');
+        }
+
+        // Bot Password logic
+        document.getElementById('bot-pass').addEventListener('input', (e) => {
+            if(e.target.value === botPassword) {
+                document.getElementById('ai-prediction').innerText = "CALCULATING...";
+                setTimeout(() => {
+                    document.getElementById('ai-prediction').innerText = "CRASH @ " + crashPoint.toFixed(2) + "x";
+                    document.getElementById('ai-prediction').style.color = "#2ecc71";
+                }, 1000);
+            }
+        });
+
+        window.onload = () => {
+            startFakeData();
+            initGameCycle();
+        };
     </script>
 </body>
 </html>
