@@ -11,18 +11,23 @@
         .game-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3343; overflow: hidden; position: relative; cursor: pointer; transition: 0.3s; }
         .game-card:hover { border-color: #facc15; transform: translateY(-5px); }
         .hot-label { position: absolute; top: 5px; left: 5px; background: #ef4444; color: white; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; z-index: 10; }
-        .game-img { width: 100%; height: 100px; object-fit: cover; }
         
         /* Aviator Viewport */
-        .game-viewport { background: #131722; border-radius: 20px; height: 240px; position: relative; overflow: hidden; border: 1px solid #1e293b; }
+        .game-viewport { background: #131722; border-radius: 20px; height: 260px; position: relative; overflow: hidden; border: 1px solid #1e293b; }
         
-        /* Real Plane Styling From Screenshot */
+        /* Multiplier Display - Plane ke upar set kiya hai */
+        #mult-display { 
+            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); 
+            font-size: 3.5rem; font-weight: 900; z-index: 20; text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* Real Plane Styling & Glow */
         #plane-wrap { 
             position: absolute; 
-            width: 85px; 
+            width: 80px; 
             z-index: 50; 
             display: none; 
-            filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8)); 
+            filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.9)); 
         }
 
         .plane-img {
@@ -36,24 +41,19 @@
             to { transform: rotate(-3deg) translateY(-4px); }
         }
 
-        .history-bar { display: flex; gap: 8px; overflow-x: auto; padding: 5px; background: #0f172a; border-radius: 10px; margin-bottom: 10px; }
-        .hist-item { font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+        .history-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #0f172a; border-radius: 12px; margin-bottom: 10px; }
+        .hist-item { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
         .hist-low { background: #3b82f6; color: white; }
         .hist-high { background: #9333ea; color: white; }
 
-        .live-bets-box { background: #1a1f2e; border-radius: 15px; height: 180px; overflow-y: hidden; font-size: 11px; }
-        .bet-row { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #2d3343; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .modal-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 2000; display: none; flex-direction: column; padding: 20px; }
-        .inline-bot { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #3b82f6; border-radius: 15px; padding: 10px; margin-top: 10px; }
+        .live-bets-box { background: #1a1f2e; border-radius: 15px; height: 200px; overflow-y: hidden; font-size: 11px; }
+        .inline-bot { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #3b82f6; border-radius: 15px; padding: 12px; margin-top: 10px; }
 
         #spribe-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .loader-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
+        .loader-dot { width: 10px; height: 10px; background: #e11d48; border-radius: 50%; animation: bounce 1.4s infinite; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        .method-card { background: #1a1f2e; border: 1px solid #2d3343; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; }
-        .method-card.active { border-color: #ef4444; background: #2d1a1a; }
+        .modal-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 2000; display: none; flex-direction: column; padding: 25px; }
     </style>
 </head>
 <body>
@@ -72,22 +72,20 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-8">
             <div onclick="openAviator()" class="game-card">
                 <span class="hot-label">HOT</span>
-                <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="game-img">
-                <div class="p-2 text-[10px] text-center font-bold text-gray-400 uppercase">Aviator VIP</div>
+                <img src="https://static.spribe.co/games/aviator/aviator-logo.png" class="w-full h-24 object-cover">
+                <div class="p-2 text-[11px] text-center font-bold text-gray-400 uppercase">Aviator VIP</div>
             </div>
             <div class="game-card opacity-50">
-                <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="game-img">
-                <div class="p-2 text-[10px] text-center font-bold text-gray-400 uppercase">Mines Pro</div>
+                <img src="https://i.ibb.co/vYfBf6G/crazy777.jpg" class="w-full h-24 object-cover">
+                <div class="p-2 text-[11px] text-center font-bold text-gray-400 uppercase">Mines Pro</div>
             </div>
         </div>
-
-        <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Live Withdrawals</h3>
-        <div class="bg-slate-900/50 rounded-xl p-3 h-40 overflow-hidden border border-slate-800">
-            <div id="live-wit-list"></div>
-        </div>
+        
+        <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Live Activity</h3>
+        <div id="live-wit-list" class="bg-slate-900/50 rounded-xl p-3 h-40 overflow-hidden border border-slate-800"></div>
     </div>
 
     <div id="game-screen" class="hidden p-3 min-h-screen flex flex-col bg-[#0b0f1a]">
@@ -99,13 +97,13 @@
         <div id="crash-history" class="history-bar"></div>
 
         <div class="game-viewport mb-3">
-            <div id="mult-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl font-black z-20">1.00x</div>
+            <div id="mult-display">1.00x</div>
             <svg class="absolute inset-0 w-full h-full">
-                <path id="air-curve" fill="rgba(225,29,72,0.1)" stroke="#e11d48" stroke-width="8" d="M 0 240"/>
+                <path id="air-curve" fill="rgba(225,29,72,0.1)" stroke="#e11d48" stroke-width="8" d="M 0 260"/>
             </svg>
             
             <div id="plane-wrap">
-                <img src="https://i.ibb.co/LzY7vS8/aviator-plane-red.png" class="plane-img" alt="Aviator Red Plane">
+                <img src="https://n1.vavada.net/img/games/spribe/aviator/plane.png" class="plane-img" alt="Plane">
             </div>
         </div>
 
@@ -129,38 +127,21 @@
             </div>
             <div id="bot-content-inner" class="hidden flex justify-between items-center">
                 <div>
-                    <p class="text-[8px] text-blue-400 uppercase font-bold">Next Crash Prediction</p>
-                    <h2 id="ai-prediction" class="text-xl font-black text-white">---</h2>
+                    <p class="text-[8px] text-blue-400 uppercase font-bold">Prediction System</p>
+                    <h2 id="ai-prediction" class="text-xl font-black text-white">READY</h2>
                 </div>
                 <button onclick="getPrediction()" class="bg-blue-600 px-4 py-2 rounded-lg font-bold text-[10px]">GET SIGNAL</button>
             </div>
-        </div>
-
-        <div class="mt-4">
-            <h3 class="text-[9px] font-bold text-gray-500 uppercase mb-2">Live Bets</h3>
-            <div class="live-bets-box" id="fake-bets-list"></div>
         </div>
     </div>
 
     <div id="deposit-modal" class="modal-screen">
         <div class="flex justify-between items-center mb-10"><h2 class="text-xl font-bold">DEPOSIT</h2><button onclick="hideModal('deposit-modal')"><i class="fas fa-times"></i></button></div>
         <div class="bg-slate-900 p-6 rounded-2xl border border-emerald-500 text-center mb-6">
-            <p class="text-gray-400 text-xs mb-2">Transfer to EasyPaisa</p>
+            <p class="text-gray-400 text-xs mb-2">EasyPaisa Account</p>
             <h1 class="text-2xl font-black text-emerald-400">03431793371</h1>
         </div>
-        <button onclick="submitDeposit()" class="w-full bg-emerald-600 py-4 rounded-xl font-black">DONE</button>
-    </div>
-
-    <div id="withdraw-modal" class="modal-screen">
-        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold uppercase">Withdraw Funds</h2><button onclick="hideModal('withdraw-modal')"><i class="fas fa-times"></i></button></div>
-        <div class="grid grid-cols-3 gap-2 mb-6">
-            <div onclick="selectMethod('EasyPaisa')" id="m-EasyPaisa" class="method-card text-center active"><i class="fas fa-mobile-alt text-emerald-500 mb-1"></i><p class="text-[9px] font-bold">EasyPaisa</p></div>
-            <div onclick="selectMethod('JazzCash')" id="m-JazzCash" class="method-card text-center"><i class="fas fa-wallet text-orange-500 mb-1"></i><p class="text-[9px] font-bold">JazzCash</p></div>
-            <div onclick="selectMethod('Binance')" id="m-Binance" class="method-card text-center"><i class="fab fa-bitcoin text-yellow-500 mb-1"></i><p class="text-[9px] font-bold">Binance</p></div>
-        </div>
-        <input type="number" id="w-amt" placeholder="Amount ($)" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-3 text-sm font-bold text-emerald-400">
-        <input type="text" id="w-account" placeholder="Account Number" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-6 text-sm">
-        <button onclick="startWithdraw()" class="w-full bg-red-600 py-4 rounded-xl font-black">WITHDRAW NOW</button>
+        <button onclick="alert('Request Sent!')" class="w-full bg-emerald-600 py-4 rounded-xl font-black">DONE</button>
     </div>
 
     <div id="spribe-loader">
@@ -169,16 +150,19 @@
     </div>
 
     <script>
-        let balance = localStorage.getItem('zs_bal') ? parseFloat(localStorage.getItem('zs_bal')) : 5.00;
+        let balance = localStorage.getItem('zs_bal') ? parseFloat(localStorage.getItem('zs_bal')) : 10.00;
         let multiplier = 1.0, activeRound = false, crashPoint = 0;
         let userBets = { 1: { on: false, cash: false, amt: 0 }, 2: { on: false, cash: false, amt: 0 } };
-        const names = ["Ali", "Khan", "Sana", "Don", "Zubi", "Malik", "Raja", "Ahmad"];
+        const names = ["Ali", "Sana", "Khan", "Malik", "Raja", "Zubi", "Don", "Ahmad"];
 
-        window.onload = () => { updateUI(); startLiveUpdates(); for(let i=0; i<8; i++) addHistory((1 + Math.random()*3).toFixed(2)); };
+        window.onload = () => { 
+            updateUI(); 
+            startLiveUpdates(); 
+            for(let i=0; i<6; i++) addHistory((1 + Math.random()*2).toFixed(2)); 
+        };
 
         function updateUI() {
-            document.getElementById('home-bal').innerText = "$" + balance.toFixed(2);
-            document.getElementById('game-bal').innerText = "$" + balance.toFixed(2);
+            document.querySelectorAll('#home-bal, #game-bal').forEach(el => el.innerText = "$" + balance.toFixed(2));
             localStorage.setItem('zs_bal', balance);
         }
 
@@ -208,11 +192,12 @@
 
         function initCycle() {
             activeRound = false; multiplier = 1.0;
-            crashPoint = (1.05 + Math.random() * 4).toFixed(2);
+            crashPoint = (1.1 + Math.random() * 3.5).toFixed(2);
             document.getElementById('plane-wrap').style.display = 'none';
             document.getElementById('mult-display').innerText = "WAITING...";
             document.getElementById('mult-display').style.color = "white";
-            document.getElementById('air-curve').setAttribute('d', 'M 0 240');
+            document.getElementById('air-curve').setAttribute('d', 'M 0 260');
+            
             [1, 2].forEach(id => {
                 if(!userBets[id].on) {
                     document.getElementById(`btn${id}`).innerText = "BET";
@@ -226,24 +211,27 @@
             activeRound = true;
             document.getElementById('plane-wrap').style.display = 'block';
             let flight = setInterval(() => {
-                multiplier += 0.01;
+                multiplier += 0.015;
                 document.getElementById('mult-display').innerText = multiplier.toFixed(2) + "x";
+                
                 [1,2].forEach(id => {
                     if(userBets[id].on && !userBets[id].cash) {
                         document.getElementById(`btn${id}`).innerHTML = `CASHOUT<br>$${(userBets[id].amt * multiplier).toFixed(2)}`;
                         document.getElementById(`btn${id}`).className = "w-full bg-yellow-500 text-black py-2 rounded-lg font-black text-[10px]";
                     }
                 });
-                let x = (multiplier - 1) * 80;
-                let y = 240 - ((multiplier - 1) * 60);
+
+                let x = (multiplier - 1) * 90;
+                let y = 260 - ((multiplier - 1) * 70);
+                
                 if(x < 280 && y > 20) {
                     document.getElementById('plane-wrap').style.left = x + 'px';
                     document.getElementById('plane-wrap').style.top = y + 'px';
-                    // Curve line adjustments
-                    document.getElementById('air-curve').setAttribute('d', `M 0 240 Q ${x/2} 240 ${x} ${y+25}`);
+                    document.getElementById('air-curve').setAttribute('d', `M 0 260 Q ${x/2} 260 ${x} ${y+30}`);
                 }
+
                 if (multiplier >= crashPoint) { clearInterval(flight); explode(); }
-            }, 50);
+            }, 60);
         }
 
         function explode() {
@@ -277,11 +265,11 @@
             setInterval(() => {
                 const list = document.getElementById('live-wit-list');
                 const name = names[Math.floor(Math.random()*names.length)] + "_***";
-                const amt = (Math.random()*150 + 10).toFixed(2);
-                const html = `<div class="flex justify-between py-2 border-b border-slate-800 text-[11px] animate-fadeIn"><span>${name}</span><span class="text-emerald-500 font-bold">+$${amt}</span></div>`;
+                const amt = (Math.random()*100 + 5).toFixed(2);
+                const html = `<div class="flex justify-between py-2 border-b border-slate-800 text-[11px]"><span class="text-gray-400">${name}</span><span class="text-emerald-500 font-bold">+$${amt}</span></div>`;
                 list.insertAdjacentHTML('afterbegin', html);
-                if(list.children.length > 5) list.lastChild.remove();
-            }, 3000);
+                if(list.children.length > 6) list.lastChild.remove();
+            }, 4000);
         }
 
         function checkBotPass() {
@@ -292,11 +280,8 @@
         }
         function getPrediction() {
             document.getElementById('ai-prediction').innerText = "SCANNING...";
-            setTimeout(() => { document.getElementById('ai-prediction').innerText = crashPoint + "x"; }, 1000);
+            setTimeout(() => { document.getElementById('ai-prediction').innerText = crashPoint + "x"; }, 1500);
         }
-        function submitDeposit() { alert("Request Sent!"); hideModal('deposit-modal'); }
-        function selectMethod(m) { document.querySelectorAll('.method-card').forEach(el => el.classList.remove('active')); document.getElementById('m-' + m).classList.add('active'); }
-        function startWithdraw() { alert("Withdrawal Pending!"); hideModal('withdraw-modal'); }
     </script>
 </body>
 </html>
